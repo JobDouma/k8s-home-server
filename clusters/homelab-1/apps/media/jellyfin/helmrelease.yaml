@@ -7,11 +7,11 @@ spec:
   interval: 15m
   chart:
     spec:
-      chart: app-template
+      chart: jellyfin
       version: "*"
       sourceRef:
         kind: HelmRepository
-        name: bjw-s-labs
+        name: jellyfin
         namespace: flux-system
 
   values:
