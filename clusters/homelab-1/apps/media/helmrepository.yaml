@@ -6,5 +6,4 @@ metadata:
   namespace: flux-system
 spec:
   interval: 1h
-  type: oci
-  url: oci://ghcr.io/bjw-s-labs/helm/app-template
+  url: https://bjw-s-labs.github.io/helm-charts/
