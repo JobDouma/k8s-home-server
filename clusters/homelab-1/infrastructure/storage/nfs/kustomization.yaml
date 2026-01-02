@@ -1,0 +1,3 @@
+resources:
+  - pv-media.yaml
+  - pvc-media.yaml
