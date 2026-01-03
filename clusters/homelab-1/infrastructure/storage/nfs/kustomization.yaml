@@ -1,3 +1,5 @@
 resources:
   - pv-media.yaml
   - pvc-media.yaml
+  - helmrelease.yaml
+  - helmrepository.yaml
