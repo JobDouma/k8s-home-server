@@ -32,7 +32,8 @@ spec:
     persistence:
       config:
         enabled: true
-        existingClaim: jellyfin-config
+        storageClass: local-path
+        size: 5Gi
 
       media:
         enabled: true
