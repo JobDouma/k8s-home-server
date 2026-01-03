@@ -4,6 +4,7 @@ metadata:
   name: jellyfin-config
   namespace: media
 spec:
+  storageClassName: ""
   accessModes:
     - ReadWriteMany
   resources:

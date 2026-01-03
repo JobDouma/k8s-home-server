@@ -32,7 +32,8 @@ spec:
     persistence:
       config:
         enabled: true
-        size: 2Gi
+        existingClaim: jellyfin-config
+
       media:
         enabled: true
         type: pvc
