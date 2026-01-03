@@ -1,5 +1,6 @@
 resources:
   - pv-media.yaml
-  - pvc-media.yaml
+  - pvc-media.yaml  
+  - pv-jellyfin-config.yaml
   - helmrelease.yaml
   - helmrepository.yaml
