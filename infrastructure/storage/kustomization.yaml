@@ -1,3 +1,4 @@
 resources:
   - pv-media.yaml
   - pvc-media.yaml
+  - pvc-jellyfin-config.yaml
