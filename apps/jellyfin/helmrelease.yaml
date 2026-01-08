@@ -29,11 +29,19 @@ spec:
       runAsGroup: 1000
       fsGroup: 1000
 
+    # REQUIRED for local PV
+    nodeSelector:
+      kubernetes.io/hostname: talos-worker-1
+
     persistence:
+      # Jellyfin config (LOCAL PV)
       config:
         enabled: true
-        size: 5Gi
+        type: pvc
+        existingClaim: jellyfin-config
+        mountPath: /config
 
+      # Media (NFS PV)
       media:
         enabled: true
         type: pvc
