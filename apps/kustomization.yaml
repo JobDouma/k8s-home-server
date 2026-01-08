@@ -4,4 +4,3 @@ kind: Kustomization
 resources:
   - jellyfin/helmrepository.yaml
   - jellyfin/helmrelease.yaml
-
