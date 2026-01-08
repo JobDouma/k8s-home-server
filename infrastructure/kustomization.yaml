@@ -2,6 +2,15 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
 resources:
+  # Namespaces first
   - namespaces/media.yaml
-  - storage
-  - longhorn
+  - longhorn/namespace.yaml
+
+  # Longhorn sources & install
+  - longhorn/helmrepository.yaml
+  - longhorn/helmrelease.yaml
+
+  # Static storage (NFS + Jellyfin config)
+  - storage/pv-media.yaml
+  - storage/pvc-media.yaml
+  - storage/pvc-jellyfin-config.yaml
