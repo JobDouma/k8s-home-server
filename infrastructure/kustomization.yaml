@@ -3,13 +3,7 @@ kind: Kustomization
 
 resources:
   # Namespaces first
-  - namespaces/media.yaml
-  - longhorn/namespace.yaml
-
-  # Longhorn sources & install
-  - longhorn/helmrepository.yaml
-  - longhorn/helmrelease.yaml
-
+  - storage/namespace.yaml
   # Static storage (NFS + Jellyfin config)
   - storage/pv-media.yaml
   - storage/pvc-media.yaml
