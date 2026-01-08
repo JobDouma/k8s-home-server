@@ -8,3 +8,4 @@ resources:
   - storage/pv-media.yaml
   - storage/pvc-media.yaml
   - storage/pvc-jellyfin-config.yaml
+  - storage/pv-jellyfin-config.yaml
