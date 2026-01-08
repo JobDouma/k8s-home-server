@@ -9,15 +9,6 @@ spec:
   accessModes:
     - ReadWriteOnce
   persistentVolumeReclaimPolicy: Retain
-
-  local:
+  hostPath:
     path: /var/lib/jellyfin
-
-  nodeAffinity:
-    required:
-      nodeSelectorTerms:
-        - matchExpressions:
-            - key: kubernetes.io/hostname
-              operator: In
-              values:
-                - talos-cp-1
+    type: DirectoryOrCreate

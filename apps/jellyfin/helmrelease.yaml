@@ -31,7 +31,7 @@ spec:
 
     # REQUIRED for local PV
     nodeSelector:
-      kubernetes.io/hostname: talos-worker-1
+      kubernetes.io/hostname: talos-cp-1
 
     persistence:
       # Jellyfin config (LOCAL PV)
