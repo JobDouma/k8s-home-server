@@ -25,8 +25,6 @@ spec:
       runAsUser: 1000
       runAsGroup: 1000
       fsGroup: 1000
-    nodeSelector:
-      kubernetes.io/hostname: talos-cp-1
     persistence:
       config:
         enabled: true
@@ -51,3 +49,16 @@ spec:
       port: 8096
       nodePort: 30096
 
+    affinity:
+      nodeAffinity:
+        preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            preference:
+              matchExpressions:
+                - key: kubernetes.io/hostname
+                  operator: In
+                  values:
+                    - talos-cp-1
+                    - talos-cp-2
+                    - talos-cp-3
+  
