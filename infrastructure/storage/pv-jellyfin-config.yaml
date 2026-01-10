@@ -9,6 +9,10 @@ spec:
   accessModes:
     - ReadWriteOnce
   persistentVolumeReclaimPolicy: Retain
-  hostPath:
-    path: /var/lib/jellyfin
-    type: DirectoryOrCreate
+  mountOptions:
+    - nfsvers=4.1
+    - hard
+    - noatime
+  nfs:
+    server: 192.168.2.5
+    path: /mnt/tank/configs/jellyfin
