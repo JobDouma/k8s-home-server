@@ -1,0 +1,8 @@
+# This is the root of FluxCD. This file is read and then ./infrastructure/ and ./apps/talos-home/ are initialized by Flux.
+
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - infrastructure.yaml
+  - apps.yaml
