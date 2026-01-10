@@ -46,9 +46,8 @@ spec:
         memory: "2Gi"
         cpu: "1"
     service:
-      main:
-        type: NodePort
-        ports:
-          http:
-            port: 8096
-            nodePort: 30096
+      enabled: true
+      type: NodePort
+      port: 8096
+      nodePort: 30096
+
