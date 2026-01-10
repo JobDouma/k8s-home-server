@@ -1,13 +1,13 @@
 ===== DIRECTORY STRUCTURE =====
 total 36
-drwxrwxr-x  7 job job 4096 Jan 10 10:13 .
+drwxrwxr-x  6 job job 4096 Jan 10 11:14 .
 drwxr-x--- 14 job job 4096 Jan 10 10:05 ..
 drwxrwxr-x  3 job job 4096 Jan 10 10:12 apps
 drwxrwxr-x  3 job job 4096 Jan 10 10:12 clusters
-drwxrwxr-x  2 job job 4096 Jan  2 14:26 flux-system
--rw-rw-r--  1 job job   32 Jan 10 10:13 full_dump.txt
-drwxrwxr-x  8 job job 4096 Jan 10 10:12 .git
+-rw-rw-r--  1 job job   32 Jan 10 11:17 full_dump.txt
+drwxrwxr-x  8 job job 4096 Jan 10 10:56 .git
 drwxrwxr-x  3 job job 4096 Jan  8 22:46 infrastructure
+-rw-rw-r--  1 job job  615 Jan 10 11:14 nfs-test.yaml
 -rw-rw-r--  1 job job   17 Jan  2 14:26 README.md
 
 infrastructure
@@ -31,14 +31,14 @@ apps
 ----- FILE: ./full_dump.txt -----
     ===== DIRECTORY STRUCTURE =====
     total 36
-    drwxrwxr-x  7 job job 4096 Jan 10 10:13 .
+    drwxrwxr-x  6 job job 4096 Jan 10 11:14 .
     drwxr-x--- 14 job job 4096 Jan 10 10:05 ..
     drwxrwxr-x  3 job job 4096 Jan 10 10:12 apps
     drwxrwxr-x  3 job job 4096 Jan 10 10:12 clusters
-    drwxrwxr-x  2 job job 4096 Jan  2 14:26 flux-system
-    -rw-rw-r--  1 job job   32 Jan 10 10:13 full_dump.txt
-    drwxrwxr-x  8 job job 4096 Jan 10 10:12 .git
+    -rw-rw-r--  1 job job   32 Jan 10 11:17 full_dump.txt
+    drwxrwxr-x  8 job job 4096 Jan 10 10:56 .git
     drwxrwxr-x  3 job job 4096 Jan  8 22:46 infrastructure
+    -rw-rw-r--  1 job job  615 Jan 10 11:14 nfs-test.yaml
     -rw-rw-r--  1 job job   17 Jan  2 14:26 README.md
     
     infrastructure
@@ -60,6 +60,38 @@ apps
     
     ===== FILE CONTENTS =====
     ----- FILE: ./full_dump.txt -----
+
+----- FILE: ./nfs-test.yaml -----
+    apiVersion: v1
+    kind: Pod
+    metadata:
+      name: nfs-test
+      namespace: media
+    spec:
+      securityContext:
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+      containers:
+        - name: nfs-test
+          image: alpine:3.18
+          command: ["sleep", "3600"]
+          volumeMounts:
+            - name: config
+              mountPath: /config
+            - name: media
+              mountPath: /media
+      volumes:
+        - name: config
+          nfs:
+            server: 192.168.2.5
+            path: /mnt/tank/configs/jellyfin
+            readOnly: false
+        - name: media
+          nfs:
+            server: 192.168.2.5
+            path: /mnt/tank/media
+            readOnly: false
 
 ----- FILE: ./README.md -----
     # k8s-home-server
@@ -91,6 +123,7 @@ apps
           runAsUser: 1000
           runAsGroup: 1000
           fsGroup: 1000
+          fsGroupChangePolicy: "OnRootMismatch"
         nodeSelector:
           kubernetes.io/hostname: talos-cp-1
         persistence:
