@@ -16,5 +16,3 @@ spec:
   nfs:
     server: 192.168.2.5
     path: /mnt/tank/configs
- volumeAttributes:
-    subPath: jellyfin
