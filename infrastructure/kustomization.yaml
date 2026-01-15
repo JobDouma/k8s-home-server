@@ -8,8 +8,9 @@ resources:
   # PersistentVolumes (must exist first)
   - storage/pv-media.yaml
   - storage/pv-jellyfin-config.yaml
+  - storage/pv-qbittorrent-config.yaml
 
   # PersistentVolumeClaims (bind to existing PVs)
   - storage/pvc-media.yaml
   - storage/pvc-jellyfin-config.yaml
-
+  - storage/pvc-qbittorrent-config.yaml

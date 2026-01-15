@@ -45,16 +45,18 @@ spec:
     persistence:
       config:
         enabled: true
-        type: pvc
-        size: 5Gi
-        mountPath: /config
+        type: persistentVolumeClaim
+        existingClaim: qbittorrent-config
+        globalMounts:
+          - path: /config
+
       media:
         enabled: true
-        type: pvc
+        type: persistentVolumeClaim
         existingClaim: media
-        mountPath: /media
-
-    securityContext:
-      runAsUser: 1000
-      runAsGroup: 1000
-      fsGroup: 1000
+        globalMounts:
+          - path: /media
+        securityContext:
+          runAsUser: 1000
+          runAsGroup: 1000
+          fsGroup: 1000
