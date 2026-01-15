@@ -15,4 +15,6 @@ spec:
     - noatime
   nfs:
     server: 192.168.2.5
-    path: /mnt/tank/configs/jellyfin
+    path: /mnt/tank/configs
+ volumeAttributes:
+    subPath: jellyfin
