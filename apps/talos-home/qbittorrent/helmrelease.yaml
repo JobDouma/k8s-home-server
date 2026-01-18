@@ -45,14 +45,14 @@ spec:
     persistence:
       config:
         enabled: true
-        type: persistentVolumeClaim
-        existingClaim: qbittorrent-config
-        globalMounts:
-          - path: /config
+        type: pvc
+        existingClaim: tank-configs
+        mountPath: /config
+        subPath: qbittorrent
 
       media:
         enabled: true
-        type: persistentVolumeClaim
+        type: pvc
         existingClaim: media
         globalMounts:
           - path: /media
