@@ -1,0 +1,425 @@
+===== DIRECTORY STRUCTURE =====
+total 36
+drwxrwxr-x  6 job job 4096 Jan 18 13:29 .
+drwxr-x--- 14 job job 4096 Jan 17 21:14 ..
+drwxrwxr-x  3 job job 4096 Jan 10 10:12 apps
+drwxrwxr-x  3 job job 4096 Jan 10 10:12 clusters
+-rw-rw-r--  1 job job   32 Jan 18 13:29 full_dump.txt
+drwxrwxr-x  8 job job 4096 Jan 18 13:03 .git
+drwxrwxr-x  3 job job 4096 Jan 15 21:57 infrastructure
+-rw-rw-r--  1 job job  621 Jan 18 13:14 nfs-test.yaml
+-rw-rw-r--  1 job job   17 Jan  2 14:26 README.md
+
+infrastructure
+├── kustomization.yaml
+└── storage
+    ├── namespace.yaml
+    ├── pvc-jellyfin-config.yaml
+    ├── pvc-media.yaml
+    ├── pvc-qbittorrent-config.yaml
+    ├── pv-jellyfin-config.yaml
+    ├── pv-media.yaml
+    └── pv-qbittorrent-config.yaml
+apps
+└── talos-home
+    ├── jellyfin
+    │   ├── helmrelease.yaml
+    │   ├── helmrepository.yaml
+    │   └── kustomization.yaml
+    ├── kustomization.yaml
+    ├── qbittorrent
+    │   ├── helmrelease.yaml
+    │   ├── helmrepository.yaml
+    │   └── kustomization.yaml
+    ├── radarr
+    └── sonarr
+
+8 directories, 15 files
+
+===== FILE CONTENTS =====
+----- FILE: ./full_dump.txt -----
+    ===== DIRECTORY STRUCTURE =====
+    total 36
+    drwxrwxr-x  6 job job 4096 Jan 18 13:29 .
+    drwxr-x--- 14 job job 4096 Jan 17 21:14 ..
+    drwxrwxr-x  3 job job 4096 Jan 10 10:12 apps
+    drwxrwxr-x  3 job job 4096 Jan 10 10:12 clusters
+    -rw-rw-r--  1 job job   32 Jan 18 13:29 full_dump.txt
+    drwxrwxr-x  8 job job 4096 Jan 18 13:03 .git
+    drwxrwxr-x  3 job job 4096 Jan 15 21:57 infrastructure
+    -rw-rw-r--  1 job job  621 Jan 18 13:14 nfs-test.yaml
+    -rw-rw-r--  1 job job   17 Jan  2 14:26 README.md
+    
+    infrastructure
+    ├── kustomization.yaml
+    └── storage
+        ├── namespace.yaml
+        ├── pvc-jellyfin-config.yaml
+        ├── pvc-media.yaml
+        ├── pvc-qbittorrent-config.yaml
+        ├── pv-jellyfin-config.yaml
+        ├── pv-media.yaml
+        └── pv-qbittorrent-config.yaml
+    apps
+    └── talos-home
+        ├── jellyfin
+        │   ├── helmrelease.yaml
+        │   ├── helmrepository.yaml
+        │   └── kustomization.yaml
+        ├── kustomization.yaml
+        ├── qbittorrent
+        │   ├── helmrelease.yaml
+        │   ├── helmrepository.yaml
+        │   └── kustomization.yaml
+        ├── radarr
+        └── sonarr
+    
+    8 directories, 15 files
+    
+    ===== FILE CONTENTS =====
+    ----- FILE: ./full_dump.txt -----
+
+----- FILE: ./nfs-test.yaml -----
+    apiVersion: v1
+    kind: Pod
+    metadata:
+      name: nfs-test
+      namespace: media
+    spec:
+      securityContext:
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+      containers:
+      - name: test
+        image: busybox
+        command:
+          - sh
+          - -c
+          - |
+            echo "UID=$(id -u) GID=$(id -g)"
+            ls -ld /config
+            ls -l /config
+            echo "Trying to create /config/log..."
+            mkdir -p /config/log
+            echo "SUCCESS: directory created"
+            sleep 3600
+        volumeMounts:
+        - name: config
+          mountPath: /config
+      volumes:
+      - name: config
+        persistentVolumeClaim:
+          claimName: jellyfin-config
+
+----- FILE: ./README.md -----
+    # k8s-home-server
+----- FILE: apps/talos-home/jellyfin/helmrelease.yaml -----
+    apiVersion: helm.toolkit.fluxcd.io/v2
+    kind: HelmRelease
+    metadata:
+      name: jellyfin
+      namespace: media
+    spec:
+      interval: 15m
+      chart:
+        spec:
+          chart: jellyfin
+          version: "*"
+          sourceRef:
+            kind: HelmRepository
+            name: jellyfin
+            namespace: flux-system
+      values:
+        image:
+          repository: jellyfin/jellyfin
+          tag: latest
+        env:
+          PUID: 1000
+          PGID: 1000
+          TZ: Europe/Amsterdam
+        securityContext:
+          runAsUser: 1000
+          runAsGroup: 1000
+          fsGroup: 1000
+        persistence:
+          config:
+            enabled: true
+            type: pvc
+            existingClaim: jellyfin-config
+            mountPath: /config
+          media:
+            enabled: true
+            type: pvc
+            existingClaim: media
+            mountPath: /media
+          cache:
+            enabled: true
+            type: emptyDir
+            mountPath: /cache
+        resources:
+          requests:
+            memory: "1Gi"
+            cpu: "250m"
+          limits:
+            memory: "2Gi"
+            cpu: "1"
+        service:
+          enabled: true
+          type: NodePort
+          port: 8096
+          nodePort: 30096
+    
+        affinity:
+          nodeAffinity:
+            preferredDuringSchedulingIgnoredDuringExecution:
+              - weight: 100
+                preference:
+                  matchExpressions:
+                    - key: kubernetes.io/hostname
+                      operator: In
+                      values:
+                        - talos-cp-1
+                        - talos-cp-2
+                        - talos-cp-3
+      
+
+----- FILE: apps/talos-home/jellyfin/helmrepository.yaml -----
+    # yaml-language-server: $schema=https://raw.githubusercontent.com/fluxcd-community/flux2-schemas/main/helmrepository-source-v1beta2.json
+    apiVersion: source.toolkit.fluxcd.io/v1beta2
+    kind: HelmRepository
+    metadata:
+      name: jellyfin
+      namespace: flux-system
+    spec:
+      interval: 1h
+      url: https://jellyfin.github.io/jellyfin-helm
+
+----- FILE: apps/talos-home/jellyfin/kustomization.yaml -----
+    apiVersion: kustomize.config.k8s.io/v1beta1
+    kind: Kustomization
+    
+    resources:
+      - helmrepository.yaml
+      - helmrelease.yaml
+
+----- FILE: apps/talos-home/kustomization.yaml -----
+    apiVersion: kustomize.config.k8s.io/v1beta1
+    kind: Kustomization
+    
+    resources:
+      - jellyfin
+      - qbittorrent
+    
+
+----- FILE: apps/talos-home/qbittorrent/helmrelease.yaml -----
+    apiVersion: helm.toolkit.fluxcd.io/v2
+    kind: HelmRelease
+    metadata:
+      name: qbittorrent
+      namespace: media
+    spec:
+      interval: 15m
+      chart:
+        spec:
+          chart: app-template
+          version: "*"
+          sourceRef:
+            kind: HelmRepository
+            name: bjw-s
+            namespace: flux-system
+    
+      values:
+        controllers:
+          qbittorrent:
+            containers:
+              app:
+                image:
+                  repository: lscr.io/linuxserver/qbittorrent
+                  tag: latest
+                env:
+                  PUID: 1000
+                  PGID: 1000
+                  TZ: Europe/Amsterdam
+                  WEBUI_PORT: 8080
+                resources:
+                  requests:
+                    cpu: 250m
+                    memory: 512Mi
+                  limits:
+                    cpu: 1
+                    memory: 2Gi
+    
+        service:
+          app:
+            controller: qbittorrent
+            ports:
+              http:
+                port: 8080
+    
+        persistence:
+          config:
+            enabled: true
+            type: persistentVolumeClaim
+            existingClaim: qbittorrent-config
+            globalMounts:
+              - path: /config
+    
+          media:
+            enabled: true
+            type: persistentVolumeClaim
+            existingClaim: media
+            globalMounts:
+              - path: /media
+    
+        securityContext:
+          runAsUser: 1000
+          runAsGroup: 1000
+          fsGroup: 1000
+
+----- FILE: apps/talos-home/qbittorrent/helmrepository.yaml -----
+    apiVersion: source.toolkit.fluxcd.io/v1beta2
+    kind: HelmRepository
+    metadata:
+      name: bjw-s
+      namespace: flux-system
+    spec:
+      interval: 1h
+      url: https://bjw-s-labs.github.io/helm-charts
+
+----- FILE: apps/talos-home/qbittorrent/kustomization.yaml -----
+    apiVersion: kustomize.config.k8s.io/v1beta1
+    kind: Kustomization
+    
+    resources:
+      - helmrepository.yaml
+      - helmrelease.yaml
+
+----- FILE: infrastructure/kustomization.yaml -----
+    apiVersion: kustomize.config.k8s.io/v1beta1
+    kind: Kustomization
+    
+    resources:
+      # Namespace first
+      - storage/namespace.yaml
+    
+      # PersistentVolumes (must exist first)
+      - storage/pv-media.yaml
+      - storage/pv-jellyfin-config.yaml
+      - storage/pv-qbittorrent-config.yaml
+    
+      # PersistentVolumeClaims (bind to existing PVs)
+      - storage/pvc-media.yaml
+      - storage/pvc-jellyfin-config.yaml
+      - storage/pvc-qbittorrent-config.yaml
+
+----- FILE: infrastructure/storage/namespace.yaml -----
+    apiVersion: v1
+    kind: Namespace
+    metadata:
+      name: media
+
+----- FILE: infrastructure/storage/pvc-jellyfin-config.yaml -----
+    apiVersion: v1
+    kind: PersistentVolumeClaim
+    metadata:
+      name: jellyfin-config
+      namespace: media
+    spec:
+      accessModes:
+        - ReadWriteOnce
+      resources:
+        requests:
+          storage: 10Gi
+      volumeName: pv-jellyfin-config
+
+----- FILE: infrastructure/storage/pvc-media.yaml -----
+    apiVersion: v1
+    kind: PersistentVolumeClaim
+    metadata:
+      name: media
+      namespace: media
+    spec:
+      accessModes:
+        - ReadWriteMany
+      resources:
+        requests:
+          storage: 20Ti
+      volumeName: pv-media
+
+----- FILE: infrastructure/storage/pvc-qbittorrent-config.yaml -----
+    apiVersion: v1
+    kind: PersistentVolumeClaim
+    metadata:
+      name: qbittorrent-config
+      namespace: media
+    spec:
+      accessModes:
+        - ReadWriteOnce
+      resources:
+        requests:
+          storage: 5Gi
+      volumeName: pv-qbittorrent-config
+    
+
+----- FILE: infrastructure/storage/pv-jellyfin-config.yaml -----
+    apiVersion: v1
+    kind: PersistentVolume
+    metadata:
+      name: pv-jellyfin-config
+    spec:
+      capacity:
+        storage: 10Gi
+      volumeMode: Filesystem
+      accessModes:
+        - ReadWriteOnce
+      persistentVolumeReclaimPolicy: Retain
+      mountOptions:
+        - nfsvers=4.1
+        - hard
+        - noatime
+      nfs:
+        server: 192.168.2.5
+        path: /mnt/tank/configs
+
+----- FILE: infrastructure/storage/pv-media.yaml -----
+    apiVersion: v1
+    kind: PersistentVolume
+    metadata:
+      name: pv-media
+    spec:
+      capacity:
+        storage: 20Ti
+      accessModes:
+        - ReadWriteMany
+      persistentVolumeReclaimPolicy: Retain
+      mountOptions:
+        - nfsvers=4.1
+        - hard
+        - noatime
+      nfs:
+        server: 192.168.2.5
+        path: /mnt/tank/media
+
+----- FILE: infrastructure/storage/pv-qbittorrent-config.yaml -----
+    apiVersion: v1
+    kind: PersistentVolume
+    metadata:
+      name: pv-qbittorrent-config
+    spec:
+      capacity:
+        storage: 5Gi
+      volumeMode: Filesystem
+      accessModes:
+        - ReadWriteOnce
+      persistentVolumeReclaimPolicy: Retain
+      mountOptions:
+        - nfsvers=4.1
+        - hard
+        - noatime
+      nfs:
+        server: 192.168.2.5
+        path: /mnt/tank/configs
+      volumeAttributes:
+        subPath: qbittorrent
+

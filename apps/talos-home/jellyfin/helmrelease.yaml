@@ -29,8 +29,9 @@ spec:
       config:
         enabled: true
         type: pvc
-        existingClaim: jellyfin-config
+        existingClaim: tank-configs
         mountPath: /config
+        subPath: jellyfin
       media:
         enabled: true
         type: pvc
