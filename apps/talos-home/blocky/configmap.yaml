@@ -1,0 +1,45 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: blocky-config
+  namespace: dns
+data:
+  config.yml: |
+    upstream:
+      default:
+        - 1.1.1.1
+        - 9.9.9.9
+        - https://dns.cloudflare.com/dns-query
+
+    bootstrapDns:
+      - upstream: 1.1.1.1
+        ips:
+          - 1.1.1.1
+
+    blocking:
+      blackLists:
+        ads:
+          - https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts
+        malware:
+          - https://mirror1.malwaredomains.com/files/justdomains
+      clientGroupsBlock:
+        default:
+          - ads
+          - malware
+
+    caching:
+      minTime: 5m
+      maxTime: 30m
+      prefetching: true
+
+    ports:
+      dns: 53
+      http: 4000
+
+    prometheus:
+      enable: true
+      path: /metrics
+
+    log:
+      level: info
+

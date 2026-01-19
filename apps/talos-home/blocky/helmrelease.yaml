@@ -1,0 +1,65 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: blocky
+  namespace: dns
+spec:
+  interval: 15m
+
+  chart:
+    spec:
+      chart: blocky
+      version: "*"
+      sourceRef:
+        kind: HelmRepository
+        name: k8s-at-home
+        namespace: flux-system
+
+  values:
+    controller:
+      replicas: 1
+
+    image:
+      repository: ghcr.io/0xerr0r/blocky
+      tag: latest
+
+    service:
+      dns:
+        enabled: true
+        type: LoadBalancer
+        loadBalancerIP: 192.168.2.54   # adjust or remove
+        ports:
+          dns:
+            port: 53
+            protocol: UDP
+          tcp:
+            port: 53
+            protocol: TCP
+
+      http:
+        enabled: true
+        type: ClusterIP
+        ports:
+          http:
+            port: 4000
+
+    persistence:
+      config:
+        enabled: true
+        type: configMap
+        name: blocky-config
+        mountPath: /app/config.yml
+        subPath: config.yml
+
+    securityContext:
+      runAsUser: 1000
+      runAsGroup: 1000
+      fsGroup: 1000
+
+    resources:
+      requests:
+        cpu: 50m
+        memory: 64Mi
+      limits:
+        cpu: 250m
+        memory: 256Mi
