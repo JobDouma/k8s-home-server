@@ -34,7 +34,7 @@ data:
 
     ports:
       dns: 53
-      http: 4000
+      http: 0.0.0.0:4000
 
     prometheus:
       enable: true
