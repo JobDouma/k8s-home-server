@@ -28,14 +28,17 @@ spec:
         type: ClusterIP
         ports:
           udp:
+            name: udp
             port: 53
           tcp:
+            name: tcp
             port: 53
       http:
         enabled: true
         type: ClusterIP
         ports:
           http:
+            name: http
             port: 4000
 
     persistence:
