@@ -29,6 +29,8 @@ spec:
               # Fixes "Unauthorized" when accessing via different IPs/Hostnames
               WebUI__CSRFProtection: "false"
               WebUI__HostHeaderValidation: "false"
+              WebUI__AuthSubnetWhitelistEnabled: "true"
+              WebUI__AuthSubnetWhitelist: "127.0.0.1/32, 10.244.0.0/16"
             resources:
               requests:
                 cpu: 250m
@@ -40,10 +42,9 @@ spec:
               repository: ghcr.io/martabal/qbittorrent-exporter
               tag: latest
             env:
-              QBITTORRENT_BASE_URL: "http://localhost:8080"
-              QBITTORRENT_USER: "admin"
+              QBITTORRENT_BASE_URL: http://localhost:8080
+              QBITTORRENT_USER: admin
               QBITTORRENT_PASS: "Harrygvd1!"
-
     service:
       app:
         controller: qbittorrent
