@@ -23,18 +23,16 @@ spec:
       tag: latest
 
     service:
-      enabled: true
-      type: ClusterIP
-      ports:
-        - name: dns
-          port: 53
-          protocol: UDP
-        - name: dns-tcp
-          port: 53
-          protocol: TCP
-        - name: http
-          port: 4000
-          protocol: TCP
+      dns:
+        enabled: true
+        type: ClusterIP
+        ports:
+          udp: 53
+          tcp: 53
+      http:
+        enabled: true
+        type: ClusterIP
+        port: 4000
 
     persistence:
       config:
