@@ -14,7 +14,6 @@ spec:
         name: blocky
         namespace: flux-system
 
-  values:
     controller:
       replicas: 1
 
@@ -26,16 +25,13 @@ spec:
       enabled: true
       type: ClusterIP
       ports:
-        dns:
-          enabled: true
+        - name: dns
           port: 53
           protocol: UDP
-        dns-tcp:
-          enabled: true
+        - name: dns-tcp
           port: 53
           protocol: TCP
-        http:
-          enabled: true
+        - name: http
           port: 4000
           protocol: TCP
 
