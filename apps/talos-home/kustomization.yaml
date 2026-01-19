@@ -22,6 +22,7 @@ resources:
   - qbittorrent/helmrepository.yaml
   - qbittorrent/helmrelease.yaml
 
+  - monitoring/namespace.yaml
   - monitoring/monitoring-release.yaml
   - monitoring/monitoring-repo.yaml
   - monitoring/servicemonitor.yaml

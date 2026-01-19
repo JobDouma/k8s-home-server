@@ -7,40 +7,32 @@ spec:
   interval: 15m
   chart:
     spec:
-      chart: blocky
-      version: "*"
+      chart: app-template
+      version: "3.2.1"
       sourceRef:
         kind: HelmRepository
-        name: blocky
+        name: bjw-s # Use the same bjw-s repo as qBittorrent
         namespace: flux-system
-
   values:
-    controller:
-      replicas: 1
-
-    image:
-      repository: ghcr.io/0xerr0r/blocky
-      tag: latest
-
+    controllers:
+      blocky:
+        containers:
+          app:
+            image:
+              repository: ghcr.io/0xerr0r/blocky
+              tag: v0.23 # Better to pin versions than 'latest'
     service:
-      dns:
-        enabled: true
-        type: ClusterIP
+      app:
+        controller: blocky
         ports:
-          udp:
-            name: udp
+          dns-tcp:
             port: 53
-          tcp:
-            name: tcp
+            protocol: TCP
+          dns-udp:
             port: 53
-      http:
-        enabled: true
-        type: ClusterIP
-        ports:
+            protocol: UDP
           http:
-            name: http
             port: 4000
-
     persistence:
       config:
         enabled: true
@@ -49,16 +41,3 @@ spec:
         globalMounts:
           - path: /app/config.yml
             subPath: config.yml
-
-    securityContext:
-      runAsUser: 1000
-      runAsGroup: 1000
-      fsGroup: 1000
-
-    resources:
-      requests:
-        cpu: 50m
-        memory: 64Mi
-      limits:
-        cpu: 250m
-        memory: 256Mi
