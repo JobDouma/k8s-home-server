@@ -9,6 +9,7 @@ resources:
   - blocky/configmap.yaml
   - blocky/helmrepository.yaml
   - blocky/helmrelease.yaml
+  - blocky/servicemonitor.yaml
 
   # ──────────────────────────────────────
   # Jellyfin

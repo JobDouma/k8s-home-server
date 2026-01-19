@@ -21,5 +21,8 @@ spec:
   values:
     # This tells Prometheus to look for "ServiceMonitors" to start scraping
     prometheus:
+      service:
+        type: NodePort
+        nodePort: 30090
       prometheusSpec:
         serviceMonitorSelectorNilUsesHelmValues: false
