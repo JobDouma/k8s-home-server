@@ -1,44 +1,61 @@
-values:
-  controller:
-    replicas: 1
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: blocky
+  namespace: dns
+spec:
+  interval: 15m
+  chart:
+    spec:
+      chart: blocky
+      version: "*"
+      sourceRef:
+        kind: HelmRepository
+        name: blocky
+        namespace: flux-system
 
-  image:
-    repository: ghcr.io/0xerr0r/blocky
-    tag: latest
+  values:
+    controller:
+      replicas: 1
 
-  service:
-    dns:
-      enabled: true
-      type: ClusterIP
-      ports:
-        udp:
-          port: 53
-        tcp:
-          port: 53
-    http:
-      enabled: true
-      type: ClusterIP
-      ports:
-        http:
-          port: 4000
+    image:
+      repository: ghcr.io/0xerr0r/blocky
+      tag: latest
 
-  persistence:
-    config:
-      enabled: true
-      type: configMap
-      name: blocky-config
-      globalMounts:
-        - path: /app/config.yml
-          subPath: config.yml
+    service:
+      dns:
+        enabled: true
+        type: ClusterIP
+        ports:
+          udp:
+            port: 53
+          tcp:
+            port: 53
+      http:
+        enabled: true
+        type: ClusterIP
+        ports:
+          http:
+            port: 4000
 
-  securityContext:
-    runAsUser: 1000
-    runAsGroup: 1000
-    fsGroup: 1000
+    persistence:
+      config:
+        enabled: true
+        type: configMap
+        name: blocky-config
+        globalMounts:
+          - path: /app/config.yml
+            subPath: config.yml
 
-  resources:
-    requests:
-      cpu: 50m
-      memory: 64Mi
-    limits:
-      cpu: 250m
+    securityContext:
+      runAsUser: 1000
+      runAsGroup: 1000
+      fsGroup: 1000
+
+    resources:
+      requests:
+        cpu: 50m
+        memory: 64Mi
+      limits:
+        cpu: 250m
+        memory: 256Mi
