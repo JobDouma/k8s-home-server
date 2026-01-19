@@ -8,12 +8,11 @@ spec:
   chart:
     spec:
       chart: app-template
-      version: "*"
+      version: "3.2.1" # It is better to pin a version than use "*"
       sourceRef:
         kind: HelmRepository
         name: bjw-s
         namespace: flux-system
-
   values:
     controllers:
       qbittorrent:
@@ -27,22 +26,33 @@ spec:
               PGID: 1000
               TZ: Europe/Amsterdam
               WEBUI_PORT: 8080
+              # Fixes "Unauthorized" when accessing via different IPs/Hostnames
+              WebUI__CSRFProtection: "false"
+              WebUI__HostHeaderValidation: "false"
             resources:
               requests:
                 cpu: 250m
                 memory: 512Mi
               limits:
-                cpu: 1
                 memory: 2Gi
+          exporter:
+            image:
+              repository: ghcr.io/martabal/qbittorrent-exporter
+              tag: latest
+            env:
+              QBITTORRENT_BASE_URL: "http://localhost:8080"
+              QBITTORRENT_USER: "admin"
+              QBITTORRENT_PASS: "Harrygvd1!"
 
     service:
       app:
         controller: qbittorrent
-        type: NodePort
+        type: ClusterIP
         ports:
           http:
             port: 8080
-            nodePort: 30080
+          metrics:
+            port: 8090
 
     persistence:
       config:
@@ -52,7 +62,6 @@ spec:
         globalMounts:
           - path: /config
             subPath: qbittorrent
-
       media:
         enabled: true
         type: persistentVolumeClaim
@@ -60,7 +69,8 @@ spec:
         globalMounts:
           - path: /media
 
-    securityContext:
-      runAsUser: 1000
-      runAsGroup: 1000
-      fsGroup: 1000
+    defaultPodOptions:
+      securityContext:
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
