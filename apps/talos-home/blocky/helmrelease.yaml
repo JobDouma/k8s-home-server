@@ -24,6 +24,7 @@ spec:
     service:
       app:
         controller: blocky
+        type: NodePort
         ports:
           dns-tcp:
             port: 53
@@ -33,6 +34,7 @@ spec:
             protocol: UDP
           http:
             port: 4000
+            nodePort: 32600
     persistence:
       config:
         enabled: true

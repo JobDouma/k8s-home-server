@@ -27,3 +27,5 @@ resources:
   - monitoring/monitoring-release.yaml
   - monitoring/monitoring-repo.yaml
   - monitoring/servicemonitor.yaml
+
+  - jellyseer/helmrelease.yaml
