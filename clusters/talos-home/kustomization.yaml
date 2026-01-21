@@ -7,4 +7,3 @@ resources:
   - infrastructure.yaml
   - apps.yaml
   - flux-system
-  - cleanup-completed-pods.yaml
