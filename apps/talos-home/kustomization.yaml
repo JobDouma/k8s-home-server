@@ -35,12 +35,3 @@ resources:
   # Jellyseerr
   # ──────────────────────────────────────
   - jellyseer/helmrelease.yaml
-
-  # ──────────────────────────────────────
-  # MetalLB (LoadBalancer)
-  # ──────────────────────────────────────
-  - metallb/namespace.yaml
-  - metallb/helmrepository.yaml
-  - metallb/helmrelease.yaml
-  - metallb/config/ipaddress-pool.yaml
-  - metallb/config/l2-advertisement.yaml
