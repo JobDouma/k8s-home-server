@@ -23,9 +23,24 @@ resources:
   - qbittorrent/helmrepository.yaml
   - qbittorrent/helmrelease.yaml
 
+  # ──────────────────────────────────────
+  # monitoring / prometheus
+  # ──────────────────────────────────────
   - monitoring/namespace.yaml
   - monitoring/monitoring-release.yaml
   - monitoring/monitoring-repo.yaml
   - monitoring/servicemonitor.yaml
 
+  # ──────────────────────────────────────
+  # Jellyseerr
+  # ──────────────────────────────────────
   - jellyseer/helmrelease.yaml
+
+  # ──────────────────────────────────────
+  # MetalLB (LoadBalancer)
+  # ──────────────────────────────────────
+  - metallb/namespace.yaml
+  - metallb/helmrepository.yaml
+  - metallb/helmrelease.yaml
+  - metallb/config/ipaddress-pool.yaml
+  - metallb/config/l2-advertisement.yaml

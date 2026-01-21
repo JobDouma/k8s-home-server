@@ -8,7 +8,7 @@ spec:
   chart:
     spec:
       chart: app-template
-      version: "3.2.1" # It is better to pin a version than use "*"
+      version: "3.2.1"
       sourceRef:
         kind: HelmRepository
         name: bjw-s
@@ -19,59 +19,53 @@ spec:
         containers:
           app:
             image:
-              repository: lscr.io/linuxserver/qbittorrent
-              tag: latest
+              repository: ghcr.io/onedr0p/qbittorrent
+              tag: 4.6.3
             env:
-              PUID: 1000
-              PGID: 1000
               TZ: Europe/Amsterdam
-              WEBUI_PORT: 8080
-              # Fixes "Unauthorized" when accessing via different IPs/Hostnames
-              WebUI__CSRFProtection: "false"
-              WebUI__HostHeaderValidation: "false"
-              WebUI__AuthSubnetWhitelistEnabled: "true"
-              WebUI__AuthSubnetWhitelist: "127.0.0.1/32, 10.244.0.0/16"
+              QBITTORRENT__PORT: &port 8080
+              QBITTORRENT__BT_PORT: &bt-port 6881
             resources:
               requests:
-                cpu: 250m
-                memory: 512Mi
+                cpu: 100m
+                memory: 256Mi
               limits:
-                memory: 2Gi
+                memory: 1Gi
           exporter:
             image:
-              repository: ghcr.io/martabal/qbittorrent-exporter
-              tag: latest
+              repository: ghcr.io/esanchezm/prometheus-qbittorrent-exporter
+              tag: v1.6.0
             env:
-              QBITTORRENT_BASE_URL: http://qbittorrent.media.svc.cluster.local:8080
-              QBITTORRENT_USER: admin
-              QBITTORRENT_PASS: "Harrygvd1!"
+              QBITTORRENT_HOST: localhost
+              QBITTORRENT_PORT: *port
+              EXPORTER_PORT: &metrics-port 8000
+
     service:
       app:
         controller: qbittorrent
-        type: ClusterIP
+        type: NodePort
         ports:
           http:
-            port: 8080
+            port: *port
+            nodePort: 30080  # Access via http://192.168.2.22:30080
           metrics:
-            port: 8090
+            port: *metrics-port
+            nodePort: 30081
+          bittorrent:
+            enabled: true
+            port: *bt-port
+            protocol: TCP
+            nodePort: 30881  # Port for peer traffic
 
     persistence:
       config:
         enabled: true
-        type: persistentVolumeClaim
         existingClaim: tank-configs
         globalMounts:
           - path: /config
             subPath: qbittorrent
-      media:
+      downloads:
         enabled: true
-        type: persistentVolumeClaim
-        existingClaim: media
+        existingClaim: tank-media # Assuming you have a media PVC
         globalMounts:
-          - path: /media
-
-    defaultPodOptions:
-      securityContext:
-        runAsUser: 1000
-        runAsGroup: 1000
-        fsGroup: 1000
+          - path: /downloads

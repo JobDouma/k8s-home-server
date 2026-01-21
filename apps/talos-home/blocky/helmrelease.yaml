@@ -24,7 +24,9 @@ spec:
     service:
       app:
         controller: blocky
-        type: NodePort
+        type: LoadBalancer
+         annotations:
+          metallb.universe.tf/address-pool: dns-pool
         ports:
           dns-tcp:
             port: 53
