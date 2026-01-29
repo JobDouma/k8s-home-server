@@ -26,13 +26,16 @@ spec:
             image:
               repository: ghcr.io/onedr0p/qbittorrent
               tag: 4.6.3
+            envFrom:
+              - secretRef:
+                name: qbittorrent-webui
             env:
               TZ: Europe/Amsterdam
               QBITTORRENT__PORT: &port 8080
               QBITTORRENT__BT_PORT: &bt-port 6881
+              QBITTORRENT__WEBUI__ADDRESS: "0.0.0.0"
               QBITTORRENT__WEBUI__HOST_HEADER_VALIDATION: "false"
               QBITTORRENT__WEBUI__CSRF_PROTECTION: "false"
-              QBITTORRENT__WEBUI__ADDRESS: "0.0.0.0"
             resources:
               requests:
                 cpu: 100m
@@ -51,19 +54,17 @@ spec:
     service:
       app:
         controller: qbittorrent
-        type: NodePort
         ports:
           http:
-            port: *port
-            nodePort: 30080  # Access via http://192.168.2.22:30080
-          metrics:
-            port: *metrics-port
-            nodePort: 30081
-          bittorrent:
-            enabled: true
-            port: *bt-port
+            port: 8080
+      bittorrent:
+        controller: qbittorrent
+        type: LoadBalancer
+        loadBalancerIP: 192.168.2.241
+        ports:
+          bt:
+            port: 6881
             protocol: TCP
-            nodePort: 30881  # Port for peer traffic
 
     persistence:
       config:
@@ -77,3 +78,18 @@ spec:
         existingClaim: media
         globalMounts:
           - path: /downloads
+
+
+    ingress:
+      app:
+        enabled: true
+        className: nginx
+        hosts:
+          - host: qbittorrent.home.arpa
+            paths:
+              - path: /
+                pathType: Prefix
+                service:
+                  identifier: app
+                  port: http
+
