@@ -13,20 +13,30 @@ spec:
         kind: HelmRepository
         name: bjw-s
         namespace: flux-system
-
   values:
     controllers:
       blocky:
+        replicas: 2
+        strategy: RollingUpdate
+        # This section ensures pods stay on separate nodes
+        pod:
+          affinity:
+            podAntiAffinity:
+              requiredDuringSchedulingIgnoredDuringExecution:
+                - labelSelector:
+                    matchLabels:
+                      app.kubernetes.io/name: blocky
+                  topologyKey: "kubernetes.io/hostname"
         containers:
           app:
             image:
               repository: ghcr.io/0xerr0r/blocky
               tag: v0.23
-
     service:
       app:
         controller: blocky
         type: LoadBalancer
+        externalTrafficPolicy: Cluster
         annotations:
           "metallb.universe.tf/address-pool": "dns-pool"
         ports:
@@ -38,7 +48,6 @@ spec:
             protocol: UDP
           http:
             port: 4000
-
     persistence:
       config:
         enabled: true
