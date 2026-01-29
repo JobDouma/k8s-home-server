@@ -26,10 +26,10 @@ spec:
         enabled: true
         existingClaim: tank-configs
         subPath: sonarr
-      tv:
+      downloads:
         enabled: true
         existingClaim: media
-        subPath: sonarr
+        subPath: TV
     service:
       type: ClusterIP
       port: 8989
