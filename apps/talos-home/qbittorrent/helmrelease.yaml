@@ -66,6 +66,6 @@ spec:
             subPath: qbittorrent
       downloads:
         enabled: true
-        existingClaim: tank-media # Assuming you have a media PVC
+        existingClaim: media
         globalMounts:
           - path: /downloads
