@@ -29,6 +29,7 @@ spec:
       tv:
         enabled: true
         existingClaim: media
+        subPath: sonarr
     service:
       type: ClusterIP
       port: 8989

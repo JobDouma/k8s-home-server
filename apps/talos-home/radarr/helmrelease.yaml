@@ -29,6 +29,7 @@ spec:
       movies:
         enabled: true
         existingClaim: media
+        subPath: radarr
     service:
       type: ClusterIP
       port: 7878
