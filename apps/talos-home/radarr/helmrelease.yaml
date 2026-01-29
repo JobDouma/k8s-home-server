@@ -26,10 +26,10 @@ spec:
         enabled: true
         existingClaim: tank-configs
         subPath: radarr
-      movies:
+      downloads:
         enabled: true
         existingClaim: media
-        subPath: radarr
+        subPath: movies
     service:
       type: ClusterIP
       port: 7878
