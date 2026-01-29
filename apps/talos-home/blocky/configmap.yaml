@@ -7,39 +7,44 @@ data:
   config.yml: |
     upstream:
       default:
+        - tcp+tls:dns.cloudflare.com
+        - tcp+tls:dns.google
         - 1.1.1.1
         - 9.9.9.9
-        - https://dns.cloudflare.com/dns-query
-
-    bootstrapDns:
-      - upstream: 1.1.1.1
-        ips:
-          - 1.1.1.1
 
     blocking:
       blackLists:
+        # High-quality lists for mobile and web ads
         ads:
           - https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts
+          - https://big.oisd.nl/domainswild
+          - https://raw.githubusercontent.com/jerryn70/GoodbyeAds/master/Hosts/GoodbyeAds.txt
         malware:
           - https://mirror1.malwaredomains.com/files/justdomains
+          - https://urlhaus.abuse.ch/downloads/hostfile/
+      
+      # This ensures all clients are filtered by all lists
       clientGroupsBlock:
         default:
           - ads
           - malware
+      
+      # IMPORTANT: If a site is blocked, return 0.0.0.0
+      blockType: zeroIp
+      refreshPeriod: 4h
 
     caching:
       minTime: 5m
       maxTime: 30m
       prefetching: true
 
+    # Port 53 for DNS, Port 4000 for the status page/metrics
     ports:
       dns: 53
-      http: 0.0.0.0:4000
+      http: 4000
 
-    prometheus:
-      enable: true
-      path: /metrics
-
+    # Useful for checking logs
     log:
       level: info
-
+      format: text
+      timestamp: true
