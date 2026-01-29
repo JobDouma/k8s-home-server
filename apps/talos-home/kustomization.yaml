@@ -41,12 +41,6 @@ resources:
   - networkpolicies
 
   # ──────────────────────────────────────
-  # Pihole
-  # ──────────────────────────────────────
-  - pihole/helmrepository.yaml
-  - pihole/helmrelease.yaml
-
-  # ──────────────────────────────────────
   # Sonarr
   # ──────────────────────────────────────
   - sonarr/helmrelease.yaml
