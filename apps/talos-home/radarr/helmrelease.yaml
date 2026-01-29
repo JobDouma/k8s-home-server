@@ -29,7 +29,7 @@ spec:
       downloads:
         enabled: true
         existingClaim: media
-        subPath: movies
+        mountPath: /media
     service:
       type: ClusterIP
       port: 7878
