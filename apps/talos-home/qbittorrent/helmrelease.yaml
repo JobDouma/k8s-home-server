@@ -32,6 +32,7 @@ spec:
               QBITTORRENT__BT_PORT: &bt-port 6881
               QBITTORRENT__WEBUI__HOST_HEADER_VALIDATION: "false"
               QBITTORRENT__WEBUI__CSRF_PROTECTION: "false"
+              QBITTORRENT__WEBUI__ADDRESS: "0.0.0.0"
             resources:
               requests:
                 cpu: 100m
