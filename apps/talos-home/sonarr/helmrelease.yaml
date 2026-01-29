@@ -26,7 +26,7 @@ spec:
         enabled: true
         existingClaim: tank-configs
         subPath: sonarr
-      downloads:
+      tv:
         enabled: true
         existingClaim: media
     service:
