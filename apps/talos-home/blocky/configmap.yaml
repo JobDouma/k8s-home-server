@@ -15,11 +15,8 @@ data:
     blocking:
       blackLists:
         ads:
-          # StevenBlack (General ads/tracking)
           - https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts
-          # OISD (The best all-in-one list for mobile apps/TVs)
           - https://big.oisd.nl/domainswild
-          # GoodbyeAds (Specifically targets mobile app ads)
           - https://raw.githubusercontent.com/jerryn70/GoodbyeAds/master/Hosts/GoodbyeAds.txt
         malware:
           - https://mirror1.malwaredomains.com/files/justdomains
@@ -30,13 +27,8 @@ data:
           - ads
           - malware
       
-      # Return 0.0.0.0 immediately for blocked domains
       blockType: zeroIp
       refreshPeriod: 4h
-
-    # These allow the 'version.blocky' query to work for testing
-    specialQueries:
-      enable: true
 
     caching:
       minTime: 5m
