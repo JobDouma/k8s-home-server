@@ -1,0 +1,34 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: radarr
+  namespace: media
+spec:
+  interval: 15m
+  chart:
+    spec:
+      chart: radarr
+      version: 3.0.2
+      sourceRef:
+        kind: HelmRepository
+        name: k8s-at-home
+        namespace: flux-system
+  values:
+    image:
+      repository: ghcr.io/linuxserver/radarr
+      tag: latest
+    env:
+      PUID: 1000
+      PGID: 1000
+      TZ: Europe/Amsterdam
+    persistence:
+      config:
+        enabled: true
+        existingClaim: tank-configs
+        subPath: radarr
+      downloads:
+        enabled: true
+        existingClaim: media
+    service:
+      type: ClusterIP
+      port: 7878

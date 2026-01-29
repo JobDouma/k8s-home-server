@@ -22,6 +22,7 @@ resources:
   # ──────────────────────────────────────
   - qbittorrent/helmrepository.yaml
   - qbittorrent/helmrelease.yaml
+  - qbittorrent/secret.yaml
 
   # ──────────────────────────────────────
   # monitoring / prometheus
@@ -35,3 +36,22 @@ resources:
   # Jellyseerr
   # ──────────────────────────────────────
   - jellyseer/helmrelease.yaml
+
+  - ingress-nginx
+  - networkpolicies
+
+  # ──────────────────────────────────────
+  # Pihole
+  # ──────────────────────────────────────
+  - pihole/helmrepository.yaml
+  - pihole/helmrelease.yaml
+
+  # ──────────────────────────────────────
+  # Sonarr
+  # ──────────────────────────────────────
+  - sonarr/helmrelease.yaml
+
+  # ──────────────────────────────────────
+  # Radarr
+  # ──────────────────────────────────────
+  - radarr/helmrelease.yaml
