@@ -1,8 +1,8 @@
 apiVersion: source.toolkit.fluxcd.io/v1beta2
 kind: HelmRepository
 metadata:
-  name: blocky
+  name: bjw-s
   namespace: flux-system
 spec:
   interval: 1h
-  url: https://k8s-at-home.com/charts/
+  url: https://bjw-s-labs.github.io/helm-charts
