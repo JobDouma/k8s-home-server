@@ -29,6 +29,7 @@ spec:
 
     speaker:
       hostNetwork: true
+      ignoreExcludeLB: true
 
       tolerations:
         - key: node-role.kubernetes.io/control-plane
