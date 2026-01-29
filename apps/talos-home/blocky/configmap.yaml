@@ -26,7 +26,8 @@ data:
         default:
           - ads
           - malware
-      
+
+      # Ensure these are aligned correctly under 'blocking'
       blockType: zeroIp
       refreshPeriod: 4h
 
