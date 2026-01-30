@@ -25,6 +25,7 @@ spec:
               PUID: 1000
               PGID: 1000
               TZ: Europe/Amsterdam
+              RADARR__SERVER__BINDADDRESS: 0.0.0.0
     service:
       app:
         controller: radarr
