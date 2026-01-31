@@ -5,7 +5,7 @@ metadata:
   namespace: flux-system
 spec:
   interval: 10m
-  path: ./apps/talos-home/metallb/config
+  path: ./infrastructure/metallb/config
   prune: true
   wait: true
   dependsOn:

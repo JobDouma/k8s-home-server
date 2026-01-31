@@ -4,8 +4,8 @@ drwxrwxr-x  6 job job 4096 Jan 19 19:48 .
 drwxr-x--- 15 job job 4096 Jan 31 09:42 ..
 drwxrwxr-x  3 job job 4096 Jan 10 10:12 apps
 drwxrwxr-x  3 job job 4096 Jan 10 10:12 clusters
--rw-rw-r--  1 job job   32 Jan 31 10:12 full_dump.txt
-drwxrwxr-x  8 job job 4096 Jan 31 09:55 .git
+-rw-rw-r--  1 job job   32 Jan 31 10:22 full_dump.txt
+drwxrwxr-x  8 job job 4096 Jan 31 10:21 .git
 drwxrwxr-x  4 job job 4096 Jan 31 09:55 infrastructure
 -rw-rw-r--  1 job job   17 Jan  2 14:26 README.md
 
@@ -33,12 +33,10 @@ apps
     │   ├── helmrelease.yaml
     │   ├── helmrepository.yaml
     │   └── ingressroute.yaml
-    ├── jellyseer
+    ├── jellyseerr
     │   ├── helmrelease.yaml
     │   └── ingressroute.yaml
     ├── kustomization.yaml
-    ├── media
-    │   └── networkpolicy-default-deny.yaml
     ├── metallb
     │   ├── base
     │   │   ├── helmrelease.yaml
@@ -60,14 +58,16 @@ apps
     ├── qbittorrent
     │   ├── helmrelease.yaml
     │   ├── helmrepository.yaml
+    │   ├── ingressroute.yaml
     │   └── secret.yaml
     ├── radarr
-    │   └── helmrelease.yaml
+    │   ├── helmrelease.yaml
+    │   └── ingressroute.yaml
     └── sonarr
         ├── helmrelease.yaml
         └── ingressroute.yaml
 
-17 directories, 40 files
+16 directories, 41 files
 
 ===== FILE CONTENTS =====
 ----- FILE: ./full_dump.txt -----
@@ -77,8 +77,8 @@ apps
     drwxr-x--- 15 job job 4096 Jan 31 09:42 ..
     drwxrwxr-x  3 job job 4096 Jan 10 10:12 apps
     drwxrwxr-x  3 job job 4096 Jan 10 10:12 clusters
-    -rw-rw-r--  1 job job   32 Jan 31 10:12 full_dump.txt
-    drwxrwxr-x  8 job job 4096 Jan 31 09:55 .git
+    -rw-rw-r--  1 job job   32 Jan 31 10:22 full_dump.txt
+    drwxrwxr-x  8 job job 4096 Jan 31 10:21 .git
     drwxrwxr-x  4 job job 4096 Jan 31 09:55 infrastructure
     -rw-rw-r--  1 job job   17 Jan  2 14:26 README.md
     
@@ -106,12 +106,10 @@ apps
         │   ├── helmrelease.yaml
         │   ├── helmrepository.yaml
         │   └── ingressroute.yaml
-        ├── jellyseer
+        ├── jellyseerr
         │   ├── helmrelease.yaml
         │   └── ingressroute.yaml
         ├── kustomization.yaml
-        ├── media
-        │   └── networkpolicy-default-deny.yaml
         ├── metallb
         │   ├── base
         │   │   ├── helmrelease.yaml
@@ -133,14 +131,16 @@ apps
         ├── qbittorrent
         │   ├── helmrelease.yaml
         │   ├── helmrepository.yaml
+        │   ├── ingressroute.yaml
         │   └── secret.yaml
         ├── radarr
-        │   └── helmrelease.yaml
+        │   ├── helmrelease.yaml
+        │   └── ingressroute.yaml
         └── sonarr
             ├── helmrelease.yaml
             └── ingressroute.yaml
     
-    17 directories, 40 files
+    16 directories, 41 files
     
     ===== FILE CONTENTS =====
     ----- FILE: ./full_dump.txt -----
@@ -171,12 +171,12 @@ apps
             malware:
               - https://mirror1.malwaredomains.com/files/justdomains
               - https://urlhaus.abuse.ch/downloads/hostfile/
+    
           clientGroupsBlock:
             default:
               - ads
               - malware
     
-          # Ensure these are aligned correctly under 'blocking'
           blockType: zeroIp
           refreshPeriod: 4h
     
@@ -191,6 +191,16 @@ apps
     
         log:
           level: info
+    
+        # ───────────────────────────────
+        # LOCAL SERVICE OVERRIDES
+        # ───────────────────────────────
+        customDNS:
+          jellyfin.lan: 192.168.2.22
+          sonarr.lan: 192.168.2.22
+          jellyseerr.lan: 192.168.2.22
+          radarr.lan: 192.168.2.22
+          qbittorrent.lan: 192.168.2.22
 
 ----- FILE: apps/talos-home/blocky/helmrelease.yaml -----
     apiVersion: helm.toolkit.fluxcd.io/v2
@@ -380,7 +390,7 @@ apps
             - name: lan-headers
               namespace: networking
 
------ FILE: apps/talos-home/jellyseer/helmrelease.yaml -----
+----- FILE: apps/talos-home/jellyseerr/helmrelease.yaml -----
     apiVersion: helm.toolkit.fluxcd.io/v2
     kind: HelmRelease
     metadata:
@@ -429,7 +439,7 @@ apps
               - path: /app/config
                 subPath: jellyseerr
 
------ FILE: apps/talos-home/jellyseer/ingressroute.yaml -----
+----- FILE: apps/talos-home/jellyseerr/ingressroute.yaml -----
     apiVersion: traefik.io/v1alpha1
     kind: IngressRoute
     metadata:
@@ -484,7 +494,8 @@ apps
       # ──────────────────────────────────────
       # Jellyseerr
       # ──────────────────────────────────────
-      - jellyseer/helmrelease.yaml
+      - jellyseerr/helmrelease.yaml
+      - jellyseerr/ingressroute.yaml
     
       # ──────────────────────────────────────
       # Network Policies
@@ -504,17 +515,6 @@ apps
       # ──────────────────────────────────────
       - radarr/helmrelease.yaml
       - radarr/ingressroute.yaml
-
------ FILE: apps/talos-home/media/networkpolicy-default-deny.yaml -----
-    apiVersion: networking.k8s.io/v1
-    kind: NetworkPolicy
-    metadata:
-      name: default-deny
-      namespace: media
-    spec:
-      podSelector: {}
-      policyTypes:
-        - Ingress
 
 ----- FILE: apps/talos-home/metallb/base/helmrelease.yaml -----
     apiVersion: helm.toolkit.fluxcd.io/v2
@@ -812,21 +812,6 @@ apps
             existingClaim: media
             globalMounts:
               - path: /downloads
-    
-    
-        ingress:
-          app:
-            enabled: true
-            className: nginx
-            hosts:
-              - host: qbittorrent.home.arpa
-                paths:
-                  - path: /
-                    pathType: Prefix
-                    service:
-                      identifier: app
-                      port: http
-    
 
 ----- FILE: apps/talos-home/qbittorrent/helmrepository.yaml -----
     apiVersion: source.toolkit.fluxcd.io/v1beta2
@@ -837,6 +822,22 @@ apps
     spec:
       interval: 1h
       url: https://bjw-s-labs.github.io/helm-charts
+
+----- FILE: apps/talos-home/qbittorrent/ingressroute.yaml -----
+    apiVersion: traefik.io/v1alpha1
+    kind: IngressRoute
+    metadata:
+      name: qbittorrent
+      namespace: media
+    spec:
+      entryPoints:
+        - web
+      routes:
+        - match: Host(`qbittorrent.lan`)
+          kind: Rule
+          services:
+            - name: qbittorrent
+              port: 8080
 
 ----- FILE: apps/talos-home/qbittorrent/secret.yaml -----
     apiVersion: v1
@@ -899,6 +900,22 @@ apps
             existingClaim: media
             globalMounts:
               - path: /media
+
+----- FILE: apps/talos-home/radarr/ingressroute.yaml -----
+    apiVersion: traefik.io/v1alpha1
+    kind: IngressRoute
+    metadata:
+      name: radarr
+      namespace: media
+    spec:
+      entryPoints:
+        - web
+      routes:
+        - match: Host(`radarr.lan`)
+          kind: Rule
+          services:
+            - name: radarr
+              port: 7878
 
 ----- FILE: apps/talos-home/sonarr/helmrelease.yaml -----
     apiVersion: helm.toolkit.fluxcd.io/v2
@@ -1130,4 +1147,6 @@ apps
     kind: Namespace
     metadata:
       name: networking
+      labels:
+        kubernetes.io/metadata.name: networking
 
