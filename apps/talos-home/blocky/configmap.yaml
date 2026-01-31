@@ -43,9 +43,6 @@ data:
     log:
       level: info
 
-    # --------------------------------------------------
-    # FIXED SECTION - NEW FORMAT
-    # --------------------------------------------------
     customDNS:
       mapping:
         jellyfin.lan: 192.168.2.22
