@@ -7,5 +7,3 @@ resources:
   - infrastructure.yaml
   - apps.yaml
   - flux-system
-  - metallb-base.yaml
-  - metallb-config.yaml
