@@ -8,14 +8,6 @@ spec:
     - name: infrastructure
   interval: 10m
   path: ./infrastructure
-  # We use a post-build target or specific paths here
-  # But the cleanest way is to point to a new specific config kustomization:
-  commonMetadata:
-    labels:
-      stack: config
-  resources:
-    - ./infrastructure/metallb/config
-    - ./infrastructure/traefik/resources
   prune: true
   sourceRef:
     kind: GitRepository
