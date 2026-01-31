@@ -4,13 +4,23 @@ drwxrwxr-x  6 job job 4096 Jan 19 19:48 .
 drwxr-x--- 15 job job 4096 Jan 31 09:42 ..
 drwxrwxr-x  3 job job 4096 Jan 10 10:12 apps
 drwxrwxr-x  3 job job 4096 Jan 10 10:12 clusters
--rw-rw-r--  1 job job   32 Jan 31 10:22 full_dump.txt
-drwxrwxr-x  8 job job 4096 Jan 31 10:21 .git
-drwxrwxr-x  4 job job 4096 Jan 31 09:55 infrastructure
+-rw-rw-r--  1 job job   32 Jan 31 12:59 full_dump.txt
+drwxrwxr-x  8 job job 4096 Jan 31 12:56 .git
+drwxrwxr-x  5 job job 4096 Jan 31 11:17 infrastructure
 -rw-rw-r--  1 job job   17 Jan  2 14:26 README.md
 
 infrastructure
 ├── kustomization.yaml
+├── metallb
+│   ├── base
+│   │   ├── helmrelease.yaml
+│   │   ├── helmrepository.yaml
+│   │   └── namespace.yaml
+│   └── config
+│       ├── ipaddress-pool-dns.yaml
+│       ├── ipaddress-pool-lan.yaml
+│       ├── kustomization.yaml
+│       └── l2-advertisement.yaml
 ├── storage
 │   ├── namespace.yaml
 │   ├── pvc-media.yaml
@@ -18,9 +28,14 @@ infrastructure
 │   ├── pv-media.yaml
 │   └── pv-tank-configs.yaml
 └── traefik
-    ├── helmrelease.yaml
-    ├── middlewares.yaml
-    └── namespace.yaml
+    ├── base
+    │   ├── helmrelease.yaml
+    │   ├── helmrepository.yaml
+    │   ├── kustomization.yaml
+    │   └── namespace.yaml
+    └── resources
+        ├── kustomization.yaml
+        └── middlewares.yaml
 apps
 └── talos-home
     ├── blocky
@@ -37,15 +52,6 @@ apps
     │   ├── helmrelease.yaml
     │   └── ingressroute.yaml
     ├── kustomization.yaml
-    ├── metallb
-    │   ├── base
-    │   │   ├── helmrelease.yaml
-    │   │   ├── helmrepository.yaml
-    │   │   └── namespace.yaml
-    │   └── config
-    │       ├── ipaddress-pool-dns.yaml
-    │       ├── ipaddress-pool-lan.yaml
-    │       └── l2-advertisement.yaml
     ├── monitoring
     │   ├── monitoring-release.yaml
     │   ├── monitoring-repo.yaml
@@ -67,7 +73,7 @@ apps
         ├── helmrelease.yaml
         └── ingressroute.yaml
 
-16 directories, 41 files
+18 directories, 45 files
 
 ===== FILE CONTENTS =====
 ----- FILE: ./full_dump.txt -----
@@ -77,13 +83,23 @@ apps
     drwxr-x--- 15 job job 4096 Jan 31 09:42 ..
     drwxrwxr-x  3 job job 4096 Jan 10 10:12 apps
     drwxrwxr-x  3 job job 4096 Jan 10 10:12 clusters
-    -rw-rw-r--  1 job job   32 Jan 31 10:22 full_dump.txt
-    drwxrwxr-x  8 job job 4096 Jan 31 10:21 .git
-    drwxrwxr-x  4 job job 4096 Jan 31 09:55 infrastructure
+    -rw-rw-r--  1 job job   32 Jan 31 12:59 full_dump.txt
+    drwxrwxr-x  8 job job 4096 Jan 31 12:56 .git
+    drwxrwxr-x  5 job job 4096 Jan 31 11:17 infrastructure
     -rw-rw-r--  1 job job   17 Jan  2 14:26 README.md
     
     infrastructure
     ├── kustomization.yaml
+    ├── metallb
+    │   ├── base
+    │   │   ├── helmrelease.yaml
+    │   │   ├── helmrepository.yaml
+    │   │   └── namespace.yaml
+    │   └── config
+    │       ├── ipaddress-pool-dns.yaml
+    │       ├── ipaddress-pool-lan.yaml
+    │       ├── kustomization.yaml
+    │       └── l2-advertisement.yaml
     ├── storage
     │   ├── namespace.yaml
     │   ├── pvc-media.yaml
@@ -91,9 +107,14 @@ apps
     │   ├── pv-media.yaml
     │   └── pv-tank-configs.yaml
     └── traefik
-        ├── helmrelease.yaml
-        ├── middlewares.yaml
-        └── namespace.yaml
+        ├── base
+        │   ├── helmrelease.yaml
+        │   ├── helmrepository.yaml
+        │   ├── kustomization.yaml
+        │   └── namespace.yaml
+        └── resources
+            ├── kustomization.yaml
+            └── middlewares.yaml
     apps
     └── talos-home
         ├── blocky
@@ -110,15 +131,6 @@ apps
         │   ├── helmrelease.yaml
         │   └── ingressroute.yaml
         ├── kustomization.yaml
-        ├── metallb
-        │   ├── base
-        │   │   ├── helmrelease.yaml
-        │   │   ├── helmrepository.yaml
-        │   │   └── namespace.yaml
-        │   └── config
-        │       ├── ipaddress-pool-dns.yaml
-        │       ├── ipaddress-pool-lan.yaml
-        │       └── l2-advertisement.yaml
         ├── monitoring
         │   ├── monitoring-release.yaml
         │   ├── monitoring-repo.yaml
@@ -140,7 +152,7 @@ apps
             ├── helmrelease.yaml
             └── ingressroute.yaml
     
-    16 directories, 41 files
+    18 directories, 45 files
     
     ===== FILE CONTENTS =====
     ----- FILE: ./full_dump.txt -----
@@ -516,113 +528,6 @@ apps
       - radarr/helmrelease.yaml
       - radarr/ingressroute.yaml
 
------ FILE: apps/talos-home/metallb/base/helmrelease.yaml -----
-    apiVersion: helm.toolkit.fluxcd.io/v2
-    kind: HelmRelease
-    metadata:
-      name: metallb
-      namespace: metallb-system
-    spec:
-      interval: 15m
-      chart:
-        spec:
-          chart: metallb
-          version: "0.14.5"
-          sourceRef:
-            kind: HelmRepository
-            name: metallb
-            namespace: flux-system
-    
-      values:
-        crds:
-          enabled: true
-    
-        controller:
-          resources:
-            requests:
-              cpu: 50m
-              memory: 64Mi
-            limits:
-              cpu: 200m
-              memory: 256Mi
-    
-        speaker:
-          hostNetwork: true
-          ignoreExcludeLB: true
-    
-          tolerations:
-            - key: node-role.kubernetes.io/control-plane
-              operator: Exists
-              effect: NoSchedule
-    
-          securityContext:
-            privileged: true
-            capabilities:
-              add:
-                - NET_ADMIN
-                - NET_RAW
-    
-          resources:
-            requests:
-              cpu: 50m
-              memory: 64Mi
-            limits:
-              cpu: 200m
-              memory: 256Mi
-
------ FILE: apps/talos-home/metallb/base/helmrepository.yaml -----
-    apiVersion: source.toolkit.fluxcd.io/v1beta2
-    kind: HelmRepository
-    metadata:
-      name: metallb
-      namespace: flux-system
-    spec:
-      interval: 1h
-      url: https://metallb.github.io/metallb
-
------ FILE: apps/talos-home/metallb/base/namespace.yaml -----
-    apiVersion: v1
-    kind: Namespace
-    metadata:
-      name: metallb-system
-      labels:
-        pod-security.kubernetes.io/enforce: privileged
-
------ FILE: apps/talos-home/metallb/config/ipaddress-pool-dns.yaml -----
-    apiVersion: metallb.io/v1beta1
-    kind: IPAddressPool
-    metadata:
-      name: dns-pool
-      namespace: metallb-system
-    spec:
-      addresses:
-        - 192.168.2.53/32
-
------ FILE: apps/talos-home/metallb/config/ipaddress-pool-lan.yaml -----
-    apiVersion: metallb.io/v1beta1
-    kind: IPAddressPool
-    metadata:
-      name: lan-pool
-      namespace: metallb-system
-    spec:
-      addresses:
-        - 192.168.2.20-192.168.2.30
-
------ FILE: apps/talos-home/metallb/config/l2-advertisement.yaml -----
-    apiVersion: metallb.io/v1beta1
-    kind: L2Advertisement
-    metadata:
-      name: dns-l2
-      namespace: metallb-system
-    spec:
-      nodeSelectors:
-        - matchLabels:
-            kubernetes.io/hostname: talos-cp-1
-        - matchLabels:
-            kubernetes.io/hostname: talos-cp-2
-        - matchLabels:
-            kubernetes.io/hostname: talos-cp-3
-
 ----- FILE: apps/talos-home/monitoring/monitoring-release.yaml -----
     apiVersion: helm.toolkit.fluxcd.io/v2
     kind: HelmRelease
@@ -997,9 +902,137 @@ apps
       - storage/pvc-media.yaml
       - storage/pvc-tank-configs.yaml
     
-      - traefik/namespace.yaml
-      - traefik/helmrelease.yaml
-      - traefik/middlewares.yaml
+      - traefik/base/namespace.yaml
+      - traefik/base/helmrepository.yaml
+      - traefik/base/helmrelease.yaml
+      - traefik/resources/middlewares.yaml
+    
+      - metallb/base/namespace.yaml
+      - metallb/base/helmrelease.yaml
+      - metallb/base/helmrepository.yaml
+      - metallb/config/ipaddress-pool-dns.yaml
+      - metallb/config/ipaddress-pool-lan.yaml
+      - metallb/config/l2-advertisement.yaml
+
+----- FILE: infrastructure/metallb/base/helmrelease.yaml -----
+    apiVersion: helm.toolkit.fluxcd.io/v2
+    kind: HelmRelease
+    metadata:
+      name: metallb
+      namespace: metallb-system
+    spec:
+      interval: 15m
+      chart:
+        spec:
+          chart: metallb
+          version: "0.14.5"
+          sourceRef:
+            kind: HelmRepository
+            name: metallb
+            namespace: flux-system
+    
+      values:
+        crds:
+          enabled: true
+    
+        controller:
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              cpu: 200m
+              memory: 256Mi
+    
+        speaker:
+          hostNetwork: true
+          ignoreExcludeLB: true
+    
+          tolerations:
+            - key: node-role.kubernetes.io/control-plane
+              operator: Exists
+              effect: NoSchedule
+    
+          securityContext:
+            privileged: true
+            capabilities:
+              add:
+                - NET_ADMIN
+                - NET_RAW
+    
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              cpu: 200m
+              memory: 256Mi
+
+----- FILE: infrastructure/metallb/base/helmrepository.yaml -----
+    apiVersion: source.toolkit.fluxcd.io/v1beta2
+    kind: HelmRepository
+    metadata:
+      name: metallb
+      namespace: flux-system
+    spec:
+      interval: 1h
+      url: https://metallb.github.io/metallb
+
+----- FILE: infrastructure/metallb/base/namespace.yaml -----
+    apiVersion: v1
+    kind: Namespace
+    metadata:
+      name: metallb-system
+      labels:
+        pod-security.kubernetes.io/enforce: privileged
+
+----- FILE: infrastructure/metallb/config/ipaddress-pool-dns.yaml -----
+    apiVersion: metallb.io/v1beta1
+    kind: IPAddressPool
+    metadata:
+      name: dns-pool
+      namespace: metallb-system
+    spec:
+      addresses:
+        - 192.168.2.53/32
+
+----- FILE: infrastructure/metallb/config/ipaddress-pool-lan.yaml -----
+    apiVersion: metallb.io/v1beta1
+    kind: IPAddressPool
+    metadata:
+      name: lan-pool
+      namespace: metallb-system
+    spec:
+      addresses:
+        - 192.168.2.20-192.168.2.30
+
+----- FILE: infrastructure/metallb/config/kustomization.yaml -----
+    apiVersion: kustomize.config.k8s.io/v1beta1
+    kind: Kustomization
+    
+    resources:
+      - ipaddress-pool-dns.yaml
+      - ipaddress-pool-lan.yaml
+      - l2-advertisement.yaml
+    
+    dependsOn:
+      - name: metallb
+        namespace: metallb-system
+
+----- FILE: infrastructure/metallb/config/l2-advertisement.yaml -----
+    apiVersion: metallb.io/v1beta1
+    kind: L2Advertisement
+    metadata:
+      name: dns-l2
+      namespace: metallb-system
+    spec:
+      nodeSelectors:
+        - matchLabels:
+            kubernetes.io/hostname: talos-cp-1
+        - matchLabels:
+            kubernetes.io/hostname: talos-cp-2
+        - matchLabels:
+            kubernetes.io/hostname: talos-cp-3
 
 ----- FILE: infrastructure/storage/namespace.yaml -----
     apiVersion: v1
@@ -1075,7 +1108,7 @@ apps
         path: /mnt/tank/configs
     
 
------ FILE: infrastructure/traefik/helmrelease.yaml -----
+----- FILE: infrastructure/traefik/base/helmrelease.yaml -----
     apiVersion: helm.toolkit.fluxcd.io/v2
     kind: HelmRelease
     metadata:
@@ -1130,7 +1163,35 @@ apps
           general:
             level: INFO
 
------ FILE: infrastructure/traefik/middlewares.yaml -----
+----- FILE: infrastructure/traefik/base/helmrepository.yaml -----
+    apiVersion: source.toolkit.fluxcd.io/v1beta2
+    kind: HelmRepository
+    metadata:
+      name: traefik
+      namespace: flux-system
+    spec:
+      interval: 1h
+      url: https://helm.traefik.io/traefik
+
+----- FILE: infrastructure/traefik/base/kustomization.yaml -----
+    resources:
+      - namespace.yaml
+      - helmrepository.yaml
+      - helmrelease.yaml
+
+----- FILE: infrastructure/traefik/base/namespace.yaml -----
+    apiVersion: v1
+    kind: Namespace
+    metadata:
+      name: networking
+      labels:
+        kubernetes.io/metadata.name: networking
+
+----- FILE: infrastructure/traefik/resources/kustomization.yaml -----
+    resources:
+      - middlewares.yaml
+
+----- FILE: infrastructure/traefik/resources/middlewares.yaml -----
     apiVersion: traefik.io/v1alpha1
     kind: Middleware
     metadata:
@@ -1141,12 +1202,4 @@ apps
         browserXssFilter: true
         contentTypeNosniff: true
         forceSTSHeader: false
-
------ FILE: infrastructure/traefik/namespace.yaml -----
-    apiVersion: v1
-    kind: Namespace
-    metadata:
-      name: networking
-      labels:
-        kubernetes.io/metadata.name: networking
 
