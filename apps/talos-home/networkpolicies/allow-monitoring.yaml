@@ -17,22 +17,3 @@ spec:
           port: 4000   # if you later expose Blocky metrics via media, adjust as needed
   policyTypes:
     - Ingress
-1~apiVersion: networking.k8s.io/v1
-kind: NetworkPolicy
-metadata:
-  name: allow-monitoring
-  namespace: media
-spec:
-  podSelector: {}
-  ingress:
-    - from:
-        - namespaceSelector:
-            matchLabels:
-              kubernetes.io/metadata.name: monitoring
-      ports:
-        - protocol: TCP
-          port: 8000   # qBittorrent metrics
-        - protocol: TCP
-          port: 4000   # if you later expose Blocky metrics via media, adjust as needed
-  policyTypes:
-    - Ingress
