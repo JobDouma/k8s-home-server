@@ -31,7 +31,6 @@ resources:
   - monitoring/monitoring-release.yaml
   - monitoring/monitoring-repo.yaml
   - monitoring/servicemonitor.yaml
-  - monitoring/allow-monitoring.yaml
 
   # ──────────────────────────────────────
   # Jellyseerr
@@ -45,6 +44,7 @@ resources:
   - networkpolicies/default-deny.yaml
   - networkpolicies/allow-traefik.yaml
   - networkpolicies/allow-arr.yaml
+  - networkpolicies/allow-monitoring.yaml
 
   # ──────────────────────────────────────
   # Sonarr
