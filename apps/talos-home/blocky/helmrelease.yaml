@@ -32,6 +32,14 @@ spec:
             image:
               repository: ghcr.io/0xerr0r/blocky
               tag: v0.23
+            extraVolumes:
+              - name: config
+                configMap:
+                  name: blocky-config
+            extraVolumeMounts:
+              - name: config
+                mountPath: /app/config.yml
+                subPath: config.yml
     service:
       app:
         controller: blocky
@@ -48,11 +56,3 @@ spec:
             protocol: UDP
           http:
             port: 4000
-    persistence:
-      config:
-        enabled: true
-        type: configMap
-        name: blocky-config
-        globalMounts:
-          - path: /app/config.yml
-            subPath: config.yml

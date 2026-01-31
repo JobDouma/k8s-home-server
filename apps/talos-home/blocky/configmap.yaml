@@ -21,12 +21,10 @@ data:
         malware:
           - https://mirror1.malwaredomains.com/files/justdomains
           - https://urlhaus.abuse.ch/downloads/hostfile/
-
       clientGroupsBlock:
         default:
           - ads
           - malware
-
       blockType: zeroIp
       refreshPeriod: 4h
 
@@ -42,12 +40,19 @@ data:
     log:
       level: info
 
-    # ───────────────────────────────
-    # LOCAL SERVICE OVERRIDES
-    # ───────────────────────────────
     customDNS:
-      jellyfin.lan: 192.168.2.22
-      sonarr.lan: 192.168.2.22
-      jellyseerr.lan: 192.168.2.22
-      radarr.lan: 192.168.2.22
-      qbittorrent.lan: 192.168.2.22
+      - name: jellyfin.lan
+        type: A
+        value: 192.168.2.22
+      - name: sonarr.lan
+        type: A
+        value: 192.168.2.22
+      - name: jellyseerr.lan
+        type: A
+        value: 192.168.2.22
+      - name: radarr.lan
+        type: A
+        value: 192.168.2.22
+      - name: qbittorrent.lan
+        type: A
+        value: 192.168.2.22
