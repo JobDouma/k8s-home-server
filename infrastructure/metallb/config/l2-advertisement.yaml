@@ -1,9 +1,12 @@
 apiVersion: metallb.io/v1beta1
 kind: L2Advertisement
 metadata:
-  name: dns-l2
+  name: main-l2
   namespace: metallb-system
 spec:
+  ipAddressPools:
+    - dns-pool
+    - lan-pool
   nodeSelectors:
     - matchLabels:
         kubernetes.io/hostname: talos-cp-1
