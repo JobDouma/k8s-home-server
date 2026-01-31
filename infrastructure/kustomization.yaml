@@ -12,3 +12,6 @@ resources:
 
   - traefik/base
   - traefik/resources
+
+  - metallb/base
+  - metallb/config
