@@ -1,13 +1,13 @@
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
-  name: apps
+  name: infrastructure-config
   namespace: flux-system
 spec:
   dependsOn:
-    - name: infrastructure-config
+    - name: infrastructure # Waits for MetalLB/Traefik HelmReleases to be applied
   interval: 10m
-  path: ./apps/talos-home
+  path: ./infrastructure/metallb/config
   prune: true
   sourceRef:
     kind: GitRepository
