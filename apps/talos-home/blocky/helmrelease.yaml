@@ -6,7 +6,6 @@ metadata:
 spec:
   interval: 15m
   timeout: 10m
-
   chart:
     spec:
       chart: app-template
@@ -15,7 +14,6 @@ spec:
         kind: HelmRepository
         name: bjw-s
         namespace: flux-system
-
   values:
     controllers:
       blocky:
@@ -42,30 +40,23 @@ spec:
             args:
               - --config
               - /app/config.yml
-
             securityContext:
               allowPrivilegeEscalation: false
               capabilities:
                 drop:
                   - ALL
-
             probes:
               liveness:
                 enabled: true
-                custom: true
-                spec:
-                  httpGet:
-                    path: /health
-                    port: 4000
+                type: HTTP
+                path: /health
+                port: 4000
               readiness:
                 enabled: true
-                custom: true
-                spec:
-                  httpGet:
-                    path: /health
-                    port: 4000
+                type: HTTP
+                path: /health
+                port: 4000
 
-    # ─── SERVICE ─────────────────────────────────────────────
     service:
       app:
         controller: blocky
@@ -73,7 +64,6 @@ spec:
         externalTrafficPolicy: Cluster
         annotations:
           metallb.universe.tf/address-pool: "dns-pool"
-
         ports:
           dns-tcp:
             port: 53
@@ -84,14 +74,12 @@ spec:
           http:
             port: 4000
 
-    # ─── PERSISTENCE MUST ONLY DECLARE SOURCE ───────────────
     persistence:
       config:
         enabled: true
         type: configMap
         name: blocky-config
-        advancedMounts:
-          blocky:
-            app:
-              - path: /app/config.yml
-                subPath: config.yml
+        globalMounts:
+          - path: /app/config.yml
+            subPath: config.yml
+            readOnly: true
