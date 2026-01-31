@@ -5,15 +5,16 @@ metadata:
   namespace: dns
 data:
   config.yml: |
-    upstream:
-      default:
-        - https://one.one.one.one/dns-query
-        - https://dns.google/dns-query
-        - 1.1.1.1
-        - 8.8.8.8
+    upstreams:
+      groups:
+        default:
+          - https://one.one.one.one/dns-query
+          - https://dns.google/dns-query
+          - 1.1.1.1
+          - 8.8.8.8
 
     blocking:
-      blackLists:
+      denylists:
         ads:
           - https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts
           - https://big.oisd.nl/domainswild
@@ -21,10 +22,12 @@ data:
         malware:
           - https://mirror1.malwaredomains.com/files/justdomains
           - https://urlhaus.abuse.ch/downloads/hostfile/
+
       clientGroupsBlock:
         default:
           - ads
           - malware
+
       blockType: zeroIp
       refreshPeriod: 4h
 
@@ -40,19 +43,13 @@ data:
     log:
       level: info
 
+    # --------------------------------------------------
+    # FIXED SECTION - NEW FORMAT
+    # --------------------------------------------------
     customDNS:
-      - name: jellyfin.lan
-        type: A
-        value: 192.168.2.22
-      - name: sonarr.lan
-        type: A
-        value: 192.168.2.22
-      - name: jellyseerr.lan
-        type: A
-        value: 192.168.2.22
-      - name: radarr.lan
-        type: A
-        value: 192.168.2.22
-      - name: qbittorrent.lan
-        type: A
-        value: 192.168.2.22
+      mapping:
+        jellyfin.lan: 192.168.2.22
+        sonarr.lan: 192.168.2.22
+        jellyseerr.lan: 192.168.2.22
+        radarr.lan: 192.168.2.22
+        qbittorrent.lan: 192.168.2.22
