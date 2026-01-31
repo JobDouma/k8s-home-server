@@ -1,4 +1,3 @@
-# For Prometheus to "find" your qBittorrent metrics, you add a ServiceMonitor. This is a small manifest that tells the monitoring stack: "Go look at port 8090 on the qbittorrent service."
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
