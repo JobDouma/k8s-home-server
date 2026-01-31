@@ -33,11 +33,10 @@ spec:
     service:
       app:
         controller: jellyseerr
-        type: NodePort
+        type: ClusterIP
         ports:
           http:
             port: 5055
-            nodePort: 30055
     persistence:
       config:
         enabled: true

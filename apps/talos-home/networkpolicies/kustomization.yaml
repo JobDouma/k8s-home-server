@@ -1,4 +1,0 @@
-resources:
-  - default-deny.yaml
-  - allow-ingress-nginx.yaml
-  - allow-arr.yaml
