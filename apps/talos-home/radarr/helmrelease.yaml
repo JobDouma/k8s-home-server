@@ -28,12 +28,11 @@ spec:
               RADARR__SERVER__BINDADDRESS: 0.0.0.0
     service:
       app:
-        type: NodePort
+        type: ClusterIP
         controller: radarr
         ports:
           http:
             port: 7878
-            nodePort: 30787
     persistence:
       config:
         enabled: true

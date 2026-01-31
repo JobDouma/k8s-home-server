@@ -78,18 +78,3 @@ spec:
         existingClaim: media
         globalMounts:
           - path: /downloads
-
-
-    ingress:
-      app:
-        enabled: true
-        className: nginx
-        hosts:
-          - host: qbittorrent.home.arpa
-            paths:
-              - path: /
-                pathType: Prefix
-                service:
-                  identifier: app
-                  port: http
-

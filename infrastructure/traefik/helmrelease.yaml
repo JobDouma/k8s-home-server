@@ -16,7 +16,7 @@ spec:
 
   values:
     deployment:
-      replicas: 1
+      replicas: 2
 
     ingressClass:
       enabled: true
@@ -25,8 +25,9 @@ spec:
 
     service:
       type: LoadBalancer
-      spec:
-        loadBalancerIP: 192.168.2.22   # your node IP
+      loadBalancerIP: 192.168.2.22
+      annotations:
+        metallb.universe.tf/address-pool: lan-pool
 
     ports:
       web:
@@ -43,6 +44,9 @@ spec:
         enabled: true
       kubernetesCRD:
         enabled: true
+
+    additionalArguments:
+      - "--providers.kubernetesingress.ingressclass=traefik"
 
     logs:
       general:

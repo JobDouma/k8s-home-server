@@ -16,6 +16,7 @@ resources:
   # ──────────────────────────────────────
   - jellyfin/helmrepository.yaml
   - jellyfin/helmrelease.yaml
+  - jellyfin/ingressroute.yaml
 
   # ──────────────────────────────────────
   # qBittorrent
@@ -35,17 +36,24 @@ resources:
   # ──────────────────────────────────────
   # Jellyseerr
   # ──────────────────────────────────────
-  - jellyseer/helmrelease.yaml
+  - jellyseerr/helmrelease.yaml
+  - jellyseerr/ingressroute.yaml
 
-  - ingress-nginx
-  - networkpolicies
+  # ──────────────────────────────────────
+  # Network Policies
+  # ──────────────────────────────────────
+  - networkpolicies/default-deny.yaml
+  - networkpolicies/allow-traefik.yaml
+  - networkpolicies/allow-arr.yaml
 
   # ──────────────────────────────────────
   # Sonarr
   # ──────────────────────────────────────
   - sonarr/helmrelease.yaml
+  - sonarr/ingressroute.yaml
 
   # ──────────────────────────────────────
   # Radarr
   # ──────────────────────────────────────
   - radarr/helmrelease.yaml
+  - radarr/ingressroute.yaml

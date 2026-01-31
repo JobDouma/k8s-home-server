@@ -28,12 +28,11 @@ spec:
               SONARR__SERVER__BINDADDRESS: 0.0.0.0
     service:
       app:
-        type: NodePort
+        type: ClusterIP
         controller: sonarr
         ports:
           http:
             port: 8989
-            nodePort: 30898
     persistence:
       config:
         enabled: true

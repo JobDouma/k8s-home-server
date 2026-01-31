@@ -50,9 +50,8 @@ spec:
         cpu: "1"
     service:
       enabled: true
-      type: NodePort
+      type: ClusterIP
       port: 8096
-      nodePort: 30096
 
     affinity:
       nodeAffinity:
