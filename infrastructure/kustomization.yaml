@@ -10,8 +10,14 @@ resources:
   - storage/pvc-media.yaml
   - storage/pvc-tank-configs.yaml
 
-  - traefik/base
-  - traefik/resources
+  - traefik/base/namespace.yaml
+  - traefik/base/helmrepository.yaml
+  - traefik/base/helmrelease.yaml
+  - traefik/resources/middlewares.yaml
 
-  - metallb/base
-  - metallb/config
+  - metallb/base/namespace.yaml
+  - metallb/base/helmrelease.yaml
+  - metallb/base/helmrepository.yaml
+  - metallb/config/ipaddress-pool-dns.yaml
+  - metallb/config/ipaddress-pool-lan.yaml
+  - metallb/config/l2-advertisement.yaml
