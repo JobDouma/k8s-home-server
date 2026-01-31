@@ -5,6 +5,7 @@ metadata:
   namespace: monitoring
 spec:
   interval: 30m
+  timeout: 20m
   chart:
     spec:
       chart: kube-prometheus-stack
@@ -19,7 +20,6 @@ spec:
   upgrade:
     crds: CreateReplace
   values:
-    # This tells Prometheus to look for "ServiceMonitors" to start scraping
     prometheus:
       service:
         type: NodePort
