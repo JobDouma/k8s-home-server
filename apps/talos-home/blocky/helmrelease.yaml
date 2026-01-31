@@ -23,6 +23,11 @@ spec:
         strategy: RollingUpdate
 
         pod:
+          securityContext:
+            runAsNonRoot: true
+            seccompProfile:
+              type: RuntimeDefault
+
           affinity:
             podAntiAffinity:
               requiredDuringSchedulingIgnoredDuringExecution:
@@ -41,44 +46,24 @@ spec:
               - --config
               - /app/config.yml
 
-    # ------------------------------------------------------------
-    # CONFIG FILE EMBEDDED AS CONFIGMAP
-    # ------------------------------------------------------------
-    configMaps:
-      config:
-        enabled: true
-        data:
-          config.yml: |
-            upstreams:
-              groups:
-                default:
-                  - 1.1.1.1
-                  - 1.0.0.1
-                  - 9.9.9.9
+            securityContext:
+              allowPrivilegeEscalation: false
+              capabilities:
+                drop:
+                  - ALL
 
-            customDNS:
-              mapping:
-                router.local: 192.168.2.1
-                nas.local: 192.168.2.10
+            probes:
+              liveness:
+                httpGet:
+                  path: /health
+                  port: 4000
+                initialDelaySeconds: 10
 
-            blocking:
-              denylists:
-                ads:
-                  - https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts
-              clientGroupsBlock:
-                default:
-                  - ads
-
-            ports:
-              dns: 53
-              http: 4000
-
-            prometheus:
-              enable: true
-              path: /metrics
-
-            log:
-              level: info
+              readiness:
+                httpGet:
+                  path: /health
+                  port: 4000
+                initialDelaySeconds: 5
 
     # ------------------------------------------------------------
     # SERVICE
@@ -103,7 +88,7 @@ spec:
             port: 4000
 
     # ------------------------------------------------------------
-    # MOUNT CONFIG EXACTLY WHERE BLOCKY EXPECTS IT
+    # USE YOUR EXISTING CONFIGMAP - SINGLE SOURCE OF TRUTH
     # ------------------------------------------------------------
     persistence:
       config:
