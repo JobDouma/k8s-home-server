@@ -21,7 +21,6 @@ resources:
   # ──────────────────────────────────────
   # qBittorrent
   # ──────────────────────────────────────
-  - qbittorrent/helmrepository.yaml
   - qbittorrent/helmrelease.yaml
   - qbittorrent/secret.yaml
 
