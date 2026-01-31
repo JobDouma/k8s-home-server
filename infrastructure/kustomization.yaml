@@ -10,6 +10,5 @@ resources:
   - storage/pvc-media.yaml
   - storage/pvc-tank-configs.yaml
 
-  - traefik/namespace.yaml
-  - traefik/helmrelease.yaml
-  - traefik/middlewares.yaml
+  - traefik/base
+  - traefik/resources
