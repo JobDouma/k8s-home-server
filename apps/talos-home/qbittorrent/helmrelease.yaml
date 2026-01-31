@@ -21,36 +21,35 @@ spec:
             runAsUser: 1000
             runAsGroup: 1000
             fsGroup: 1000
-        containers:
-          app:
-            image:
-              repository: ghcr.io/onedr0p/qbittorrent
-              tag: 4.6.3
-            envFrom:
-              - secretRef:
-                name: qbittorrent-webui
-            env:
-              TZ: Europe/Amsterdam
-              QBITTORRENT__PORT: &port 8080
-              QBITTORRENT__BT_PORT: &bt-port 6881
-              QBITTORRENT__WEBUI__ADDRESS: "0.0.0.0"
-              QBITTORRENT__WEBUI__HOST_HEADER_VALIDATION: "false"
-              QBITTORRENT__WEBUI__CSRF_PROTECTION: "false"
-            resources:
-              requests:
-                cpu: 100m
-                memory: 256Mi
-              limits:
-                memory: 1Gi
-          exporter:
-            image:
-              repository: ghcr.io/esanchezm/prometheus-qbittorrent-exporter
-              tag: v1.6.0
-            env:
-              QBITTORRENT_HOST: localhost
-              QBITTORRENT_PORT: *port
-              EXPORTER_PORT: &metrics-port 8000
-
+          containers:
+            app:
+              image:
+                repository: ghcr.io/onedr0p/qbittorrent
+                tag: 4.6.3
+              envFrom:
+                - secretRef:
+                    name: qbittorrent-webui
+              env:
+                TZ: Europe/Amsterdam
+                QBITTORRENT__PORT: 8080
+                QBITTORRENT__BT_PORT: 6881
+                QBITTORRENT__WEBUI__ADDRESS: "0.0.0.0"
+                QBITTORRENT__WEBUI__HOST_HEADER_VALIDATION: "false"
+                QBITTORRENT__WEBUI__CSRF_PROTECTION: "false"
+              resources:
+                requests:
+                  cpu: 100m
+                  memory: 256Mi
+                limits:
+                  memory: 1Gi
+            exporter:
+              image:
+                repository: ghcr.io/esanchezm/prometheus-qbittorrent-exporter
+                tag: v1.6.0
+              env:
+                QBITTORRENT_HOST: localhost
+                QBITTORRENT_PORT: 8080
+                EXPORTER_PORT: 8000
     service:
       app:
         controller: qbittorrent
@@ -65,7 +64,6 @@ spec:
           bt:
             port: 6881
             protocol: TCP
-
     persistence:
       config:
         enabled: true
