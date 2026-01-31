@@ -21,13 +21,11 @@ spec:
       blocky:
         replicas: 2
         strategy: RollingUpdate
-
         pod:
           securityContext:
             runAsNonRoot: true
             seccompProfile:
               type: RuntimeDefault
-
           affinity:
             podAntiAffinity:
               requiredDuringSchedulingIgnoredDuringExecution:
@@ -41,7 +39,6 @@ spec:
             image:
               repository: ghcr.io/0xerr0r/blocky
               tag: v0.23
-
             args:
               - --config
               - /app/config.yml
@@ -52,24 +49,21 @@ spec:
                 drop:
                   - ALL
 
-            # ─── MOUNTS GO HERE IN V3 ─────────────────────
-            volumeMounts:
-              - name: config
-                mountPath: /app/config.yml
-                subPath: config.yml
-
             probes:
               liveness:
                 enabled: true
-                type: http
-                path: /health
-                port: 4000
-
+                custom: true
+                spec:
+                  httpGet:
+                    path: /health
+                    port: 4000
               readiness:
                 enabled: true
-                type: http
-                path: /health
-                port: 4000
+                custom: true
+                spec:
+                  httpGet:
+                    path: /health
+                    port: 4000
 
     # ─── SERVICE ─────────────────────────────────────────────
     service:
@@ -77,7 +71,6 @@ spec:
         controller: blocky
         type: LoadBalancer
         externalTrafficPolicy: Cluster
-
         annotations:
           metallb.universe.tf/address-pool: "dns-pool"
 
@@ -94,6 +87,11 @@ spec:
     # ─── PERSISTENCE MUST ONLY DECLARE SOURCE ───────────────
     persistence:
       config:
+        enabled: true
         type: configMap
-        identifier: config
         name: blocky-config
+        advancedMounts:
+          blocky:
+            app:
+              - path: /app/config.yml
+                subPath: config.yml
