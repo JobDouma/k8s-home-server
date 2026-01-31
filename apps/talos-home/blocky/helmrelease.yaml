@@ -26,6 +26,15 @@ spec:
             runAsNonRoot: true
             seccompProfile:
               type: RuntimeDefault
+          affinity:
+            podAntiAffinity:
+              preferredDuringSchedulingIgnoredDuringExecution:
+                - weight: 100
+                  podAffinityTerm:
+                    labelSelector:
+                      matchLabels:
+                        app.kubernetes.io/name: blocky
+                    topologyKey: "kubernetes.io/hostname"
 
         containers:
           app:
@@ -35,6 +44,22 @@ spec:
             args:
               - --config
               - /app/config.yml
+            securityContext:
+              allowPrivilegeEscalation: false
+              capabilities:
+                add:
+                  - NET_BIND_SERVICE
+
+            # Mount ConfigMap manually
+            extraVolumes:
+              - name: blocky-config
+                configMap:
+                  name: blocky-config
+            extraVolumeMounts:
+              - name: blocky-config
+                mountPath: /app/config.yml
+                subPath: config.yml
+                readOnly: true
 
     service:
       app:
@@ -54,11 +79,3 @@ spec:
             protocol: UDP
           http:
             port: 4000
-
-    persistence:
-      config:
-        enabled: true
-        type: configMap
-        name: blocky-config
-        mountPath: /app/config.yml
-        readOnly: true

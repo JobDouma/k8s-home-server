@@ -22,12 +22,10 @@ data:
         malware:
           - https://mirror1.malwaredomains.com/files/justdomains
           - https://urlhaus.abuse.ch/downloads/hostfile/
-
       clientGroupsBlock:
         default:
           - ads
           - malware
-
       blockType: zeroIp
       refreshPeriod: 4h
 
