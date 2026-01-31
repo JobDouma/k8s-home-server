@@ -14,3 +14,7 @@ resources:
   - metallb/base/namespace.yaml
   - metallb/base/helmrelease.yaml
   - metallb/base/helmrepository.yaml
+  - metallb/config/ipaddress-pool-dns.yaml
+  - metallb/config/ipaddress-pool-lan.yaml
+  - metallb/config/l2-advertisement.yaml
+
