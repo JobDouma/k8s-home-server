@@ -17,62 +17,59 @@ spec:
     controllers:
       qbittorrent:
         pod:
-          securityContext:
-            runAsUser: 1000
-            runAsGroup: 1000
-            fsGroup: 1000
-          containers:
-            app:
-              image:
-                repository: ghcr.io/onedr0p/qbittorrent
-                tag: 4.6.3
-              envFrom:
-                - secretRef:
-                    name: qbittorrent-webui
-              env:
-                TZ: Europe/Amsterdam
-                QBITTORRENT__PORT: 8080
-                QBITTORRENT__BT_PORT: 6881
-                QBITTORRENT__WEBUI__ADDRESS: "0.0.0.0"
-                QBITTORRENT__WEBUI__HOST_HEADER_VALIDATION: "false"
-                QBITTORRENT__WEBUI__CSRF_PROTECTION: "false"
-              resources:
-                requests:
-                  cpu: 100m
-                  memory: 256Mi
-                limits:
-                  memory: 1Gi
-            exporter:
-              image:
-                repository: ghcr.io/esanchezm/prometheus-qbittorrent-exporter
-                tag: v1.6.0
-              env:
-                QBITTORRENT_HOST: localhost
-                QBITTORRENT_PORT: 8080
-                EXPORTER_PORT: 8000
+          affinity:
+            podAntiAffinity:
+              requiredDuringSchedulingIgnoredDuringExecution:
+                - labelSelector:
+                    matchLabels:
+                      app.kubernetes.io/name: qbittorrent
+                  topologyKey: "kubernetes.io/hostname"
+        containers:
+          app:
+            image:
+              repository: ghcr.io/onedr0p/qbittorrent
+              tag: 4.6.3
+            envFrom:
+              - secretRef:
+                  name: qbittorrent-webui
+            env:
+              TZ: Europe/Amsterdam
+              QBITTORRENT__PORT: 8080
+              QBITTORRENT__BT_PORT: 6881
+              QBITTORRENT__WEBUI__ADDRESS: "0.0.0.0"
+              QBITTORRENT__WEBUI__HOST_HEADER_VALIDATION: "false"
+              QBITTORRENT__WEBUI__CSRF_PROTECTION: "false"
+            resources:
+              requests:
+                cpu: 100m
+                memory: 256Mi
+              limits:
+                memory: 1Gi
+          exporter:
+            image:
+              repository: ghcr.io/esanchezm/prometheus-qbittorrent-exporter
+              tag: v1.6.0
+            env:
+              QBITTORRENT_HOST: localhost
+              QBITTORRENT_PORT: 8080
+              EXPORTER_PORT: 8000
     service:
       app:
         controller: qbittorrent
+        type: LoadBalancer
+        externalTrafficPolicy: Cluster
+        annotations:
+          "metallb.universe.tf/address-pool": "media-pool"
         ports:
           http:
             port: 8080
-      bittorrent:
-        controller: qbittorrent
-        type: LoadBalancer
-        loadBalancerIP: 192.168.2.241
-        ports:
           bt:
             port: 6881
             protocol: TCP
     persistence:
       config:
-        enabled: true
+        type: persistentVolumeClaim
         existingClaim: tank-configs
-        globalMounts:
-          - path: /config
-            subPath: qbittorrent
       downloads:
-        enabled: true
+        type: persistentVolumeClaim
         existingClaim: media
-        globalMounts:
-          - path: /downloads
