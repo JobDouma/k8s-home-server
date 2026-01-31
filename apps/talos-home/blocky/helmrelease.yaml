@@ -52,22 +52,26 @@ spec:
                 drop:
                   - ALL
 
+            # ─── MOUNTS GO HERE IN V3 ─────────────────────
+            volumeMounts:
+              - name: config
+                mountPath: /app/config.yml
+                subPath: config.yml
+
             probes:
               liveness:
-                httpGet:
-                  path: /health
-                  port: 4000
-                initialDelaySeconds: 10
+                enabled: true
+                type: http
+                path: /health
+                port: 4000
 
               readiness:
-                httpGet:
-                  path: /health
-                  port: 4000
-                initialDelaySeconds: 5
+                enabled: true
+                type: http
+                path: /health
+                port: 4000
 
-    # ------------------------------------------------------------
-    # SERVICE
-    # ------------------------------------------------------------
+    # ─── SERVICE ─────────────────────────────────────────────
     service:
       app:
         controller: blocky
@@ -87,13 +91,9 @@ spec:
           http:
             port: 4000
 
-    # ------------------------------------------------------------
-    # USE YOUR EXISTING CONFIGMAP - SINGLE SOURCE OF TRUTH
-    # ------------------------------------------------------------
+    # ─── PERSISTENCE MUST ONLY DECLARE SOURCE ───────────────
     persistence:
       config:
-        enabled: true
         type: configMap
+        identifier: config
         name: blocky-config
-        subPath: config.yml
-        mountPath: /app/config.yml
