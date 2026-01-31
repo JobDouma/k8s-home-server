@@ -53,19 +53,28 @@ spec:
               QBITTORRENT_HOST: localhost
               QBITTORRENT_PORT: 8080
               EXPORTER_PORT: 8000
+            ports:
+              - name: metrics
+                containerPort: 8000
+                protocol: TCP
+
     service:
       app:
         controller: qbittorrent
         type: LoadBalancer
         externalTrafficPolicy: Cluster
         annotations:
-          "metallb.universe.tf/address-pool": "lan-pool"
+          metallb.universe.tf/address-pool: "lan-pool"
         ports:
           http:
             port: 8080
           bt:
             port: 6881
             protocol: TCP
+          metrics:
+            port: 8000
+            protocol: TCP
+
     persistence:
       config:
         type: persistentVolumeClaim
