@@ -10,7 +10,7 @@ resources:
   - storage/pvc-tank-configs.yaml
 
   # Controllers (Base)
-  - traefik/base/kustomization.yaml
+  - traefik/base
   - metallb/base/namespace.yaml
   - metallb/base/helmrelease.yaml
   - metallb/base/helmrepository.yaml

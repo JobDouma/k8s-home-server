@@ -5,7 +5,3 @@ resources:
   - ipaddress-pool-dns.yaml
   - ipaddress-pool-lan.yaml
   - l2-advertisement.yaml
-
-dependsOn:
-  - name: metallb
-    namespace: metallb-system

@@ -4,9 +4,9 @@ drwxrwxr-x  6 job job 4096 Jan 19 19:48 .
 drwxr-x--- 15 job job 4096 Jan 31 09:42 ..
 drwxrwxr-x  3 job job 4096 Jan 10 10:12 apps
 drwxrwxr-x  3 job job 4096 Jan 10 10:12 clusters
--rw-rw-r--  1 job job   32 Jan 31 12:59 full_dump.txt
-drwxrwxr-x  8 job job 4096 Jan 31 12:56 .git
-drwxrwxr-x  5 job job 4096 Jan 31 11:17 infrastructure
+-rw-rw-r--  1 job job   32 Jan 31 13:34 full_dump.txt
+drwxrwxr-x  8 job job 4096 Jan 31 13:34 .git
+drwxrwxr-x  5 job job 4096 Jan 31 13:26 infrastructure
 -rw-rw-r--  1 job job   17 Jan  2 14:26 README.md
 
 infrastructure
@@ -83,9 +83,9 @@ apps
     drwxr-x--- 15 job job 4096 Jan 31 09:42 ..
     drwxrwxr-x  3 job job 4096 Jan 10 10:12 apps
     drwxrwxr-x  3 job job 4096 Jan 10 10:12 clusters
-    -rw-rw-r--  1 job job   32 Jan 31 12:59 full_dump.txt
-    drwxrwxr-x  8 job job 4096 Jan 31 12:56 .git
-    drwxrwxr-x  5 job job 4096 Jan 31 11:17 infrastructure
+    -rw-rw-r--  1 job job   32 Jan 31 13:34 full_dump.txt
+    drwxrwxr-x  8 job job 4096 Jan 31 13:34 .git
+    drwxrwxr-x  5 job job 4096 Jan 31 13:26 infrastructure
     -rw-rw-r--  1 job job   17 Jan  2 14:26 README.md
     
     infrastructure
@@ -894,25 +894,18 @@ apps
     kind: Kustomization
     
     resources:
+      # Storage
       - storage/namespace.yaml
-    
       - storage/pv-media.yaml
       - storage/pv-tank-configs.yaml
-    
       - storage/pvc-media.yaml
       - storage/pvc-tank-configs.yaml
     
-      - traefik/base/namespace.yaml
-      - traefik/base/helmrepository.yaml
-      - traefik/base/helmrelease.yaml
-      - traefik/resources/middlewares.yaml
-    
+      # Controllers (Base)
+      - traefik/base/kustomization.yaml
       - metallb/base/namespace.yaml
       - metallb/base/helmrelease.yaml
       - metallb/base/helmrepository.yaml
-      - metallb/config/ipaddress-pool-dns.yaml
-      - metallb/config/ipaddress-pool-lan.yaml
-      - metallb/config/l2-advertisement.yaml
 
 ----- FILE: infrastructure/metallb/base/helmrelease.yaml -----
     apiVersion: helm.toolkit.fluxcd.io/v2
@@ -1014,18 +1007,17 @@ apps
       - ipaddress-pool-dns.yaml
       - ipaddress-pool-lan.yaml
       - l2-advertisement.yaml
-    
-    dependsOn:
-      - name: metallb
-        namespace: metallb-system
 
 ----- FILE: infrastructure/metallb/config/l2-advertisement.yaml -----
     apiVersion: metallb.io/v1beta1
     kind: L2Advertisement
     metadata:
-      name: dns-l2
+      name: main-l2
       namespace: metallb-system
     spec:
+      ipAddressPools:
+        - dns-pool
+        - lan-pool
       nodeSelectors:
         - matchLabels:
             kubernetes.io/hostname: talos-cp-1
@@ -1174,6 +1166,8 @@ apps
       url: https://helm.traefik.io/traefik
 
 ----- FILE: infrastructure/traefik/base/kustomization.yaml -----
+    apiVersion: kustomize.config.k8s.io/v1beta1
+    kind: Kustomization
     resources:
       - namespace.yaml
       - helmrepository.yaml
@@ -1188,6 +1182,8 @@ apps
         kubernetes.io/metadata.name: networking
 
 ----- FILE: infrastructure/traefik/resources/kustomization.yaml -----
+    apiVersion: kustomize.config.k8s.io/v1beta1
+    kind: Kustomization
     resources:
       - middlewares.yaml
 
