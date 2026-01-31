@@ -5,6 +5,8 @@ metadata:
   namespace: dns
 spec:
   interval: 15m
+  timeout: 10m
+
   chart:
     spec:
       chart: app-template
@@ -13,11 +15,13 @@ spec:
         kind: HelmRepository
         name: bjw-s
         namespace: flux-system
+
   values:
     controllers:
       blocky:
         replicas: 2
         strategy: RollingUpdate
+
         pod:
           affinity:
             podAntiAffinity:
@@ -26,18 +30,68 @@ spec:
                     matchLabels:
                       app.kubernetes.io/name: blocky
                   topologyKey: "kubernetes.io/hostname"
+
         containers:
           app:
             image:
               repository: ghcr.io/0xerr0r/blocky
               tag: v0.23
+
+            args:
+              - --config
+              - /app/config.yml
+
+    # ------------------------------------------------------------
+    # CONFIG FILE EMBEDDED AS CONFIGMAP
+    # ------------------------------------------------------------
+    configMaps:
+      config:
+        enabled: true
+        data:
+          config.yml: |
+            upstreams:
+              groups:
+                default:
+                  - 1.1.1.1
+                  - 1.0.0.1
+                  - 9.9.9.9
+
+            customDNS:
+              mapping:
+                router.local: 192.168.2.1
+                nas.local: 192.168.2.10
+
+            blocking:
+              denylists:
+                ads:
+                  - https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts
+              clientGroupsBlock:
+                default:
+                  - ads
+
+            ports:
+              dns: 53
+              http: 4000
+
+            prometheus:
+              enable: true
+              path: /metrics
+
+            log:
+              level: info
+
+    # ------------------------------------------------------------
+    # SERVICE
+    # ------------------------------------------------------------
     service:
       app:
         controller: blocky
         type: LoadBalancer
         externalTrafficPolicy: Cluster
+
         annotations:
-          "metallb.universe.tf/address-pool": "dns-pool"
+          metallb.universe.tf/address-pool: "dns-pool"
+
         ports:
           dns-tcp:
             port: 53
@@ -47,12 +101,14 @@ spec:
             protocol: UDP
           http:
             port: 4000
+
+    # ------------------------------------------------------------
+    # MOUNT CONFIG EXACTLY WHERE BLOCKY EXPECTS IT
+    # ------------------------------------------------------------
     persistence:
       config:
-        type: custom
-        volumeSpec:
-          configMap:
-            name: blocky-config
-            items:
-              - key: config.yml
-                path: config.yml
+        enabled: true
+        type: configMap
+        name: blocky-config
+        subPath: config.yml
+        mountPath: /app/config.yml
