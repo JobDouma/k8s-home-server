@@ -5,9 +5,17 @@ metadata:
   namespace: flux-system
 spec:
   dependsOn:
-    - name: infrastructure # Waits for MetalLB/Traefik HelmReleases to be applied
+    - name: infrastructure
   interval: 10m
-  path: ./infrastructure/metallb/config
+  path: ./infrastructure
+  # We use a post-build target or specific paths here
+  # But the cleanest way is to point to a new specific config kustomization:
+  commonMetadata:
+    labels:
+      stack: config
+  resources:
+    - ./infrastructure/metallb/config
+    - ./infrastructure/traefik/resources
   prune: true
   sourceRef:
     kind: GitRepository
