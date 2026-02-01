@@ -16,9 +16,11 @@ data:
     blocking:
       blackLists:
         ads:
-          - https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts
-          - https://big.oisd.nl/domainswild
-          - https://raw.githubusercontent.com/jerryn70/GoodbyeAds/master/Hosts/GoodbyeAds.txt
+          - https://oisd.nl/downloads/basic
+          - https://adaway.org/hosts.txt
+          - https://adguardteam.github.io/AdGuardSDNSFilter/Filters/filter.txt
+          - https://raw.githubusercontent.com/hoshsadiq/adblock-nocoin-list/master/hosts.txt
+          - https://raw.githubusercontent.com/EnergizedProtection/block/master/EnergizedBlu.hosts
         malware:
           - https://mirror1.malwaredomains.com/files/justdomains
           - https://urlhaus.abuse.ch/downloads/hostfile/
