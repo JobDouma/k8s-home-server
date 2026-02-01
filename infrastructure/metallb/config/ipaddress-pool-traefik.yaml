@@ -1,12 +1,20 @@
 apiVersion: metallb.io/v1beta1
+kind: IPAddressPool
+metadata:
+  name: traefik-pool
+  namespace: metallb-system
+spec:
+  addresses:
+    - 192.168.2.20/32
+---
+apiVersion: metallb.io/v1beta1
 kind: L2Advertisement
 metadata:
-  name: main-l2
+  name: traefik-l2
   namespace: metallb-system
 spec:
   ipAddressPools:
-    - dns-pool
-    - lan-pool
+    - traefik-pool
   nodeSelectors:
     - matchLabels:
         kubernetes.io/hostname: talos-cp-1
