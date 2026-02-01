@@ -13,5 +13,5 @@ spec:
         - name: jellyfin
           port: 8096
       middlewares:
-        - name: lan-headers
-          namespace: networking
+      - name: lan-headers
+        namespace: networking
