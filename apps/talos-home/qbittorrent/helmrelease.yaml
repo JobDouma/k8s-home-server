@@ -16,16 +16,6 @@ spec:
         name: bjw-s
         namespace: flux-system
 
-  install:
-    remediation:
-      retries: 3
-    cleanupOnFail: true
-
-  upgrade:
-    remediation:
-      retries: 3
-    cleanupOnFail: true
-
   values:
     controllers:
       qbittorrent:
