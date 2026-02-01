@@ -22,6 +22,8 @@ spec:
         replicas: 2
 
         pod:
+          annotations:
+            configmap.reloader.stakater.com/reload: "blocky-config"
           securityContext:
             runAsNonRoot: true
             runAsUser: 1000
