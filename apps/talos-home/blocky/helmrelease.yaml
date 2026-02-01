@@ -16,6 +16,14 @@ spec:
         name: bjw-s
         namespace: flux-system
 
+  install:
+    remediation:
+      retries: 3
+
+  upgrade:
+    remediation:
+      retries: 3
+
   values:
     controllers:
       blocky:
@@ -24,6 +32,9 @@ spec:
         pod:
           securityContext:
             runAsNonRoot: true
+            runAsUser: 1000
+            runAsGroup: 1000
+            fsGroup: 1000
             seccompProfile:
               type: RuntimeDefault
           affinity:
@@ -45,15 +56,15 @@ spec:
               - --config
               - /app/config.yml
 
-            # Explicit container ports so the service can target them by name
+            # app-template v3 expects an ARRAY here
             ports:
-              dns-udp:
+              - name: dns-udp
                 containerPort: 53
                 protocol: UDP
-              dns-tcp:
+              - name: dns-tcp
                 containerPort: 53
                 protocol: TCP
-              http:
+              - name: http
                 containerPort: 4000
                 protocol: TCP
 
@@ -86,8 +97,6 @@ spec:
             protocol: TCP
             targetPort: http
 
-    # This is the schema-valid way to mount your ConfigMap as /app/config.yml
-    # (Your previous extraVolumes/extraVolumeMounts placement is what broke schema validation.)
     persistence:
       config:
         enabled: true
