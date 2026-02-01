@@ -43,8 +43,8 @@ data:
 
     customDNS:
       mapping:
-        jellyfin.lan: 192.168.2.22
-        sonarr.lan: 192.168.2.22
-        jellyseerr.lan: 192.168.2.22
-        radarr.lan: 192.168.2.22
-        qbittorrent.lan: 192.168.2.22
+        jellyfin.lan: 192.168.2.20
+        sonarr.lan: 192.168.2.20
+        jellyseerr.lan: 192.168.2.20
+        radarr.lan: 192.168.2.20
+        qbittorrent.lan: 192.168.2.20
