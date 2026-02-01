@@ -16,7 +16,7 @@ data:
     blocking:
       blackLists:
         ads:
-          - https://oisd.nl/downloads/basic
+          - https://oisd.nl/downloads/full
           - https://adaway.org/hosts.txt
           - https://adguardteam.github.io/AdGuardSDNSFilter/Filters/filter.txt
           - https://raw.githubusercontent.com/hoshsadiq/adblock-nocoin-list/master/hosts.txt
