@@ -21,13 +21,13 @@ spec:
     crds: CreateReplace
     remediation:
       retries: 3
-    cleanupOnFail: true
+    # cleanupOnFail: removed (invalid in v2 API)
 
   upgrade:
     crds: CreateReplace
     remediation:
       retries: 3
-    cleanupOnFail: true
+    # cleanupOnFail: removed (invalid in v2 API)
 
   values:
     prometheus:
