@@ -19,9 +19,19 @@ resources:
   - jellyfin/ingressroute.yaml
 
   # ──────────────────────────────────────
-  # Media namespace Traefik middlewares (app-side)
+  # qBittorrent
   # ──────────────────────────────────────
-  - traefik/middleware-lan-headers-media.yaml
+  - qbittorrent/helmrelease.yaml
+  - qbittorrent/secret.yaml
+  - qbittorrent/ingressroute.yaml
+
+  # ──────────────────────────────────────
+  # monitoring / prometheus
+  # ──────────────────────────────────────
+  - monitoring/namespace.yaml
+  - monitoring/monitoring-release.yaml
+  - monitoring/monitoring-repo.yaml
+  - monitoring/servicemonitor.yaml
 
   # ──────────────────────────────────────
   # Jellyseerr
@@ -30,11 +40,13 @@ resources:
   - jellyseerr/ingressroute.yaml
 
   # ──────────────────────────────────────
-  # qBittorrent
+  # Network Policies
   # ──────────────────────────────────────
-  - qbittorrent/helmrelease.yaml
-  - qbittorrent/secret.yaml
-  - qbittorrent/ingressroute.yaml
+  - networkpolicies/default-deny.yaml
+  - networkpolicies/allow-traefik.yaml
+  - networkpolicies/allow-arr.yaml
+  - networkpolicies/allow-monitoring.yaml
+  - networkpolicies/allow-media-namespace-internal.yaml
 
   # ──────────────────────────────────────
   # Sonarr
@@ -47,22 +59,6 @@ resources:
   # ──────────────────────────────────────
   - radarr/helmrelease.yaml
   - radarr/ingressroute.yaml
-
-  # ──────────────────────────────────────
-  # monitoring / prometheus
-  # ──────────────────────────────────────
-  - monitoring/namespace.yaml
-  - monitoring/monitoring-release.yaml
-  - monitoring/monitoring-repo.yaml
-  - monitoring/servicemonitor.yaml
-
-  # ──────────────────────────────────────
-  # Network Policies
-  # ──────────────────────────────────────
-  - networkpolicies/default-deny.yaml
-  - networkpolicies/allow-traefik.yaml
-  - networkpolicies/allow-arr.yaml
-  - networkpolicies/allow-monitoring.yaml
 
   # ──────────────────────────────────────
   # PodDisruptionBudgets
