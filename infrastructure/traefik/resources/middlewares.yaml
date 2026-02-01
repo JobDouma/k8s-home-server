@@ -8,14 +8,3 @@ spec:
     browserXssFilter: true
     contentTypeNosniff: true
     forceSTSHeader: false
----
-apiVersion: traefik.io/v1alpha1
-kind: Middleware
-metadata:
-  name: lan-headers
-  namespace: media
-spec:
-  headers:
-    browserXssFilter: true
-    contentTypeNosniff: true
-    forceSTSHeader: false
