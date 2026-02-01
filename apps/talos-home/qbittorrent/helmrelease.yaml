@@ -18,7 +18,7 @@ spec:
 
   values:
     controllers:
-      qbittorrent:
+      main:
         pod:
           affinity:
             podAntiAffinity:
@@ -29,7 +29,7 @@ spec:
                   topologyKey: kubernetes.io/hostname
 
         containers:
-          app:
+          main:
             image:
               repository: ghcr.io/onedr0p/qbittorrent
               tag: 4.6.3
@@ -54,10 +54,10 @@ spec:
                 memory: 1Gi
 
             ports:
-              http:
+              - name: http
                 containerPort: 8080
                 protocol: TCP
-              bt:
+              - name: bt
                 containerPort: 6881
                 protocol: TCP
 
@@ -82,12 +82,13 @@ spec:
                 protocol: TCP
 
     service:
-      app:
-        controller: qbittorrent
+      main:
+        controller: main
         type: LoadBalancer
         externalTrafficPolicy: Cluster
         annotations:
           metallb.universe.tf/address-pool: "lan-pool"
+
         ports:
           http:
             port: 8080
@@ -110,6 +111,7 @@ spec:
         globalMounts:
           - path: /config
             subPath: qbittorrent
+
       downloads:
         enabled: true
         type: persistentVolumeClaim
