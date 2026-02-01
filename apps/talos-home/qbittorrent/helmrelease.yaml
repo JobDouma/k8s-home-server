@@ -5,6 +5,8 @@ metadata:
   namespace: media
 spec:
   interval: 15m
+  timeout: 20m
+
   chart:
     spec:
       chart: app-template
@@ -13,6 +15,17 @@ spec:
         kind: HelmRepository
         name: bjw-s
         namespace: flux-system
+
+  install:
+    remediation:
+      retries: 3
+    cleanupOnFail: true
+
+  upgrade:
+    remediation:
+      retries: 3
+    cleanupOnFail: true
+
   values:
     controllers:
       qbittorrent:
@@ -23,36 +36,56 @@ spec:
                 - labelSelector:
                     matchLabels:
                       app.kubernetes.io/name: qbittorrent
-                  topologyKey: "kubernetes.io/hostname"
+                  topologyKey: kubernetes.io/hostname
+
         containers:
           app:
             image:
               repository: ghcr.io/onedr0p/qbittorrent
               tag: 4.6.3
+
             envFrom:
               - secretRef:
                   name: qbittorrent-webui
+
             env:
               TZ: Europe/Amsterdam
-              QBITTORRENT__PORT: 8080
-              QBITTORRENT__BT_PORT: 6881
+              QBITTORRENT__PORT: "8080"
+              QBITTORRENT__BT_PORT: "6881"
               QBITTORRENT__WEBUI__ADDRESS: "0.0.0.0"
               QBITTORRENT__WEBUI__HOST_HEADER_VALIDATION: "false"
               QBITTORRENT__WEBUI__CSRF_PROTECTION: "false"
+
             resources:
               requests:
                 cpu: 100m
                 memory: 256Mi
               limits:
                 memory: 1Gi
+
+            ports:
+              http:
+                containerPort: 8080
+                protocol: TCP
+              bt:
+                containerPort: 6881
+                protocol: TCP
+
           exporter:
             image:
               repository: ghcr.io/esanchezm/prometheus-qbittorrent-exporter
               tag: v1.6.0
+
+            envFrom:
+              - secretRef:
+                  name: qbittorrent-webui
+
             env:
-              QBITTORRENT_HOST: localhost
-              QBITTORRENT_PORT: 8080
-              EXPORTER_PORT: 8000
+              QBITTORRENT_HOST: "127.0.0.1"
+              QBITTORRENT_PORT: "8080"
+              QBITTORRENT_URL_BASE: ""
+              EXPORTER_PORT: "8000"
+
             ports:
               - name: metrics
                 containerPort: 8000
@@ -68,17 +101,29 @@ spec:
         ports:
           http:
             port: 8080
+            protocol: TCP
+            targetPort: http
           bt:
             port: 6881
             protocol: TCP
+            targetPort: bt
           metrics:
             port: 8000
             protocol: TCP
+            targetPort: metrics
 
     persistence:
       config:
+        enabled: true
         type: persistentVolumeClaim
         existingClaim: tank-configs
+        globalMounts:
+          - path: /config
+            subPath: qbittorrent
       downloads:
+        enabled: true
         type: persistentVolumeClaim
         existingClaim: media
+        globalMounts:
+          - path: /downloads
+            subPath: downloads

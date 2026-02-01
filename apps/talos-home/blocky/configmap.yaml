@@ -14,7 +14,7 @@ data:
           - 8.8.8.8
 
     blocking:
-      denylists:
+      blackLists:
         ads:
           - https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts
           - https://big.oisd.nl/domainswild
@@ -22,17 +22,20 @@ data:
         malware:
           - https://mirror1.malwaredomains.com/files/justdomains
           - https://urlhaus.abuse.ch/downloads/hostfile/
+
       clientGroupsBlock:
         default:
           - ads
           - malware
+
       blockType: zeroIp
-      refreshPeriod: 4h
+
+      loading:
+        refreshPeriod: 4h
 
     caching:
       minTime: 5m
       maxTime: 30m
-      prefetching: true
 
     ports:
       dns: 53
@@ -41,7 +44,6 @@ data:
     log:
       level: info
 
-    # Enable Prometheus metrics on the HTTP port (used by your ServiceMonitor)
     prometheus:
       enable: true
       path: /metrics
