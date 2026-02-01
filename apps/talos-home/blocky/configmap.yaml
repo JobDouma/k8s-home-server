@@ -41,6 +41,11 @@ data:
     log:
       level: info
 
+    # Enable Prometheus metrics on the HTTP port (used by your ServiceMonitor)
+    prometheus:
+      enable: true
+      path: /metrics
+
     customDNS:
       mapping:
         jellyfin.lan: 192.168.2.20
