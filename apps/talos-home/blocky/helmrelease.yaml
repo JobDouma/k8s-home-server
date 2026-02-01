@@ -16,14 +16,6 @@ spec:
         name: bjw-s
         namespace: flux-system
 
-  install:
-    remediation:
-      retries: 3
-
-  upgrade:
-    remediation:
-      retries: 3
-
   values:
     controllers:
       main:
@@ -37,16 +29,6 @@ spec:
             fsGroup: 1000
             seccompProfile:
               type: RuntimeDefault
-
-          affinity:
-            podAntiAffinity:
-              preferredDuringSchedulingIgnoredDuringExecution:
-                - weight: 100
-                  podAffinityTerm:
-                    labelSelector:
-                      matchLabels:
-                        app.kubernetes.io/name: blocky
-                    topologyKey: kubernetes.io/hostname
 
         containers:
           main:
