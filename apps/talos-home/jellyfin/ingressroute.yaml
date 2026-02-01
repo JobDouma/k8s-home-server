@@ -14,3 +14,4 @@ spec:
           port: 8096
       middlewares:
         - name: lan-headers
+          namespace: networking

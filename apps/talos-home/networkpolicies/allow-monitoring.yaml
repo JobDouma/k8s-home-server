@@ -1,10 +1,17 @@
+# FILE: ./apps/talos-home/networkpolicies/allow-monitoring.yaml
+# Restrict monitoring access to only the qBittorrent metrics port (8000).
+# (Your old "4000 for Blocky" does not belong in media; Blocky is in dns namespace.)
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
-  name: allow-monitoring
+  name: allow-monitoring-to-qbittorrent-metrics
   namespace: media
 spec:
-  podSelector: {}
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: qbittorrent
+  policyTypes:
+    - Ingress
   ingress:
     - from:
         - namespaceSelector:
@@ -12,8 +19,4 @@ spec:
               kubernetes.io/metadata.name: monitoring
       ports:
         - protocol: TCP
-          port: 8000   # qBittorrent metrics
-        - protocol: TCP
-          port: 4000   # if you later expose Blocky metrics via media, adjust as needed
-  policyTypes:
-    - Ingress
+          port: 8000
