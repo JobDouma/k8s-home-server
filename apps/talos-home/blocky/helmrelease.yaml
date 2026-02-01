@@ -79,3 +79,13 @@ spec:
             protocol: UDP
           http:
             port: 4000
+
+    persistence:
+      config:
+        enabled: true
+        type: configMap
+        name: blocky-config
+        globalMounts:
+          - path: /app/config.yml
+            subPath: config.yml
+            readOnly: true
