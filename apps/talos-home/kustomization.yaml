@@ -45,6 +45,8 @@ resources:
   - networkpolicies/allow-traefik.yaml
   - networkpolicies/allow-arr.yaml
   - networkpolicies/allow-monitoring.yaml
+  - networkpolicies/pdb-traefik.yaml
+  - networkpolicies/pdb-blocky.yaml
 
   # ──────────────────────────────────────
   # Sonarr
