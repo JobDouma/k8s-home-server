@@ -72,3 +72,10 @@ resources:
   - renovate/secret.yaml
   - renovate/helmrepository.yaml
   - renovate/helmrelease.yaml
+
+  # ──────────────────────────────────────
+  # Renovate
+  # ──────────────────────────────────────
+  - dashy/configmap.yaml
+  - dashy/helmrelease.yaml
+  - dashy/ingressroute.yaml
