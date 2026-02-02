@@ -1,0 +1,39 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: recyclarr-sync
+  namespace: media
+spec:
+  schedule: "0 */6 * * *"
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      backoffLimit: 1
+      template:
+        spec:
+          restartPolicy: Never
+          containers:
+            - name: recyclarr
+              image: ghcr.io/recyclarr/recyclarr:latest
+              imagePullPolicy: IfNotPresent
+              env:
+                - name: TZ
+                  value: Europe/Amsterdam
+              args:
+                - sync
+              volumeMounts:
+                - name: config
+                  mountPath: /config/recyclarr.yml
+                  subPath: recyclarr.yml
+                - name: secrets
+                  mountPath: /config/secrets.yml
+                  subPath: secrets.yml
+          volumes:
+            - name: config
+              configMap:
+                name: recyclarr-config
+            - name: secrets
+              secret:
+                secretName: recyclarr-secrets
