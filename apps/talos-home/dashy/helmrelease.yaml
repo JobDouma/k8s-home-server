@@ -19,6 +19,17 @@ spec:
   values:
     controllers:
       main:
+        replicas: 1
+
+        pod:
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 1000
+            runAsGroup: 1000
+            fsGroup: 1000
+            seccompProfile:
+              type: RuntimeDefault
+
         containers:
           main:
             image:
@@ -27,6 +38,13 @@ spec:
 
             env:
               TZ: Europe/Amsterdam
+              NODE_ENV: production
+
+            # ✅ CRITICAL: do NOT run the build step
+            command:
+              - node
+            args:
+              - server
 
             ports:
               - name: http
@@ -38,11 +56,6 @@ spec:
               capabilities:
                 drop:
                   - ALL
-              seccompProfile:
-                type: RuntimeDefault
-              runAsNonRoot: true
-              runAsUser: 1000
-              runAsGroup: 1000
 
     service:
       main:
@@ -64,7 +77,7 @@ spec:
             subPath: conf.yml
             readOnly: true
 
-      # ✅ Fix: give Dashy a writable dist directory
+      # Keep this so /app/dist exists and is writable if the server touches it
       dist:
         enabled: true
         type: emptyDir
