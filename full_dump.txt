@@ -1,165 +1,4 @@
-===== DIRECTORY STRUCTURE =====
-total 32
-drwxrwxr-x  6 job job 4096 Jan 19 19:48 .
-drwxr-x--- 15 job job 4096 Jan 31 09:42 ..
-drwxrwxr-x  3 job job 4096 Jan 10 10:12 apps
-drwxrwxr-x  3 job job 4096 Jan 10 10:12 clusters
--rw-rw-r--  1 job job   32 Jan 31 13:34 full_dump.txt
-drwxrwxr-x  8 job job 4096 Jan 31 13:34 .git
-drwxrwxr-x  5 job job 4096 Jan 31 13:26 infrastructure
--rw-rw-r--  1 job job   17 Jan  2 14:26 README.md
-
-infrastructure
-├── kustomization.yaml
-├── metallb
-│   ├── base
-│   │   ├── helmrelease.yaml
-│   │   ├── helmrepository.yaml
-│   │   └── namespace.yaml
-│   └── config
-│       ├── ipaddress-pool-dns.yaml
-│       ├── ipaddress-pool-lan.yaml
-│       ├── kustomization.yaml
-│       └── l2-advertisement.yaml
-├── storage
-│   ├── namespace.yaml
-│   ├── pvc-media.yaml
-│   ├── pvc-tank-configs.yaml
-│   ├── pv-media.yaml
-│   └── pv-tank-configs.yaml
-└── traefik
-    ├── base
-    │   ├── helmrelease.yaml
-    │   ├── helmrepository.yaml
-    │   ├── kustomization.yaml
-    │   └── namespace.yaml
-    └── resources
-        ├── kustomization.yaml
-        └── middlewares.yaml
-apps
-└── talos-home
-    ├── blocky
-    │   ├── configmap.yaml
-    │   ├── helmrelease.yaml
-    │   ├── helmrepository.yaml
-    │   ├── namespace.yaml
-    │   └── servicemonitor.yaml
-    ├── jellyfin
-    │   ├── helmrelease.yaml
-    │   ├── helmrepository.yaml
-    │   └── ingressroute.yaml
-    ├── jellyseerr
-    │   ├── helmrelease.yaml
-    │   └── ingressroute.yaml
-    ├── kustomization.yaml
-    ├── monitoring
-    │   ├── monitoring-release.yaml
-    │   ├── monitoring-repo.yaml
-    │   ├── namespace.yaml
-    │   └── servicemonitor.yaml
-    ├── networkpolicies
-    │   ├── allow-arr.yaml
-    │   ├── allow-traefik.yaml
-    │   └── default-deny.yaml
-    ├── qbittorrent
-    │   ├── helmrelease.yaml
-    │   ├── helmrepository.yaml
-    │   ├── ingressroute.yaml
-    │   └── secret.yaml
-    ├── radarr
-    │   ├── helmrelease.yaml
-    │   └── ingressroute.yaml
-    └── sonarr
-        ├── helmrelease.yaml
-        └── ingressroute.yaml
-
-18 directories, 45 files
-
-===== FILE CONTENTS =====
------ FILE: ./full_dump.txt -----
-    ===== DIRECTORY STRUCTURE =====
-    total 32
-    drwxrwxr-x  6 job job 4096 Jan 19 19:48 .
-    drwxr-x--- 15 job job 4096 Jan 31 09:42 ..
-    drwxrwxr-x  3 job job 4096 Jan 10 10:12 apps
-    drwxrwxr-x  3 job job 4096 Jan 10 10:12 clusters
-    -rw-rw-r--  1 job job   32 Jan 31 13:34 full_dump.txt
-    drwxrwxr-x  8 job job 4096 Jan 31 13:34 .git
-    drwxrwxr-x  5 job job 4096 Jan 31 13:26 infrastructure
-    -rw-rw-r--  1 job job   17 Jan  2 14:26 README.md
-    
-    infrastructure
-    ├── kustomization.yaml
-    ├── metallb
-    │   ├── base
-    │   │   ├── helmrelease.yaml
-    │   │   ├── helmrepository.yaml
-    │   │   └── namespace.yaml
-    │   └── config
-    │       ├── ipaddress-pool-dns.yaml
-    │       ├── ipaddress-pool-lan.yaml
-    │       ├── kustomization.yaml
-    │       └── l2-advertisement.yaml
-    ├── storage
-    │   ├── namespace.yaml
-    │   ├── pvc-media.yaml
-    │   ├── pvc-tank-configs.yaml
-    │   ├── pv-media.yaml
-    │   └── pv-tank-configs.yaml
-    └── traefik
-        ├── base
-        │   ├── helmrelease.yaml
-        │   ├── helmrepository.yaml
-        │   ├── kustomization.yaml
-        │   └── namespace.yaml
-        └── resources
-            ├── kustomization.yaml
-            └── middlewares.yaml
-    apps
-    └── talos-home
-        ├── blocky
-        │   ├── configmap.yaml
-        │   ├── helmrelease.yaml
-        │   ├── helmrepository.yaml
-        │   ├── namespace.yaml
-        │   └── servicemonitor.yaml
-        ├── jellyfin
-        │   ├── helmrelease.yaml
-        │   ├── helmrepository.yaml
-        │   └── ingressroute.yaml
-        ├── jellyseerr
-        │   ├── helmrelease.yaml
-        │   └── ingressroute.yaml
-        ├── kustomization.yaml
-        ├── monitoring
-        │   ├── monitoring-release.yaml
-        │   ├── monitoring-repo.yaml
-        │   ├── namespace.yaml
-        │   └── servicemonitor.yaml
-        ├── networkpolicies
-        │   ├── allow-arr.yaml
-        │   ├── allow-traefik.yaml
-        │   └── default-deny.yaml
-        ├── qbittorrent
-        │   ├── helmrelease.yaml
-        │   ├── helmrepository.yaml
-        │   ├── ingressroute.yaml
-        │   └── secret.yaml
-        ├── radarr
-        │   ├── helmrelease.yaml
-        │   └── ingressroute.yaml
-        └── sonarr
-            ├── helmrelease.yaml
-            └── ingressroute.yaml
-    
-    18 directories, 45 files
-    
-    ===== FILE CONTENTS =====
-    ----- FILE: ./full_dump.txt -----
-
------ FILE: ./README.md -----
-    # k8s-home-server
------ FILE: apps/talos-home/blocky/configmap.yaml -----
+----- FILE: ./apps/talos-home/blocky/configmap.yaml -----
     apiVersion: v1
     kind: ConfigMap
     metadata:
@@ -167,19 +6,22 @@ apps
       namespace: dns
     data:
       config.yml: |
-        upstream:
-          default:
-            - https://one.one.one.one/dns-query
-            - https://dns.google/dns-query
-            - 1.1.1.1
-            - 8.8.8.8
+        upstreams:
+          groups:
+            default:
+              - https://one.one.one.one/dns-query
+              - https://dns.google/dns-query
+              - 1.1.1.1
+              - 8.8.8.8
     
         blocking:
           blackLists:
             ads:
-              - https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts
-              - https://big.oisd.nl/domainswild
-              - https://raw.githubusercontent.com/jerryn70/GoodbyeAds/master/Hosts/GoodbyeAds.txt
+              - https://oisd.nl/downloads/full
+              - https://adaway.org/hosts.txt
+              - https://adguardteam.github.io/AdGuardSDNSFilter/Filters/filter.txt
+              - https://raw.githubusercontent.com/hoshsadiq/adblock-nocoin-list/master/hosts.txt
+              - https://raw.githubusercontent.com/EnergizedProtection/block/master/EnergizedBlu.hosts
             malware:
               - https://mirror1.malwaredomains.com/files/justdomains
               - https://urlhaus.abuse.ch/downloads/hostfile/
@@ -190,12 +32,13 @@ apps
               - malware
     
           blockType: zeroIp
-          refreshPeriod: 4h
+    
+          loading:
+            refreshPeriod: 4h
     
         caching:
           minTime: 5m
           maxTime: 30m
-          prefetching: true
     
         ports:
           dns: 53
@@ -204,17 +47,19 @@ apps
         log:
           level: info
     
-        # ───────────────────────────────
-        # LOCAL SERVICE OVERRIDES
-        # ───────────────────────────────
+        prometheus:
+          enable: true
+          path: /metrics
+    
         customDNS:
-          jellyfin.lan: 192.168.2.22
-          sonarr.lan: 192.168.2.22
-          jellyseerr.lan: 192.168.2.22
-          radarr.lan: 192.168.2.22
-          qbittorrent.lan: 192.168.2.22
+          mapping:
+            jellyfin.lan: 192.168.2.100
+            sonarr.lan: 192.168.2.100
+            jellyseerr.lan: 192.168.2.100
+            radarr.lan: 192.168.2.100
+            qbittorrent.lan: 192.168.2.100
 
------ FILE: apps/talos-home/blocky/helmrelease.yaml -----
+----- FILE: ./apps/talos-home/blocky/helmrelease.yaml -----
     apiVersion: helm.toolkit.fluxcd.io/v2
     kind: HelmRelease
     metadata:
@@ -222,6 +67,8 @@ apps
       namespace: dns
     spec:
       interval: 15m
+      timeout: 10m
+    
       chart:
         spec:
           chart: app-template
@@ -230,41 +77,70 @@ apps
             kind: HelmRepository
             name: bjw-s
             namespace: flux-system
+    
       values:
         controllers:
-          blocky:
+          main:
             replicas: 2
-            strategy: RollingUpdate
-            # This section ensures pods stay on separate nodes
+    
             pod:
-              affinity:
-                podAntiAffinity:
-                  requiredDuringSchedulingIgnoredDuringExecution:
-                    - labelSelector:
-                        matchLabels:
-                          app.kubernetes.io/name: blocky
-                      topologyKey: "kubernetes.io/hostname"
+              annotations:
+                configmap.reloader.stakater.com/reload: "blocky-config"
+              securityContext:
+                runAsNonRoot: true
+                runAsUser: 1000
+                runAsGroup: 1000
+                fsGroup: 1000
+                seccompProfile:
+                  type: RuntimeDefault
+    
             containers:
-              app:
+              main:
                 image:
                   repository: ghcr.io/0xerr0r/blocky
                   tag: v0.23
+                args:
+                  - --config
+                  - /app/config.yml
+    
+                ports:
+                  - name: dns-udp
+                    containerPort: 53
+                    protocol: UDP
+                  - name: dns-tcp
+                    containerPort: 53
+                    protocol: TCP
+                  - name: http
+                    containerPort: 4000
+                    protocol: TCP
+    
+                securityContext:
+                  allowPrivilegeEscalation: false
+                  capabilities:
+                    add:
+                      - NET_BIND_SERVICE
+    
         service:
-          app:
-            controller: blocky
+          main:
+            controller: main
             type: LoadBalancer
             externalTrafficPolicy: Cluster
             annotations:
-              "metallb.universe.tf/address-pool": "dns-pool"
+              metallb.universe.tf/address-pool: "dns-pool"
             ports:
               dns-tcp:
                 port: 53
                 protocol: TCP
+                targetPort: dns-tcp
               dns-udp:
                 port: 53
                 protocol: UDP
+                targetPort: dns-udp
               http:
                 port: 4000
+                protocol: TCP
+                targetPort: http
+    
         persistence:
           config:
             enabled: true
@@ -273,8 +149,9 @@ apps
             globalMounts:
               - path: /app/config.yml
                 subPath: config.yml
+                readOnly: true
 
------ FILE: apps/talos-home/blocky/helmrepository.yaml -----
+----- FILE: ./apps/talos-home/blocky/helmrepository.yaml -----
     apiVersion: source.toolkit.fluxcd.io/v1beta2
     kind: HelmRepository
     metadata:
@@ -284,13 +161,13 @@ apps
       interval: 1h
       url: https://bjw-s-labs.github.io/helm-charts
 
------ FILE: apps/talos-home/blocky/namespace.yaml -----
+----- FILE: ./apps/talos-home/blocky/namespace.yaml -----
     apiVersion: v1
     kind: Namespace
     metadata:
       name: dns
 
------ FILE: apps/talos-home/blocky/servicemonitor.yaml -----
+----- FILE: ./apps/talos-home/blocky/servicemonitor.yaml -----
     apiVersion: monitoring.coreos.com/v1
     kind: ServiceMonitor
     metadata:
@@ -305,7 +182,7 @@ apps
           path: /metrics
           interval: 30s
 
------ FILE: apps/talos-home/jellyfin/helmrelease.yaml -----
+----- FILE: ./apps/talos-home/jellyfin/helmrelease.yaml -----
     apiVersion: helm.toolkit.fluxcd.io/v2
     kind: HelmRelease
     metadata:
@@ -372,7 +249,7 @@ apps
                       values:
                         - talos-cp-2
 
------ FILE: apps/talos-home/jellyfin/helmrepository.yaml -----
+----- FILE: ./apps/talos-home/jellyfin/helmrepository.yaml -----
     # yaml-language-server: $schema=https://raw.githubusercontent.com/fluxcd-community/flux2-schemas/main/helmrepository-source-v1beta2.json
     apiVersion: source.toolkit.fluxcd.io/v1beta2
     kind: HelmRepository
@@ -383,7 +260,7 @@ apps
       interval: 1h
       url: https://jellyfin.github.io/jellyfin-helm
 
------ FILE: apps/talos-home/jellyfin/ingressroute.yaml -----
+----- FILE: ./apps/talos-home/jellyfin/ingressroute.yaml -----
     apiVersion: traefik.io/v1alpha1
     kind: IngressRoute
     metadata:
@@ -400,9 +277,8 @@ apps
               port: 8096
           middlewares:
             - name: lan-headers
-              namespace: networking
 
------ FILE: apps/talos-home/jellyseerr/helmrelease.yaml -----
+----- FILE: ./apps/talos-home/jellyseerr/helmrelease.yaml -----
     apiVersion: helm.toolkit.fluxcd.io/v2
     kind: HelmRelease
     metadata:
@@ -451,7 +327,7 @@ apps
               - path: /app/config
                 subPath: jellyseerr
 
------ FILE: apps/talos-home/jellyseerr/ingressroute.yaml -----
+----- FILE: ./apps/talos-home/jellyseerr/ingressroute.yaml -----
     apiVersion: traefik.io/v1alpha1
     kind: IngressRoute
     metadata:
@@ -467,7 +343,7 @@ apps
             - name: jellyseerr
               port: 5055
 
------ FILE: apps/talos-home/kustomization.yaml -----
+----- FILE: ./apps/talos-home/kustomization.yaml -----
     apiVersion: kustomize.config.k8s.io/v1beta1
     kind: Kustomization
     
@@ -491,9 +367,9 @@ apps
       # ──────────────────────────────────────
       # qBittorrent
       # ──────────────────────────────────────
-      - qbittorrent/helmrepository.yaml
       - qbittorrent/helmrelease.yaml
       - qbittorrent/secret.yaml
+      - qbittorrent/ingressroute.yaml
     
       # ──────────────────────────────────────
       # monitoring / prometheus
@@ -515,6 +391,7 @@ apps
       - networkpolicies/default-deny.yaml
       - networkpolicies/allow-traefik.yaml
       - networkpolicies/allow-arr.yaml
+      - networkpolicies/allow-monitoring.yaml
     
       # ──────────────────────────────────────
       # Sonarr
@@ -527,8 +404,14 @@ apps
       # ──────────────────────────────────────
       - radarr/helmrelease.yaml
       - radarr/ingressroute.yaml
+    
+      # ──────────────────────────────────────
+      # PodDisruptionBudgets
+      # ──────────────────────────────────────
+      - policies/pdb-traefik.yaml
+      - policies/pdb-blocky.yaml
 
------ FILE: apps/talos-home/monitoring/monitoring-release.yaml -----
+----- FILE: ./apps/talos-home/monitoring/monitoring-release.yaml -----
     apiVersion: helm.toolkit.fluxcd.io/v2
     kind: HelmRelease
     metadata:
@@ -536,6 +419,8 @@ apps
       namespace: monitoring
     spec:
       interval: 30m
+      timeout: 60m
+    
       chart:
         spec:
           chart: kube-prometheus-stack
@@ -544,13 +429,19 @@ apps
             kind: HelmRepository
             name: prometheus-community
             namespace: flux-system
+    
       install:
         createNamespace: true
         crds: CreateReplace
+        remediation:
+          retries: 5
+    
       upgrade:
         crds: CreateReplace
+        remediation:
+          retries: 5
+    
       values:
-        # This tells Prometheus to look for "ServiceMonitors" to start scraping
         prometheus:
           service:
             type: NodePort
@@ -558,7 +449,7 @@ apps
           prometheusSpec:
             serviceMonitorSelectorNilUsesHelmValues: false
 
------ FILE: apps/talos-home/monitoring/monitoring-repo.yaml -----
+----- FILE: ./apps/talos-home/monitoring/monitoring-repo.yaml -----
     apiVersion: source.toolkit.fluxcd.io/v1beta2
     kind: HelmRepository
     metadata:
@@ -568,14 +459,13 @@ apps
       interval: 2h
       url: https://prometheus-community.github.io/helm-charts
 
------ FILE: apps/talos-home/monitoring/namespace.yaml -----
+----- FILE: ./apps/talos-home/monitoring/namespace.yaml -----
     apiVersion: v1
     kind: Namespace
     metadata:
       name: monitoring
 
------ FILE: apps/talos-home/monitoring/servicemonitor.yaml -----
-    # For Prometheus to "find" your qBittorrent metrics, you add a ServiceMonitor. This is a small manifest that tells the monitoring stack: "Go look at port 8090 on the qbittorrent service."
+----- FILE: ./apps/talos-home/monitoring/servicemonitor.yaml -----
     apiVersion: monitoring.coreos.com/v1
     kind: ServiceMonitor
     metadata:
@@ -589,7 +479,7 @@ apps
         - port: metrics
           interval: 30s
 
------ FILE: apps/talos-home/networkpolicies/allow-arr.yaml -----
+----- FILE: ./apps/talos-home/networkpolicies/allow-arr.yaml -----
     apiVersion: networking.k8s.io/v1
     kind: NetworkPolicy
     metadata:
@@ -611,7 +501,28 @@ apps
             - protocol: TCP
               port: 8080
 
------ FILE: apps/talos-home/networkpolicies/allow-traefik.yaml -----
+----- FILE: ./apps/talos-home/networkpolicies/allow-monitoring.yaml -----
+    apiVersion: networking.k8s.io/v1
+    kind: NetworkPolicy
+    metadata:
+      name: allow-monitoring
+      namespace: media
+    spec:
+      podSelector: {}
+      ingress:
+        - from:
+            - namespaceSelector:
+                matchLabels:
+                  kubernetes.io/metadata.name: monitoring
+          ports:
+            - protocol: TCP
+              port: 8000   # qBittorrent metrics
+            - protocol: TCP
+              port: 4000   # if you later expose Blocky metrics via media, adjust as needed
+      policyTypes:
+        - Ingress
+
+----- FILE: ./apps/talos-home/networkpolicies/allow-traefik.yaml -----
     apiVersion: networking.k8s.io/v1
     kind: NetworkPolicy
     metadata:
@@ -625,7 +536,7 @@ apps
                 matchLabels:
                   kubernetes.io/metadata.name: networking
 
------ FILE: apps/talos-home/networkpolicies/default-deny.yaml -----
+----- FILE: ./apps/talos-home/networkpolicies/default-deny.yaml -----
     apiVersion: networking.k8s.io/v1
     kind: NetworkPolicy
     metadata:
@@ -636,7 +547,31 @@ apps
       policyTypes:
         - Ingress
 
------ FILE: apps/talos-home/qbittorrent/helmrelease.yaml -----
+----- FILE: ./apps/talos-home/policies/pdb-blocky.yaml -----
+    apiVersion: policy/v1
+    kind: PodDisruptionBudget
+    metadata:
+      name: pdb-blocky
+      namespace: dns
+    spec:
+      minAvailable: 1
+      selector:
+        matchLabels:
+          app.kubernetes.io/name: blocky
+
+----- FILE: ./apps/talos-home/policies/pdb-traefik.yaml -----
+    apiVersion: policy/v1
+    kind: PodDisruptionBudget
+    metadata:
+      name: pdb-traefik
+      namespace: networking
+    spec:
+      minAvailable: 1
+      selector:
+        matchLabels:
+          app.kubernetes.io/name: traefik
+
+----- FILE: ./apps/talos-home/qbittorrent/helmrelease.yaml -----
     apiVersion: helm.toolkit.fluxcd.io/v2
     kind: HelmRelease
     metadata:
@@ -644,6 +579,8 @@ apps
       namespace: media
     spec:
       interval: 15m
+      timeout: 20m
+    
       chart:
         spec:
           chart: app-template
@@ -652,83 +589,113 @@ apps
             kind: HelmRepository
             name: bjw-s
             namespace: flux-system
+    
       values:
         controllers:
-          qbittorrent:
+          main:
             pod:
               securityContext:
                 runAsUser: 1000
                 runAsGroup: 1000
                 fsGroup: 1000
+                fsGroupChangePolicy: OnRootMismatch
+              affinity:
+                podAntiAffinity:
+                  requiredDuringSchedulingIgnoredDuringExecution:
+                    - labelSelector:
+                        matchLabels:
+                          app.kubernetes.io/name: qbittorrent
+                      topologyKey: kubernetes.io/hostname
+    
             containers:
-              app:
+              main:
                 image:
                   repository: ghcr.io/onedr0p/qbittorrent
                   tag: 4.6.3
+    
                 envFrom:
                   - secretRef:
-                    name: qbittorrent-webui
+                      name: qbittorrent-webui
+    
                 env:
                   TZ: Europe/Amsterdam
-                  QBITTORRENT__PORT: &port 8080
-                  QBITTORRENT__BT_PORT: &bt-port 6881
+                  QBITTORRENT__PORT: "8080"
+                  QBITTORRENT__BT_PORT: "6881"
                   QBITTORRENT__WEBUI__ADDRESS: "0.0.0.0"
                   QBITTORRENT__WEBUI__HOST_HEADER_VALIDATION: "false"
                   QBITTORRENT__WEBUI__CSRF_PROTECTION: "false"
+    
                 resources:
                   requests:
                     cpu: 100m
                     memory: 256Mi
                   limits:
                     memory: 1Gi
+    
+                ports:
+                  - name: http
+                    containerPort: 8080
+                    protocol: TCP
+                  - name: bt
+                    containerPort: 6881
+                    protocol: TCP
+    
               exporter:
                 image:
                   repository: ghcr.io/esanchezm/prometheus-qbittorrent-exporter
                   tag: v1.6.0
+    
+                envFrom:
+                  - secretRef:
+                      name: qbittorrent-webui
+    
                 env:
-                  QBITTORRENT_HOST: localhost
-                  QBITTORRENT_PORT: *port
-                  EXPORTER_PORT: &metrics-port 8000
+                  QBITTORRENT_HOST: "127.0.0.1"
+                  QBITTORRENT_PORT: "8080"
+                  QBITTORRENT_URL_BASE: ""
+                  EXPORTER_PORT: "8000"
+    
+                ports:
+                  - name: metrics
+                    containerPort: 8000
+                    protocol: TCP
     
         service:
-          app:
-            controller: qbittorrent
+          main:
+            controller: main
+            type: ClusterIP
             ports:
               http:
                 port: 8080
-          bittorrent:
-            controller: qbittorrent
-            type: LoadBalancer
-            loadBalancerIP: 192.168.2.241
-            ports:
+                protocol: TCP
+                targetPort: http
               bt:
                 port: 6881
                 protocol: TCP
+                targetPort: bt
+              metrics:
+                port: 8000
+                protocol: TCP
+                targetPort: metrics
     
         persistence:
           config:
             enabled: true
+            type: persistentVolumeClaim
             existingClaim: tank-configs
             globalMounts:
               - path: /config
                 subPath: qbittorrent
+    
           downloads:
             enabled: true
+            type: persistentVolumeClaim
             existingClaim: media
             globalMounts:
               - path: /downloads
+                subPath: downloads
 
------ FILE: apps/talos-home/qbittorrent/helmrepository.yaml -----
-    apiVersion: source.toolkit.fluxcd.io/v1beta2
-    kind: HelmRepository
-    metadata:
-      name: bjw-s
-      namespace: flux-system
-    spec:
-      interval: 1h
-      url: https://bjw-s-labs.github.io/helm-charts
-
------ FILE: apps/talos-home/qbittorrent/ingressroute.yaml -----
+----- FILE: ./apps/talos-home/qbittorrent/ingressroute.yaml -----
     apiVersion: traefik.io/v1alpha1
     kind: IngressRoute
     metadata:
@@ -744,7 +711,7 @@ apps
             - name: qbittorrent
               port: 8080
 
------ FILE: apps/talos-home/qbittorrent/secret.yaml -----
+----- FILE: ./apps/talos-home/qbittorrent/secret.yaml -----
     apiVersion: v1
     kind: Secret
     metadata:
@@ -754,8 +721,10 @@ apps
     stringData:
       QBITTORRENT__WEBUI__USERNAME: admin
       QBITTORRENT__WEBUI__PASSWORD: super-secret-password
+      QBITTORRENT_USER: admin
+      QBITTORRENT_PASS: super-secret-password
 
------ FILE: apps/talos-home/radarr/helmrelease.yaml -----
+----- FILE: ./apps/talos-home/radarr/helmrelease.yaml -----
     apiVersion: helm.toolkit.fluxcd.io/v2
     kind: HelmRelease
     metadata:
@@ -806,7 +775,7 @@ apps
             globalMounts:
               - path: /media
 
------ FILE: apps/talos-home/radarr/ingressroute.yaml -----
+----- FILE: ./apps/talos-home/radarr/ingressroute.yaml -----
     apiVersion: traefik.io/v1alpha1
     kind: IngressRoute
     metadata:
@@ -822,7 +791,7 @@ apps
             - name: radarr
               port: 7878
 
------ FILE: apps/talos-home/sonarr/helmrelease.yaml -----
+----- FILE: ./apps/talos-home/sonarr/helmrelease.yaml -----
     apiVersion: helm.toolkit.fluxcd.io/v2
     kind: HelmRelease
     metadata:
@@ -873,7 +842,7 @@ apps
             globalMounts:
               - path: /media
 
------ FILE: apps/talos-home/sonarr/ingressroute.yaml -----
+----- FILE: ./apps/talos-home/sonarr/ingressroute.yaml -----
     apiVersion: traefik.io/v1alpha1
     kind: IngressRoute
     metadata:
@@ -889,7 +858,2738 @@ apps
             - name: sonarr
               port: 8989
 
------ FILE: infrastructure/kustomization.yaml -----
+----- FILE: ./clusters/talos-home/apps.yaml -----
+    apiVersion: kustomize.toolkit.fluxcd.io/v1
+    kind: Kustomization
+    metadata:
+      name: apps
+      namespace: flux-system
+    spec:
+      dependsOn:
+        - name: infrastructure-config
+      interval: 10m
+      path: ./apps/talos-home
+      prune: true
+      sourceRef:
+        kind: GitRepository
+        name: flux-system
+
+----- FILE: ./clusters/talos-home/cleanup-completed-pods.yaml -----
+    apiVersion: v1
+    kind: ServiceAccount
+    metadata:
+      name: cleanup-completed-pods
+      namespace: kube-system
+    ---
+    apiVersion: rbac.authorization.k8s.io/v1
+    kind: ClusterRole
+    metadata:
+      name: cleanup-completed-pods
+    rules:
+      - apiGroups: [""]
+        resources: ["pods"]
+        verbs: ["get", "list", "delete"]
+    ---
+    apiVersion: rbac.authorization.k8s.io/v1
+    kind: ClusterRoleBinding
+    metadata:
+      name: cleanup-completed-pods
+    roleRef:
+      apiGroup: rbac.authorization.k8s.io
+      kind: ClusterRole
+      name: cleanup-completed-pods
+    subjects:
+      - kind: ServiceAccount
+        name: cleanup-completed-pods
+        namespace: kube-system
+    ---
+    apiVersion: batch/v1
+    kind: CronJob
+    metadata:
+      name: cleanup-completed-pods
+      namespace: kube-system
+    spec:
+      schedule: "0 0 * * *"
+      concurrencyPolicy: Forbid
+      successfulJobsHistoryLimit: 1
+      failedJobsHistoryLimit: 1
+      jobTemplate:
+        spec:
+          template:
+            spec:
+              serviceAccountName: cleanup-completed-pods
+              restartPolicy: OnFailure
+              containers:
+                - name: kubectl
+                  image: bitnami/kubectl:latest
+                  command:
+                    - /bin/sh
+                    - -c
+                    - |
+                      kubectl delete pod -A --field-selector=status.phase==Succeeded,status.phase==Failed
+
+----- FILE: ./clusters/talos-home/infrastructure-config.yaml -----
+    apiVersion: kustomize.toolkit.fluxcd.io/v1
+    kind: Kustomization
+    metadata:
+      name: infrastructure-config
+      namespace: flux-system
+    spec:
+      dependsOn:
+        - name: infrastructure
+      interval: 10m
+      path: ./infrastructure
+      prune: true
+      sourceRef:
+        kind: GitRepository
+        name: flux-system
+
+----- FILE: ./clusters/talos-home/infrastructure.yaml -----
+    apiVersion: kustomize.toolkit.fluxcd.io/v1
+    kind: Kustomization
+    metadata:
+      name: infrastructure
+      namespace: flux-system
+    spec:
+      interval: 10m
+      path: ./infrastructure
+      prune: true
+      sourceRef:
+        kind: GitRepository
+        name: flux-system
+
+----- FILE: ./clusters/talos-home/kustomization.yaml -----
+    # This is the root of FluxCD. This file is read and then ./infrastructure/ and ./apps/talos-home/ are initialized by Flux.
+    
+    apiVersion: kustomize.config.k8s.io/v1beta1
+    kind: Kustomization
+    
+    resources:
+      - infrastructure.yaml
+      - infrastructure-config.yaml
+      - apps.yaml
+      - flux-system
+
+----- FILE: ./full_dump.txt -----
+    ----- FILE: ./apps/talos-home/blocky/configmap.yaml -----
+        apiVersion: v1
+        kind: ConfigMap
+        metadata:
+          name: blocky-config
+          namespace: dns
+        data:
+          config.yml: |
+            upstreams:
+              groups:
+                default:
+                  - https://one.one.one.one/dns-query
+                  - https://dns.google/dns-query
+                  - 1.1.1.1
+                  - 8.8.8.8
+        
+            blocking:
+              blackLists:
+                ads:
+                  - https://oisd.nl/downloads/full
+                  - https://adaway.org/hosts.txt
+                  - https://adguardteam.github.io/AdGuardSDNSFilter/Filters/filter.txt
+                  - https://raw.githubusercontent.com/hoshsadiq/adblock-nocoin-list/master/hosts.txt
+                  - https://raw.githubusercontent.com/EnergizedProtection/block/master/EnergizedBlu.hosts
+                malware:
+                  - https://mirror1.malwaredomains.com/files/justdomains
+                  - https://urlhaus.abuse.ch/downloads/hostfile/
+        
+              clientGroupsBlock:
+                default:
+                  - ads
+                  - malware
+        
+              blockType: zeroIp
+        
+              loading:
+                refreshPeriod: 4h
+        
+            caching:
+              minTime: 5m
+              maxTime: 30m
+        
+            ports:
+              dns: 53
+              http: 4000
+        
+            log:
+              level: info
+        
+            prometheus:
+              enable: true
+              path: /metrics
+        
+            customDNS:
+              mapping:
+                jellyfin.lan: 192.168.2.20
+                sonarr.lan: 192.168.2.20
+                jellyseerr.lan: 192.168.2.20
+                radarr.lan: 192.168.2.20
+                qbittorrent.lan: 192.168.2.20
+    
+    ----- FILE: ./apps/talos-home/blocky/helmrelease.yaml -----
+        apiVersion: helm.toolkit.fluxcd.io/v2
+        kind: HelmRelease
+        metadata:
+          name: blocky
+          namespace: dns
+        spec:
+          interval: 15m
+          timeout: 10m
+        
+          chart:
+            spec:
+              chart: app-template
+              version: "3.2.1"
+              sourceRef:
+                kind: HelmRepository
+                name: bjw-s
+                namespace: flux-system
+        
+          values:
+            controllers:
+              main:
+                replicas: 2
+        
+                pod:
+                  securityContext:
+                    runAsNonRoot: true
+                    runAsUser: 1000
+                    runAsGroup: 1000
+                    fsGroup: 1000
+                    seccompProfile:
+                      type: RuntimeDefault
+        
+                containers:
+                  main:
+                    image:
+                      repository: ghcr.io/0xerr0r/blocky
+                      tag: v0.23
+                    args:
+                      - --config
+                      - /app/config.yml
+        
+                    ports:
+                      - name: dns-udp
+                        containerPort: 53
+                        protocol: UDP
+                      - name: dns-tcp
+                        containerPort: 53
+                        protocol: TCP
+                      - name: http
+                        containerPort: 4000
+                        protocol: TCP
+        
+                    securityContext:
+                      allowPrivilegeEscalation: false
+                      capabilities:
+                        add:
+                          - NET_BIND_SERVICE
+        
+            service:
+              main:
+                controller: main
+                type: LoadBalancer
+                externalTrafficPolicy: Cluster
+                annotations:
+                  metallb.universe.tf/address-pool: "dns-pool"
+                ports:
+                  dns-tcp:
+                    port: 53
+                    protocol: TCP
+                    targetPort: dns-tcp
+                  dns-udp:
+                    port: 53
+                    protocol: UDP
+                    targetPort: dns-udp
+                  http:
+                    port: 4000
+                    protocol: TCP
+                    targetPort: http
+        
+            persistence:
+              config:
+                enabled: true
+                type: configMap
+                name: blocky-config
+                globalMounts:
+                  - path: /app/config.yml
+                    subPath: config.yml
+                    readOnly: true
+    
+    ----- FILE: ./apps/talos-home/blocky/helmrepository.yaml -----
+        apiVersion: source.toolkit.fluxcd.io/v1beta2
+        kind: HelmRepository
+        metadata:
+          name: bjw-s
+          namespace: flux-system
+        spec:
+          interval: 1h
+          url: https://bjw-s-labs.github.io/helm-charts
+    
+    ----- FILE: ./apps/talos-home/blocky/namespace.yaml -----
+        apiVersion: v1
+        kind: Namespace
+        metadata:
+          name: dns
+    
+    ----- FILE: ./apps/talos-home/blocky/servicemonitor.yaml -----
+        apiVersion: monitoring.coreos.com/v1
+        kind: ServiceMonitor
+        metadata:
+          name: blocky
+          namespace: dns
+        spec:
+          selector:
+            matchLabels:
+              app.kubernetes.io/name: blocky
+          endpoints:
+            - port: http
+              path: /metrics
+              interval: 30s
+    
+    ----- FILE: ./apps/talos-home/jellyfin/helmrelease.yaml -----
+        apiVersion: helm.toolkit.fluxcd.io/v2
+        kind: HelmRelease
+        metadata:
+          name: jellyfin
+          namespace: media
+        spec:
+          interval: 15m
+          chart:
+            spec:
+              chart: jellyfin
+              version: "*"
+              sourceRef:
+                kind: HelmRepository
+                name: jellyfin
+                namespace: flux-system
+          values:
+            image:
+              repository: jellyfin/jellyfin
+              tag: latest
+            env:
+              PUID: 1000
+              PGID: 1000
+              TZ: Europe/Amsterdam
+            securityContext:
+              runAsUser: 1000
+              runAsGroup: 1000
+              fsGroup: 1000
+            persistence:
+              config:
+                enabled: true
+                type: pvc
+                existingClaim: tank-configs
+                mountPath: /config
+                subPath: jellyfin
+              media:
+                enabled: true
+                type: pvc
+                existingClaim: media
+                mountPath: /media
+              cache:
+                enabled: true
+                type: emptyDir
+                mountPath: /cache
+            resources:
+              requests:
+                memory: "1Gi"
+                cpu: "250m"
+              limits:
+                memory: "2Gi"
+                cpu: "1"
+            service:
+              enabled: true
+              type: ClusterIP
+              port: 8096
+        
+            affinity:
+              nodeAffinity:
+                preferredDuringSchedulingIgnoredDuringExecution:
+                  - weight: 100
+                    preference:
+                      matchExpressions:
+                        - key: kubernetes.io/hostname
+                          operator: In
+                          values:
+                            - talos-cp-2
+    
+    ----- FILE: ./apps/talos-home/jellyfin/helmrepository.yaml -----
+        # yaml-language-server: $schema=https://raw.githubusercontent.com/fluxcd-community/flux2-schemas/main/helmrepository-source-v1beta2.json
+        apiVersion: source.toolkit.fluxcd.io/v1beta2
+        kind: HelmRepository
+        metadata:
+          name: jellyfin
+          namespace: flux-system
+        spec:
+          interval: 1h
+          url: https://jellyfin.github.io/jellyfin-helm
+    
+    ----- FILE: ./apps/talos-home/jellyfin/ingressroute.yaml -----
+        apiVersion: traefik.io/v1alpha1
+        kind: IngressRoute
+        metadata:
+          name: jellyfin
+          namespace: media
+        spec:
+          entryPoints:
+            - web
+          routes:
+            - match: Host(`jellyfin.lan`)
+              kind: Rule
+              services:
+                - name: jellyfin
+                  port: 8096
+              middlewares:
+                - name: lan-headers
+                  namespace: networking
+    
+    ----- FILE: ./apps/talos-home/jellyseerr/helmrelease.yaml -----
+        apiVersion: helm.toolkit.fluxcd.io/v2
+        kind: HelmRelease
+        metadata:
+          name: jellyseerr
+          namespace: media
+        spec:
+          interval: 15m
+          chart:
+            spec:
+              chart: app-template
+              version: "3.2.1"
+              sourceRef:
+                kind: HelmRepository
+                name: bjw-s
+                namespace: flux-system
+          values:
+            controllers:
+              jellyseerr:
+                containers:
+                  app:
+                    image:
+                      repository: ghcr.io/fallenbagel/jellyseerr
+                      tag: latest
+                    env:
+                      TZ: Europe/Amsterdam
+                      LOG_LEVEL: info
+                    resources:
+                      requests:
+                        cpu: 100m
+                        memory: 256Mi
+                      limits:
+                        memory: 512Mi
+            service:
+              app:
+                controller: jellyseerr
+                type: ClusterIP
+                ports:
+                  http:
+                    port: 5055
+            persistence:
+              config:
+                enabled: true
+                type: persistentVolumeClaim
+                existingClaim: tank-configs
+                globalMounts:
+                  - path: /app/config
+                    subPath: jellyseerr
+    
+    ----- FILE: ./apps/talos-home/jellyseerr/ingressroute.yaml -----
+        apiVersion: traefik.io/v1alpha1
+        kind: IngressRoute
+        metadata:
+          name: jellyseerr
+          namespace: media
+        spec:
+          entryPoints:
+            - web
+          routes:
+            - match: Host(`jellyseerr.lan`)
+              kind: Rule
+              services:
+                - name: jellyseerr
+                  port: 5055
+    
+    ----- FILE: ./apps/talos-home/kustomization.yaml -----
+        apiVersion: kustomize.config.k8s.io/v1beta1
+        kind: Kustomization
+        
+        resources:
+          # ──────────────────────────────────────
+          # Blocky (DNS)
+          # ──────────────────────────────────────
+          - blocky/namespace.yaml
+          - blocky/configmap.yaml
+          - blocky/helmrepository.yaml
+          - blocky/helmrelease.yaml
+          - blocky/servicemonitor.yaml
+        
+          # ──────────────────────────────────────
+          # Jellyfin
+          # ──────────────────────────────────────
+          - jellyfin/helmrepository.yaml
+          - jellyfin/helmrelease.yaml
+          - jellyfin/ingressroute.yaml
+        
+          # ──────────────────────────────────────
+          # qBittorrent
+          # ──────────────────────────────────────
+          - qbittorrent/helmrelease.yaml
+          - qbittorrent/secret.yaml
+          - qbittorrent/ingressroute.yaml
+        
+          # ──────────────────────────────────────
+          # monitoring / prometheus
+          # ──────────────────────────────────────
+          - monitoring/namespace.yaml
+          - monitoring/monitoring-release.yaml
+          - monitoring/monitoring-repo.yaml
+          - monitoring/servicemonitor.yaml
+        
+          # ──────────────────────────────────────
+          # Jellyseerr
+          # ──────────────────────────────────────
+          - jellyseerr/helmrelease.yaml
+          - jellyseerr/ingressroute.yaml
+        
+          # ──────────────────────────────────────
+          # Network Policies
+          # ──────────────────────────────────────
+          - networkpolicies/default-deny.yaml
+          - networkpolicies/allow-traefik.yaml
+          - networkpolicies/allow-arr.yaml
+          - networkpolicies/allow-monitoring.yaml
+        
+          # ──────────────────────────────────────
+          # Sonarr
+          # ──────────────────────────────────────
+          - sonarr/helmrelease.yaml
+          - sonarr/ingressroute.yaml
+        
+          # ──────────────────────────────────────
+          # Radarr
+          # ──────────────────────────────────────
+          - radarr/helmrelease.yaml
+          - radarr/ingressroute.yaml
+        
+          # ──────────────────────────────────────
+          # PodDisruptionBudgets
+          # ──────────────────────────────────────
+          - policies/pdb-traefik.yaml
+          - policies/pdb-blocky.yaml
+    
+    ----- FILE: ./apps/talos-home/monitoring/monitoring-release.yaml -----
+        apiVersion: helm.toolkit.fluxcd.io/v2
+        kind: HelmRelease
+        metadata:
+          name: kube-prometheus-stack
+          namespace: monitoring
+        spec:
+          interval: 30m
+          timeout: 60m
+        
+          chart:
+            spec:
+              chart: kube-prometheus-stack
+              version: "61.x"
+              sourceRef:
+                kind: HelmRepository
+                name: prometheus-community
+                namespace: flux-system
+        
+          install:
+            createNamespace: true
+            crds: CreateReplace
+            remediation:
+              retries: 5
+        
+          upgrade:
+            crds: CreateReplace
+            remediation:
+              retries: 5
+        
+          values:
+            prometheus:
+              service:
+                type: NodePort
+                nodePort: 30090
+              prometheusSpec:
+                serviceMonitorSelectorNilUsesHelmValues: false
+    
+    ----- FILE: ./apps/talos-home/monitoring/monitoring-repo.yaml -----
+        apiVersion: source.toolkit.fluxcd.io/v1beta2
+        kind: HelmRepository
+        metadata:
+          name: prometheus-community
+          namespace: flux-system
+        spec:
+          interval: 2h
+          url: https://prometheus-community.github.io/helm-charts
+    
+    ----- FILE: ./apps/talos-home/monitoring/namespace.yaml -----
+        apiVersion: v1
+        kind: Namespace
+        metadata:
+          name: monitoring
+    
+    ----- FILE: ./apps/talos-home/monitoring/servicemonitor.yaml -----
+        apiVersion: monitoring.coreos.com/v1
+        kind: ServiceMonitor
+        metadata:
+          name: qbittorrent
+          namespace: media
+        spec:
+          selector:
+            matchLabels:
+              app.kubernetes.io/name: qbittorrent
+          endpoints:
+            - port: metrics
+              interval: 30s
+    
+    ----- FILE: ./apps/talos-home/networkpolicies/allow-arr.yaml -----
+        apiVersion: networking.k8s.io/v1
+        kind: NetworkPolicy
+        metadata:
+          name: allow-arr-to-qbittorrent
+          namespace: media
+        spec:
+          podSelector:
+            matchLabels:
+              app.kubernetes.io/name: qbittorrent
+          ingress:
+            - from:
+                - podSelector:
+                    matchLabels:
+                      app.kubernetes.io/name: sonarr
+                - podSelector:
+                    matchLabels:
+                      app.kubernetes.io/name: radarr
+              ports:
+                - protocol: TCP
+                  port: 8080
+    
+    ----- FILE: ./apps/talos-home/networkpolicies/allow-monitoring.yaml -----
+        apiVersion: networking.k8s.io/v1
+        kind: NetworkPolicy
+        metadata:
+          name: allow-monitoring
+          namespace: media
+        spec:
+          podSelector: {}
+          ingress:
+            - from:
+                - namespaceSelector:
+                    matchLabels:
+                      kubernetes.io/metadata.name: monitoring
+              ports:
+                - protocol: TCP
+                  port: 8000   # qBittorrent metrics
+                - protocol: TCP
+                  port: 4000   # if you later expose Blocky metrics via media, adjust as needed
+          policyTypes:
+            - Ingress
+    
+    ----- FILE: ./apps/talos-home/networkpolicies/allow-traefik.yaml -----
+        apiVersion: networking.k8s.io/v1
+        kind: NetworkPolicy
+        metadata:
+          name: allow-traefik
+          namespace: media
+        spec:
+          podSelector: {}
+          ingress:
+            - from:
+                - namespaceSelector:
+                    matchLabels:
+                      kubernetes.io/metadata.name: networking
+    
+    ----- FILE: ./apps/talos-home/networkpolicies/default-deny.yaml -----
+        apiVersion: networking.k8s.io/v1
+        kind: NetworkPolicy
+        metadata:
+          name: default-deny
+          namespace: media
+        spec:
+          podSelector: {}
+          policyTypes:
+            - Ingress
+    
+    ----- FILE: ./apps/talos-home/policies/pdb-blocky.yaml -----
+        apiVersion: policy/v1
+        kind: PodDisruptionBudget
+        metadata:
+          name: pdb-blocky
+          namespace: dns
+        spec:
+          minAvailable: 1
+          selector:
+            matchLabels:
+              app.kubernetes.io/name: blocky
+    
+    ----- FILE: ./apps/talos-home/policies/pdb-traefik.yaml -----
+        apiVersion: policy/v1
+        kind: PodDisruptionBudget
+        metadata:
+          name: pdb-traefik
+          namespace: networking
+        spec:
+          minAvailable: 1
+          selector:
+            matchLabels:
+              app.kubernetes.io/name: traefik
+    
+    ----- FILE: ./apps/talos-home/qbittorrent/helmrelease.yaml -----
+        apiVersion: helm.toolkit.fluxcd.io/v2
+        kind: HelmRelease
+        metadata:
+          name: qbittorrent
+          namespace: media
+        spec:
+          interval: 15m
+          timeout: 20m
+        
+          chart:
+            spec:
+              chart: app-template
+              version: "3.2.1"
+              sourceRef:
+                kind: HelmRepository
+                name: bjw-s
+                namespace: flux-system
+        
+          values:
+            controllers:
+              main:
+                pod:
+                  securityContext:
+                    runAsUser: 1000
+                    runAsGroup: 1000
+                    fsGroup: 1000
+                    fsGroupChangePolicy: OnRootMismatch
+                  affinity:
+                    podAntiAffinity:
+                      requiredDuringSchedulingIgnoredDuringExecution:
+                        - labelSelector:
+                            matchLabels:
+                              app.kubernetes.io/name: qbittorrent
+                          topologyKey: kubernetes.io/hostname
+        
+                containers:
+                  main:
+                    image:
+                      repository: ghcr.io/onedr0p/qbittorrent
+                      tag: 4.6.3
+        
+                    envFrom:
+                      - secretRef:
+                          name: qbittorrent-webui
+        
+                    env:
+                      TZ: Europe/Amsterdam
+                      QBITTORRENT__PORT: "8080"
+                      QBITTORRENT__BT_PORT: "6881"
+                      QBITTORRENT__WEBUI__ADDRESS: "0.0.0.0"
+                      QBITTORRENT__WEBUI__HOST_HEADER_VALIDATION: "false"
+                      QBITTORRENT__WEBUI__CSRF_PROTECTION: "false"
+        
+                    resources:
+                      requests:
+                        cpu: 100m
+                        memory: 256Mi
+                      limits:
+                        memory: 1Gi
+        
+                    ports:
+                      - name: http
+                        containerPort: 8080
+                        protocol: TCP
+                      - name: bt
+                        containerPort: 6881
+                        protocol: TCP
+        
+                  exporter:
+                    image:
+                      repository: ghcr.io/esanchezm/prometheus-qbittorrent-exporter
+                      tag: v1.6.0
+        
+                    envFrom:
+                      - secretRef:
+                          name: qbittorrent-webui
+        
+                    env:
+                      QBITTORRENT_HOST: "127.0.0.1"
+                      QBITTORRENT_PORT: "8080"
+                      QBITTORRENT_URL_BASE: ""
+                      EXPORTER_PORT: "8000"
+        
+                    ports:
+                      - name: metrics
+                        containerPort: 8000
+                        protocol: TCP
+        
+            service:
+              main:
+                controller: main
+                type: ClusterIP
+                ports:
+                  http:
+                    port: 8080
+                    protocol: TCP
+                    targetPort: http
+                  bt:
+                    port: 6881
+                    protocol: TCP
+                    targetPort: bt
+                  metrics:
+                    port: 8000
+                    protocol: TCP
+                    targetPort: metrics
+        
+            persistence:
+              config:
+                enabled: true
+                type: persistentVolumeClaim
+                existingClaim: tank-configs
+                globalMounts:
+                  - path: /config
+                    subPath: qbittorrent
+        
+              downloads:
+                enabled: true
+                type: persistentVolumeClaim
+                existingClaim: media
+                globalMounts:
+                  - path: /downloads
+                    subPath: downloads
+    
+    ----- FILE: ./apps/talos-home/qbittorrent/ingressroute.yaml -----
+        apiVersion: traefik.io/v1alpha1
+        kind: IngressRoute
+        metadata:
+          name: qbittorrent
+          namespace: media
+        spec:
+          entryPoints:
+            - web
+          routes:
+            - match: Host(`qbittorrent.lan`)
+              kind: Rule
+              services:
+                - name: qbittorrent
+                  port: 8080
+    
+    ----- FILE: ./apps/talos-home/qbittorrent/secret.yaml -----
+        apiVersion: v1
+        kind: Secret
+        metadata:
+          name: qbittorrent-webui
+          namespace: media
+        type: Opaque
+        stringData:
+          QBITTORRENT__WEBUI__USERNAME: admin
+          QBITTORRENT__WEBUI__PASSWORD: super-secret-password
+          QBITTORRENT_USER: admin
+          QBITTORRENT_PASS: super-secret-password
+    
+    ----- FILE: ./apps/talos-home/radarr/helmrelease.yaml -----
+        apiVersion: helm.toolkit.fluxcd.io/v2
+        kind: HelmRelease
+        metadata:
+          name: radarr
+          namespace: media
+        spec:
+          interval: 15m
+          chart:
+            spec:
+              chart: app-template
+              version: "3.2.1"
+              sourceRef:
+                kind: HelmRepository
+                name: bjw-s
+                namespace: flux-system
+          values:
+            controllers:
+              radarr:
+                containers:
+                  app:
+                    image:
+                      repository: ghcr.io/linuxserver/radarr
+                      tag: latest
+                    env:
+                      PUID: 1000
+                      PGID: 1000
+                      TZ: Europe/Amsterdam
+                      RADARR__SERVER__BINDADDRESS: 0.0.0.0
+            service:
+              app:
+                type: ClusterIP
+                controller: radarr
+                ports:
+                  http:
+                    port: 7878
+            persistence:
+              config:
+                enabled: true
+                type: persistentVolumeClaim
+                existingClaim: tank-configs
+                globalMounts:
+                  - path: /config
+                    subPath: radarr
+              media:
+                enabled: true
+                type: persistentVolumeClaim
+                existingClaim: media
+                globalMounts:
+                  - path: /media
+    
+    ----- FILE: ./apps/talos-home/radarr/ingressroute.yaml -----
+        apiVersion: traefik.io/v1alpha1
+        kind: IngressRoute
+        metadata:
+          name: radarr
+          namespace: media
+        spec:
+          entryPoints:
+            - web
+          routes:
+            - match: Host(`radarr.lan`)
+              kind: Rule
+              services:
+                - name: radarr
+                  port: 7878
+    
+    ----- FILE: ./apps/talos-home/sonarr/helmrelease.yaml -----
+        apiVersion: helm.toolkit.fluxcd.io/v2
+        kind: HelmRelease
+        metadata:
+          name: sonarr
+          namespace: media
+        spec:
+          interval: 15m
+          chart:
+            spec:
+              chart: app-template
+              version: "3.2.1"
+              sourceRef:
+                kind: HelmRepository
+                name: bjw-s
+                namespace: flux-system
+          values:
+            controllers:
+              sonarr:
+                containers:
+                  app:
+                    image:
+                      repository: ghcr.io/linuxserver/sonarr
+                      tag: latest
+                    env:
+                      PUID: 1000
+                      PGID: 1000
+                      TZ: Europe/Amsterdam
+                      SONARR__SERVER__BINDADDRESS: 0.0.0.0
+            service:
+              app:
+                type: ClusterIP
+                controller: sonarr
+                ports:
+                  http:
+                    port: 8989
+            persistence:
+              config:
+                enabled: true
+                type: persistentVolumeClaim
+                existingClaim: tank-configs
+                globalMounts:
+                  - path: /config
+                    subPath: sonarr
+              media:
+                enabled: true
+                type: persistentVolumeClaim
+                existingClaim: media
+                globalMounts:
+                  - path: /media
+    
+    ----- FILE: ./apps/talos-home/sonarr/ingressroute.yaml -----
+        apiVersion: traefik.io/v1alpha1
+        kind: IngressRoute
+        metadata:
+          name: sonarr
+          namespace: media
+        spec:
+          entryPoints:
+            - web
+          routes:
+            - match: Host(`sonarr.lan`)
+              kind: Rule
+              services:
+                - name: sonarr
+                  port: 8989
+    
+    ----- FILE: ./clusters/talos-home/apps.yaml -----
+        apiVersion: kustomize.toolkit.fluxcd.io/v1
+        kind: Kustomization
+        metadata:
+          name: apps
+          namespace: flux-system
+        spec:
+          dependsOn:
+            - name: infrastructure-config
+          interval: 10m
+          path: ./apps/talos-home
+          prune: true
+          sourceRef:
+            kind: GitRepository
+            name: flux-system
+    
+    ----- FILE: ./clusters/talos-home/cleanup-completed-pods.yaml -----
+        apiVersion: v1
+        kind: ServiceAccount
+        metadata:
+          name: cleanup-completed-pods
+          namespace: kube-system
+        ---
+        apiVersion: rbac.authorization.k8s.io/v1
+        kind: ClusterRole
+        metadata:
+          name: cleanup-completed-pods
+        rules:
+          - apiGroups: [""]
+            resources: ["pods"]
+            verbs: ["get", "list", "delete"]
+        ---
+        apiVersion: rbac.authorization.k8s.io/v1
+        kind: ClusterRoleBinding
+        metadata:
+          name: cleanup-completed-pods
+        roleRef:
+          apiGroup: rbac.authorization.k8s.io
+          kind: ClusterRole
+          name: cleanup-completed-pods
+        subjects:
+          - kind: ServiceAccount
+            name: cleanup-completed-pods
+            namespace: kube-system
+        ---
+        apiVersion: batch/v1
+        kind: CronJob
+        metadata:
+          name: cleanup-completed-pods
+          namespace: kube-system
+        spec:
+          schedule: "0 0 * * *"
+          concurrencyPolicy: Forbid
+          successfulJobsHistoryLimit: 1
+          failedJobsHistoryLimit: 1
+          jobTemplate:
+            spec:
+              template:
+                spec:
+                  serviceAccountName: cleanup-completed-pods
+                  restartPolicy: OnFailure
+                  containers:
+                    - name: kubectl
+                      image: bitnami/kubectl:latest
+                      command:
+                        - /bin/sh
+                        - -c
+                        - |
+                          kubectl delete pod -A --field-selector=status.phase==Succeeded,status.phase==Failed
+    
+    ----- FILE: ./clusters/talos-home/infrastructure-config.yaml -----
+        apiVersion: kustomize.toolkit.fluxcd.io/v1
+        kind: Kustomization
+        metadata:
+          name: infrastructure-config
+          namespace: flux-system
+        spec:
+          dependsOn:
+            - name: infrastructure
+          interval: 10m
+          path: ./infrastructure
+          prune: true
+          sourceRef:
+            kind: GitRepository
+            name: flux-system
+    
+    ----- FILE: ./clusters/talos-home/infrastructure.yaml -----
+        apiVersion: kustomize.toolkit.fluxcd.io/v1
+        kind: Kustomization
+        metadata:
+          name: infrastructure
+          namespace: flux-system
+        spec:
+          interval: 10m
+          path: ./infrastructure
+          prune: true
+          sourceRef:
+            kind: GitRepository
+            name: flux-system
+    
+    ----- FILE: ./clusters/talos-home/kustomization.yaml -----
+        # This is the root of FluxCD. This file is read and then ./infrastructure/ and ./apps/talos-home/ are initialized by Flux.
+        
+        apiVersion: kustomize.config.k8s.io/v1beta1
+        kind: Kustomization
+        
+        resources:
+          - infrastructure.yaml
+          - infrastructure-config.yaml
+          - apps.yaml
+          - flux-system
+    
+    ----- FILE: ./full_dump.txt -----
+        ----- FILE: ./apps/talos-home/blocky/configmap.yaml -----
+            apiVersion: v1
+            kind: ConfigMap
+            metadata:
+              name: blocky-config
+              namespace: dns
+            data:
+              config.yml: |
+                upstreams:
+                  groups:
+                    default:
+                      - https://one.one.one.one/dns-query
+                      - https://dns.google/dns-query
+                      - 1.1.1.1
+                      - 8.8.8.8
+            
+                blocking:
+                  blackLists:
+                    ads:
+                      - https://oisd.nl/downloads/full
+                      - https://adaway.org/hosts.txt
+                      - https://adguardteam.github.io/AdGuardSDNSFilter/Filters/filter.txt
+                      - https://raw.githubusercontent.com/hoshsadiq/adblock-nocoin-list/master/hosts.txt
+                      - https://raw.githubusercontent.com/EnergizedProtection/block/master/EnergizedBlu.hosts
+                    malware:
+                      - https://mirror1.malwaredomains.com/files/justdomains
+                      - https://urlhaus.abuse.ch/downloads/hostfile/
+            
+                  clientGroupsBlock:
+                    default:
+                      - ads
+                      - malware
+            
+                  blockType: zeroIp
+            
+                  loading:
+                    refreshPeriod: 4h
+            
+                caching:
+                  minTime: 5m
+                  maxTime: 30m
+            
+                ports:
+                  dns: 53
+                  http: 4000
+            
+                log:
+                  level: info
+            
+                prometheus:
+                  enable: true
+                  path: /metrics
+            
+                customDNS:
+                  mapping:
+                    jellyfin.lan: 192.168.2.20
+                    sonarr.lan: 192.168.2.20
+                    jellyseerr.lan: 192.168.2.20
+                    radarr.lan: 192.168.2.20
+                    qbittorrent.lan: 192.168.2.20
+        
+        ----- FILE: ./apps/talos-home/blocky/helmrelease.yaml -----
+            apiVersion: helm.toolkit.fluxcd.io/v2
+            kind: HelmRelease
+            metadata:
+              name: blocky
+              namespace: dns
+            spec:
+              interval: 15m
+              timeout: 10m
+            
+              chart:
+                spec:
+                  chart: app-template
+                  version: "3.2.1"
+                  sourceRef:
+                    kind: HelmRepository
+                    name: bjw-s
+                    namespace: flux-system
+            
+              values:
+                controllers:
+                  main:
+                    replicas: 2
+            
+                    pod:
+                      securityContext:
+                        runAsNonRoot: true
+                        runAsUser: 1000
+                        runAsGroup: 1000
+                        fsGroup: 1000
+                        seccompProfile:
+                          type: RuntimeDefault
+            
+                    containers:
+                      main:
+                        image:
+                          repository: ghcr.io/0xerr0r/blocky
+                          tag: v0.23
+                        args:
+                          - --config
+                          - /app/config.yml
+            
+                        ports:
+                          - name: dns-udp
+                            containerPort: 53
+                            protocol: UDP
+                          - name: dns-tcp
+                            containerPort: 53
+                            protocol: TCP
+                          - name: http
+                            containerPort: 4000
+                            protocol: TCP
+            
+                        securityContext:
+                          allowPrivilegeEscalation: false
+                          capabilities:
+                            add:
+                              - NET_BIND_SERVICE
+            
+                service:
+                  main:
+                    controller: main
+                    type: LoadBalancer
+                    externalTrafficPolicy: Cluster
+                    annotations:
+                      metallb.universe.tf/address-pool: "dns-pool"
+                    ports:
+                      dns-tcp:
+                        port: 53
+                        protocol: TCP
+                        targetPort: dns-tcp
+                      dns-udp:
+                        port: 53
+                        protocol: UDP
+                        targetPort: dns-udp
+                      http:
+                        port: 4000
+                        protocol: TCP
+                        targetPort: http
+            
+                persistence:
+                  config:
+                    enabled: true
+                    type: configMap
+                    name: blocky-config
+                    globalMounts:
+                      - path: /app/config.yml
+                        subPath: config.yml
+                        readOnly: true
+        
+        ----- FILE: ./apps/talos-home/blocky/helmrepository.yaml -----
+            apiVersion: source.toolkit.fluxcd.io/v1beta2
+            kind: HelmRepository
+            metadata:
+              name: bjw-s
+              namespace: flux-system
+            spec:
+              interval: 1h
+              url: https://bjw-s-labs.github.io/helm-charts
+        
+        ----- FILE: ./apps/talos-home/blocky/namespace.yaml -----
+            apiVersion: v1
+            kind: Namespace
+            metadata:
+              name: dns
+        
+        ----- FILE: ./apps/talos-home/blocky/servicemonitor.yaml -----
+            apiVersion: monitoring.coreos.com/v1
+            kind: ServiceMonitor
+            metadata:
+              name: blocky
+              namespace: dns
+            spec:
+              selector:
+                matchLabels:
+                  app.kubernetes.io/name: blocky
+              endpoints:
+                - port: http
+                  path: /metrics
+                  interval: 30s
+        
+        ----- FILE: ./apps/talos-home/jellyfin/helmrelease.yaml -----
+            apiVersion: helm.toolkit.fluxcd.io/v2
+            kind: HelmRelease
+            metadata:
+              name: jellyfin
+              namespace: media
+            spec:
+              interval: 15m
+              chart:
+                spec:
+                  chart: jellyfin
+                  version: "*"
+                  sourceRef:
+                    kind: HelmRepository
+                    name: jellyfin
+                    namespace: flux-system
+              values:
+                image:
+                  repository: jellyfin/jellyfin
+                  tag: latest
+                env:
+                  PUID: 1000
+                  PGID: 1000
+                  TZ: Europe/Amsterdam
+                securityContext:
+                  runAsUser: 1000
+                  runAsGroup: 1000
+                  fsGroup: 1000
+                persistence:
+                  config:
+                    enabled: true
+                    type: pvc
+                    existingClaim: tank-configs
+                    mountPath: /config
+                    subPath: jellyfin
+                  media:
+                    enabled: true
+                    type: pvc
+                    existingClaim: media
+                    mountPath: /media
+                  cache:
+                    enabled: true
+                    type: emptyDir
+                    mountPath: /cache
+                resources:
+                  requests:
+                    memory: "1Gi"
+                    cpu: "250m"
+                  limits:
+                    memory: "2Gi"
+                    cpu: "1"
+                service:
+                  enabled: true
+                  type: ClusterIP
+                  port: 8096
+            
+                affinity:
+                  nodeAffinity:
+                    preferredDuringSchedulingIgnoredDuringExecution:
+                      - weight: 100
+                        preference:
+                          matchExpressions:
+                            - key: kubernetes.io/hostname
+                              operator: In
+                              values:
+                                - talos-cp-2
+        
+        ----- FILE: ./apps/talos-home/jellyfin/helmrepository.yaml -----
+            # yaml-language-server: $schema=https://raw.githubusercontent.com/fluxcd-community/flux2-schemas/main/helmrepository-source-v1beta2.json
+            apiVersion: source.toolkit.fluxcd.io/v1beta2
+            kind: HelmRepository
+            metadata:
+              name: jellyfin
+              namespace: flux-system
+            spec:
+              interval: 1h
+              url: https://jellyfin.github.io/jellyfin-helm
+        
+        ----- FILE: ./apps/talos-home/jellyfin/ingressroute.yaml -----
+            apiVersion: traefik.io/v1alpha1
+            kind: IngressRoute
+            metadata:
+              name: jellyfin
+              namespace: media
+            spec:
+              entryPoints:
+                - web
+              routes:
+                - match: Host(`jellyfin.lan`)
+                  kind: Rule
+                  services:
+                    - name: jellyfin
+                      port: 8096
+                  middlewares:
+                    - name: lan-headers
+                      namespace: networking
+        
+        ----- FILE: ./apps/talos-home/jellyseerr/helmrelease.yaml -----
+            apiVersion: helm.toolkit.fluxcd.io/v2
+            kind: HelmRelease
+            metadata:
+              name: jellyseerr
+              namespace: media
+            spec:
+              interval: 15m
+              chart:
+                spec:
+                  chart: app-template
+                  version: "3.2.1"
+                  sourceRef:
+                    kind: HelmRepository
+                    name: bjw-s
+                    namespace: flux-system
+              values:
+                controllers:
+                  jellyseerr:
+                    containers:
+                      app:
+                        image:
+                          repository: ghcr.io/fallenbagel/jellyseerr
+                          tag: latest
+                        env:
+                          TZ: Europe/Amsterdam
+                          LOG_LEVEL: info
+                        resources:
+                          requests:
+                            cpu: 100m
+                            memory: 256Mi
+                          limits:
+                            memory: 512Mi
+                service:
+                  app:
+                    controller: jellyseerr
+                    type: ClusterIP
+                    ports:
+                      http:
+                        port: 5055
+                persistence:
+                  config:
+                    enabled: true
+                    type: persistentVolumeClaim
+                    existingClaim: tank-configs
+                    globalMounts:
+                      - path: /app/config
+                        subPath: jellyseerr
+        
+        ----- FILE: ./apps/talos-home/jellyseerr/ingressroute.yaml -----
+            apiVersion: traefik.io/v1alpha1
+            kind: IngressRoute
+            metadata:
+              name: jellyseerr
+              namespace: media
+            spec:
+              entryPoints:
+                - web
+              routes:
+                - match: Host(`jellyseerr.lan`)
+                  kind: Rule
+                  services:
+                    - name: jellyseerr
+                      port: 5055
+        
+        ----- FILE: ./apps/talos-home/kustomization.yaml -----
+            apiVersion: kustomize.config.k8s.io/v1beta1
+            kind: Kustomization
+            
+            resources:
+              # ──────────────────────────────────────
+              # Blocky (DNS)
+              # ──────────────────────────────────────
+              - blocky/namespace.yaml
+              - blocky/configmap.yaml
+              - blocky/helmrepository.yaml
+              - blocky/helmrelease.yaml
+              - blocky/servicemonitor.yaml
+            
+              # ──────────────────────────────────────
+              # Jellyfin
+              # ──────────────────────────────────────
+              - jellyfin/helmrepository.yaml
+              - jellyfin/helmrelease.yaml
+              - jellyfin/ingressroute.yaml
+            
+              # ──────────────────────────────────────
+              # qBittorrent
+              # ──────────────────────────────────────
+              - qbittorrent/helmrelease.yaml
+              - qbittorrent/secret.yaml
+            
+              # ──────────────────────────────────────
+              # monitoring / prometheus
+              # ──────────────────────────────────────
+              - monitoring/namespace.yaml
+              - monitoring/monitoring-release.yaml
+              - monitoring/monitoring-repo.yaml
+              - monitoring/servicemonitor.yaml
+            
+              # ──────────────────────────────────────
+              # Jellyseerr
+              # ──────────────────────────────────────
+              - jellyseerr/helmrelease.yaml
+              - jellyseerr/ingressroute.yaml
+            
+              # ──────────────────────────────────────
+              # Network Policies
+              # ──────────────────────────────────────
+              - networkpolicies/default-deny.yaml
+              - networkpolicies/allow-traefik.yaml
+              - networkpolicies/allow-arr.yaml
+              - networkpolicies/allow-monitoring.yaml
+            
+              # ──────────────────────────────────────
+              # Sonarr
+              # ──────────────────────────────────────
+              - sonarr/helmrelease.yaml
+              - sonarr/ingressroute.yaml
+            
+              # ──────────────────────────────────────
+              # Radarr
+              # ──────────────────────────────────────
+              - radarr/helmrelease.yaml
+              - radarr/ingressroute.yaml
+        
+        ----- FILE: ./apps/talos-home/monitoring/monitoring-release.yaml -----
+            apiVersion: helm.toolkit.fluxcd.io/v2
+            kind: HelmRelease
+            metadata:
+              name: kube-prometheus-stack
+              namespace: monitoring
+            spec:
+              interval: 30m
+              timeout: 30m
+            
+              chart:
+                spec:
+                  chart: kube-prometheus-stack
+                  version: "61.x"
+                  sourceRef:
+                    kind: HelmRepository
+                    name: prometheus-community
+                    namespace: flux-system
+            
+              install:
+                createNamespace: true
+                crds: CreateReplace
+                remediation:
+                  retries: 3
+                # cleanupOnFail: removed (invalid in v2 API)
+            
+              upgrade:
+                crds: CreateReplace
+                remediation:
+                  retries: 3
+                # cleanupOnFail: removed (invalid in v2 API)
+            
+              values:
+                prometheus:
+                  service:
+                    type: NodePort
+                    nodePort: 30090
+                  prometheusSpec:
+                    serviceMonitorSelectorNilUsesHelmValues: false
+        
+        ----- FILE: ./apps/talos-home/monitoring/monitoring-repo.yaml -----
+            apiVersion: source.toolkit.fluxcd.io/v1beta2
+            kind: HelmRepository
+            metadata:
+              name: prometheus-community
+              namespace: flux-system
+            spec:
+              interval: 2h
+              url: https://prometheus-community.github.io/helm-charts
+        
+        ----- FILE: ./apps/talos-home/monitoring/namespace.yaml -----
+            apiVersion: v1
+            kind: Namespace
+            metadata:
+              name: monitoring
+        
+        ----- FILE: ./apps/talos-home/monitoring/servicemonitor.yaml -----
+            apiVersion: monitoring.coreos.com/v1
+            kind: ServiceMonitor
+            metadata:
+              name: qbittorrent
+              namespace: media
+            spec:
+              selector:
+                matchLabels:
+                  app.kubernetes.io/name: qbittorrent
+              endpoints:
+                - port: metrics
+                  interval: 30s
+        
+        ----- FILE: ./apps/talos-home/networkpolicies/allow-arr.yaml -----
+            apiVersion: networking.k8s.io/v1
+            kind: NetworkPolicy
+            metadata:
+              name: allow-arr-to-qbittorrent
+              namespace: media
+            spec:
+              podSelector:
+                matchLabels:
+                  app.kubernetes.io/name: qbittorrent
+              ingress:
+                - from:
+                    - podSelector:
+                        matchLabels:
+                          app.kubernetes.io/name: sonarr
+                    - podSelector:
+                        matchLabels:
+                          app.kubernetes.io/name: radarr
+                  ports:
+                    - protocol: TCP
+                      port: 8080
+        
+        ----- FILE: ./apps/talos-home/networkpolicies/allow-monitoring.yaml -----
+            apiVersion: networking.k8s.io/v1
+            kind: NetworkPolicy
+            metadata:
+              name: allow-monitoring
+              namespace: media
+            spec:
+              podSelector: {}
+              ingress:
+                - from:
+                    - namespaceSelector:
+                        matchLabels:
+                          kubernetes.io/metadata.name: monitoring
+                  ports:
+                    - protocol: TCP
+                      port: 8000   # qBittorrent metrics
+                    - protocol: TCP
+                      port: 4000   # if you later expose Blocky metrics via media, adjust as needed
+              policyTypes:
+                - Ingress
+        
+        ----- FILE: ./apps/talos-home/networkpolicies/allow-traefik.yaml -----
+            apiVersion: networking.k8s.io/v1
+            kind: NetworkPolicy
+            metadata:
+              name: allow-traefik
+              namespace: media
+            spec:
+              podSelector: {}
+              ingress:
+                - from:
+                    - namespaceSelector:
+                        matchLabels:
+                          kubernetes.io/metadata.name: networking
+        
+        ----- FILE: ./apps/talos-home/networkpolicies/default-deny.yaml -----
+            apiVersion: networking.k8s.io/v1
+            kind: NetworkPolicy
+            metadata:
+              name: default-deny
+              namespace: media
+            spec:
+              podSelector: {}
+              policyTypes:
+                - Ingress
+        
+        ----- FILE: ./apps/talos-home/qbittorrent/helmrelease.yaml -----
+            apiVersion: helm.toolkit.fluxcd.io/v2
+            kind: HelmRelease
+            metadata:
+              name: qbittorrent
+              namespace: media
+            spec:
+              interval: 15m
+              timeout: 20m
+            
+              chart:
+                spec:
+                  chart: app-template
+                  version: "3.2.1"
+                  sourceRef:
+                    kind: HelmRepository
+                    name: bjw-s
+                    namespace: flux-system
+            
+              values:
+                controllers:
+                  main:
+                    pod:
+                      securityContext:
+                        runAsUser: 1000
+                        runAsGroup: 1000
+                        fsGroup: 1000
+                        fsGroupChangePolicy: OnRootMismatch
+                      affinity:
+                        podAntiAffinity:
+                          requiredDuringSchedulingIgnoredDuringExecution:
+                            - labelSelector:
+                                matchLabels:
+                                  app.kubernetes.io/name: qbittorrent
+                              topologyKey: kubernetes.io/hostname
+            
+                    containers:
+                      main:
+                        image:
+                          repository: ghcr.io/onedr0p/qbittorrent
+                          tag: 4.6.3
+            
+                        envFrom:
+                          - secretRef:
+                              name: qbittorrent-webui
+            
+                        env:
+                          TZ: Europe/Amsterdam
+                          QBITTORRENT__PORT: "8080"
+                          QBITTORRENT__BT_PORT: "6881"
+                          QBITTORRENT__WEBUI__ADDRESS: "0.0.0.0"
+                          QBITTORRENT__WEBUI__HOST_HEADER_VALIDATION: "false"
+                          QBITTORRENT__WEBUI__CSRF_PROTECTION: "false"
+            
+                        resources:
+                          requests:
+                            cpu: 100m
+                            memory: 256Mi
+                          limits:
+                            memory: 1Gi
+            
+                        ports:
+                          - name: http
+                            containerPort: 8080
+                            protocol: TCP
+                          - name: bt
+                            containerPort: 6881
+                            protocol: TCP
+            
+                      exporter:
+                        image:
+                          repository: ghcr.io/esanchezm/prometheus-qbittorrent-exporter
+                          tag: v1.6.0
+            
+                        envFrom:
+                          - secretRef:
+                              name: qbittorrent-webui
+            
+                        env:
+                          QBITTORRENT_HOST: "127.0.0.1"
+                          QBITTORRENT_PORT: "8080"
+                          QBITTORRENT_URL_BASE: ""
+                          EXPORTER_PORT: "8000"
+            
+                        ports:
+                          - name: metrics
+                            containerPort: 8000
+                            protocol: TCP
+            
+                service:
+                  main:
+                    controller: main
+                    type: ClusterIP
+                    ports:
+                      http:
+                        port: 8080
+                        protocol: TCP
+                        targetPort: http
+                      bt:
+                        port: 6881
+                        protocol: TCP
+                        targetPort: bt
+                      metrics:
+                        port: 8000
+                        protocol: TCP
+                        targetPort: metrics
+            
+                persistence:
+                  config:
+                    enabled: true
+                    type: persistentVolumeClaim
+                    existingClaim: tank-configs
+                    globalMounts:
+                      - path: /config
+                        subPath: qbittorrent
+            
+                  downloads:
+                    enabled: true
+                    type: persistentVolumeClaim
+                    existingClaim: media
+                    globalMounts:
+                      - path: /downloads
+                        subPath: downloads
+        
+        ----- FILE: ./apps/talos-home/qbittorrent/ingressroute.yaml -----
+            apiVersion: traefik.io/v1alpha1
+            kind: IngressRoute
+            metadata:
+              name: qbittorrent
+              namespace: media
+            spec:
+              entryPoints:
+                - web
+              routes:
+                - match: Host(`qbittorrent.lan`)
+                  kind: Rule
+                  services:
+                    - name: qbittorrent
+                      port: 8080
+        
+        ----- FILE: ./apps/talos-home/qbittorrent/secret.yaml -----
+            apiVersion: v1
+            kind: Secret
+            metadata:
+              name: qbittorrent-webui
+              namespace: media
+            type: Opaque
+            stringData:
+              QBITTORRENT__WEBUI__USERNAME: admin
+              QBITTORRENT__WEBUI__PASSWORD: super-secret-password
+              QBITTORRENT_USER: admin
+              QBITTORRENT_PASS: super-secret-password
+        
+        ----- FILE: ./apps/talos-home/radarr/helmrelease.yaml -----
+            apiVersion: helm.toolkit.fluxcd.io/v2
+            kind: HelmRelease
+            metadata:
+              name: radarr
+              namespace: media
+            spec:
+              interval: 15m
+              chart:
+                spec:
+                  chart: app-template
+                  version: "3.2.1"
+                  sourceRef:
+                    kind: HelmRepository
+                    name: bjw-s
+                    namespace: flux-system
+              values:
+                controllers:
+                  radarr:
+                    containers:
+                      app:
+                        image:
+                          repository: ghcr.io/linuxserver/radarr
+                          tag: latest
+                        env:
+                          PUID: 1000
+                          PGID: 1000
+                          TZ: Europe/Amsterdam
+                          RADARR__SERVER__BINDADDRESS: 0.0.0.0
+                service:
+                  app:
+                    type: ClusterIP
+                    controller: radarr
+                    ports:
+                      http:
+                        port: 7878
+                persistence:
+                  config:
+                    enabled: true
+                    type: persistentVolumeClaim
+                    existingClaim: tank-configs
+                    globalMounts:
+                      - path: /config
+                        subPath: radarr
+                  media:
+                    enabled: true
+                    type: persistentVolumeClaim
+                    existingClaim: media
+                    globalMounts:
+                      - path: /media
+        
+        ----- FILE: ./apps/talos-home/radarr/ingressroute.yaml -----
+            apiVersion: traefik.io/v1alpha1
+            kind: IngressRoute
+            metadata:
+              name: radarr
+              namespace: media
+            spec:
+              entryPoints:
+                - web
+              routes:
+                - match: Host(`radarr.lan`)
+                  kind: Rule
+                  services:
+                    - name: radarr
+                      port: 7878
+        
+        ----- FILE: ./apps/talos-home/sonarr/helmrelease.yaml -----
+            apiVersion: helm.toolkit.fluxcd.io/v2
+            kind: HelmRelease
+            metadata:
+              name: sonarr
+              namespace: media
+            spec:
+              interval: 15m
+              chart:
+                spec:
+                  chart: app-template
+                  version: "3.2.1"
+                  sourceRef:
+                    kind: HelmRepository
+                    name: bjw-s
+                    namespace: flux-system
+              values:
+                controllers:
+                  sonarr:
+                    containers:
+                      app:
+                        image:
+                          repository: ghcr.io/linuxserver/sonarr
+                          tag: latest
+                        env:
+                          PUID: 1000
+                          PGID: 1000
+                          TZ: Europe/Amsterdam
+                          SONARR__SERVER__BINDADDRESS: 0.0.0.0
+                service:
+                  app:
+                    type: ClusterIP
+                    controller: sonarr
+                    ports:
+                      http:
+                        port: 8989
+                persistence:
+                  config:
+                    enabled: true
+                    type: persistentVolumeClaim
+                    existingClaim: tank-configs
+                    globalMounts:
+                      - path: /config
+                        subPath: sonarr
+                  media:
+                    enabled: true
+                    type: persistentVolumeClaim
+                    existingClaim: media
+                    globalMounts:
+                      - path: /media
+        
+        ----- FILE: ./apps/talos-home/sonarr/ingressroute.yaml -----
+            apiVersion: traefik.io/v1alpha1
+            kind: IngressRoute
+            metadata:
+              name: sonarr
+              namespace: media
+            spec:
+              entryPoints:
+                - web
+              routes:
+                - match: Host(`sonarr.lan`)
+                  kind: Rule
+                  services:
+                    - name: sonarr
+                      port: 8989
+        
+        ----- FILE: ./clusters/talos-home/apps.yaml -----
+            apiVersion: kustomize.toolkit.fluxcd.io/v1
+            kind: Kustomization
+            metadata:
+              name: apps
+              namespace: flux-system
+            spec:
+              dependsOn:
+                - name: infrastructure-config
+              interval: 10m
+              path: ./apps/talos-home
+              prune: true
+              sourceRef:
+                kind: GitRepository
+                name: flux-system
+        
+        ----- FILE: ./clusters/talos-home/cleanup-completed-pods.yaml -----
+            apiVersion: batch/v1
+            kind: CronJob
+            metadata:
+              name: cleanup-completed-pods
+            spec:
+              schedule: "0 0 * * *" 
+              jobTemplate:
+                spec:
+                  template:
+                    spec:
+                      containers:
+                      - name: kubectl
+                        image: bitnami/kubectl:latest
+                        command:
+                        - /bin/sh
+                        - -c
+                        - kubectl delete pod --field-selector=status.phase==Succeeded,status.phase==Failed
+                      restartPolicy: OnFailure
+        
+        ----- FILE: ./clusters/talos-home/infrastructure-config.yaml -----
+            apiVersion: kustomize.toolkit.fluxcd.io/v1
+            kind: Kustomization
+            metadata:
+              name: infrastructure-config
+              namespace: flux-system
+            spec:
+              dependsOn:
+                - name: infrastructure
+              interval: 10m
+              path: ./infrastructure
+              prune: true
+              sourceRef:
+                kind: GitRepository
+                name: flux-system
+        
+        ----- FILE: ./clusters/talos-home/infrastructure.yaml -----
+            apiVersion: kustomize.toolkit.fluxcd.io/v1
+            kind: Kustomization
+            metadata:
+              name: infrastructure
+              namespace: flux-system
+            spec:
+              interval: 10m
+              path: ./infrastructure
+              prune: true
+              sourceRef:
+                kind: GitRepository
+                name: flux-system
+        
+        ----- FILE: ./clusters/talos-home/kustomization.yaml -----
+            # This is the root of FluxCD. This file is read and then ./infrastructure/ and ./apps/talos-home/ are initialized by Flux.
+            
+            apiVersion: kustomize.config.k8s.io/v1beta1
+            kind: Kustomization
+            
+            resources:
+              - infrastructure.yaml
+              - infrastructure-config.yaml
+              - apps.yaml
+              - flux-system
+        
+        ----- FILE: ./infrastructure/kustomization.yaml -----
+            apiVersion: kustomize.config.k8s.io/v1beta1
+            kind: Kustomization
+            
+            resources:
+              # Storage
+              - storage/namespace.yaml
+              - storage/pv-media.yaml
+              - storage/pv-tank-configs.yaml
+              - storage/pvc-media.yaml
+              - storage/pvc-tank-configs.yaml
+            
+              # Controllers (Base)
+              - traefik/base
+              - metallb/base/namespace.yaml
+              - metallb/base/helmrelease.yaml
+              - metallb/base/helmrepository.yaml
+              - metallb/config/ipaddress-pool-dns.yaml
+              - metallb/config/ipaddress-pool-lan.yaml
+              - metallb/config/l2-advertisement.yaml
+            
+        
+        ----- FILE: ./infrastructure/metallb/base/helmrelease.yaml -----
+            apiVersion: helm.toolkit.fluxcd.io/v2
+            kind: HelmRelease
+            metadata:
+              name: metallb
+              namespace: metallb-system
+            spec:
+              interval: 15m
+              chart:
+                spec:
+                  chart: metallb
+                  version: "0.14.5"
+                  sourceRef:
+                    kind: HelmRepository
+                    name: metallb
+                    namespace: flux-system
+            
+              values:
+                crds:
+                  enabled: true
+            
+                controller:
+                  resources:
+                    requests:
+                      cpu: 50m
+                      memory: 64Mi
+                    limits:
+                      cpu: 200m
+                      memory: 256Mi
+            
+                speaker:
+                  hostNetwork: true
+                  ignoreExcludeLB: true
+            
+                  tolerations:
+                    - key: node-role.kubernetes.io/control-plane
+                      operator: Exists
+                      effect: NoSchedule
+            
+                  securityContext:
+                    privileged: true
+                    capabilities:
+                      add:
+                        - NET_ADMIN
+                        - NET_RAW
+            
+                  resources:
+                    requests:
+                      cpu: 50m
+                      memory: 64Mi
+                    limits:
+                      cpu: 200m
+                      memory: 256Mi
+        
+        ----- FILE: ./infrastructure/metallb/base/helmrepository.yaml -----
+            apiVersion: source.toolkit.fluxcd.io/v1beta2
+            kind: HelmRepository
+            metadata:
+              name: metallb
+              namespace: flux-system
+            spec:
+              interval: 1h
+              url: https://metallb.github.io/metallb
+        
+        ----- FILE: ./infrastructure/metallb/base/namespace.yaml -----
+            apiVersion: v1
+            kind: Namespace
+            metadata:
+              name: metallb-system
+              labels:
+                pod-security.kubernetes.io/enforce: privileged
+        
+        ----- FILE: ./infrastructure/metallb/config/ipaddress-pool-dns.yaml -----
+            apiVersion: metallb.io/v1beta1
+            kind: IPAddressPool
+            metadata:
+              name: dns-pool
+              namespace: metallb-system
+            spec:
+              addresses:
+                - 192.168.2.53/32
+        
+        ----- FILE: ./infrastructure/metallb/config/ipaddress-pool-lan.yaml -----
+            apiVersion: metallb.io/v1beta1
+            kind: IPAddressPool
+            metadata:
+              name: lan-pool
+              namespace: metallb-system
+            spec:
+              addresses:
+                - 192.168.2.20-192.168.2.30
+        
+        ----- FILE: ./infrastructure/metallb/config/l2-advertisement.yaml -----
+            apiVersion: metallb.io/v1beta1
+            kind: L2Advertisement
+            metadata:
+              name: main-l2
+              namespace: metallb-system
+            spec:
+              ipAddressPools:
+                - dns-pool
+                - lan-pool
+              nodeSelectors:
+                - matchLabels:
+                    kubernetes.io/hostname: talos-cp-1
+                - matchLabels:
+                    kubernetes.io/hostname: talos-cp-2
+                - matchLabels:
+                    kubernetes.io/hostname: talos-cp-3
+        
+        ----- FILE: ./infrastructure/storage/namespace.yaml -----
+            apiVersion: v1
+            kind: Namespace
+            metadata:
+              name: media
+        
+        ----- FILE: ./infrastructure/storage/pvc-media.yaml -----
+            apiVersion: v1
+            kind: PersistentVolumeClaim
+            metadata:
+              name: media
+              namespace: media
+            spec:
+              accessModes:
+                - ReadWriteMany
+              resources:
+                requests:
+                  storage: 20Ti
+              volumeName: pv-media
+        
+        ----- FILE: ./infrastructure/storage/pvc-tank-configs.yaml -----
+            apiVersion: v1
+            kind: PersistentVolumeClaim
+            metadata:
+              name: tank-configs
+              namespace: media
+            spec:
+              accessModes:
+                - ReadWriteMany
+              resources:
+                requests:
+                  storage: 20Gi
+              volumeName: pv-tank-configs
+        
+        ----- FILE: ./infrastructure/storage/pv-media.yaml -----
+            apiVersion: v1
+            kind: PersistentVolume
+            metadata:
+              name: pv-media
+            spec:
+              capacity:
+                storage: 20Ti
+              accessModes:
+                - ReadWriteMany
+              persistentVolumeReclaimPolicy: Retain
+              mountOptions:
+                - nfsvers=4.1
+                - hard
+                - noatime
+              nfs:
+                server: 192.168.2.5
+                path: /mnt/tank/media
+        
+        ----- FILE: ./infrastructure/storage/pv-tank-configs.yaml -----
+            apiVersion: v1
+            kind: PersistentVolume
+            metadata:
+              name: pv-tank-configs
+            spec:
+              capacity:
+                storage: 20Gi
+              volumeMode: Filesystem
+              accessModes:
+                - ReadWriteMany
+              persistentVolumeReclaimPolicy: Retain
+              mountOptions:
+                - nfsvers=4.1
+                - hard
+                - noatime
+              nfs:
+                server: 192.168.2.5
+                path: /mnt/tank/configs
+            
+        
+        ----- FILE: ./infrastructure/traefik/base/helmrelease.yaml -----
+            apiVersion: helm.toolkit.fluxcd.io/v2
+            kind: HelmRelease
+            metadata:
+              name: traefik
+              namespace: networking
+            spec:
+              interval: 15m
+              chart:
+                spec:
+                  chart: traefik
+                  version: "27.x"
+                  sourceRef:
+                    kind: HelmRepository
+                    name: traefik
+                    namespace: flux-system
+            
+              values:
+                deployment:
+                  replicas: 2
+            
+                ingressClass:
+                  enabled: true
+                  isDefaultClass: true
+                  name: traefik
+            
+                service:
+                  type: LoadBalancer
+                  loadBalancerIP: 192.168.2.22
+                  annotations:
+                    metallb.universe.tf/address-pool: lan-pool
+            
+                ports:
+                  web:
+                    port: 80
+                    expose:
+                      default: true
+                    exposedPort: 80
+                  websecure:
+                    port: 443
+                    expose:
+                      default: true
+                    exposedPort: 443
+            
+                providers:
+                  kubernetesIngress:
+                    enabled: true
+                  kubernetesCRD:
+                    enabled: true
+            
+                additionalArguments:
+                  - "--providers.kubernetesingress.ingressclass=traefik"
+            
+                logs:
+                  general:
+                    level: INFO
+        
+        ----- FILE: ./infrastructure/traefik/base/helmrepository.yaml -----
+            apiVersion: source.toolkit.fluxcd.io/v1beta2
+            kind: HelmRepository
+            metadata:
+              name: traefik
+              namespace: flux-system
+            spec:
+              interval: 1h
+              url: https://helm.traefik.io/traefik
+        
+        ----- FILE: ./infrastructure/traefik/base/kustomization.yaml -----
+            apiVersion: kustomize.config.k8s.io/v1beta1
+            kind: Kustomization
+            resources:
+              - namespace.yaml
+              - helmrepository.yaml
+              - helmrelease.yaml
+        
+        ----- FILE: ./infrastructure/traefik/base/namespace.yaml -----
+            apiVersion: v1
+            kind: Namespace
+            metadata:
+              name: networking
+              labels:
+                kubernetes.io/metadata.name: networking
+        
+        ----- FILE: ./infrastructure/traefik/resources/kustomization.yaml -----
+            apiVersion: kustomize.config.k8s.io/v1beta1
+            kind: Kustomization
+            resources:
+              - middlewares.yaml
+        
+        ----- FILE: ./infrastructure/traefik/resources/middlewares.yaml -----
+            apiVersion: traefik.io/v1alpha1
+            kind: Middleware
+            metadata:
+              name: lan-headers
+              namespace: networking
+            spec:
+              headers:
+                browserXssFilter: true
+                contentTypeNosniff: true
+                forceSTSHeader: false
+        
+        ----- FILE: ./README.md -----
+            # k8s-home-server
+        ----- FILE: ./repo_dump.sh -----
+            #!/usr/bin/env bash
+            set -Eeuo pipefail
+            
+            STAMP="$(date +'%Y-%m-%d_%H-%M-%S')"
+            OUT="${STAMP}_full_dump.txt"
+            
+            MAX_BYTES=$((512 * 1024))
+            
+            {
+              find . \
+                -path "./.git" -prune -o \
+                -path "./clusters/talos-home/flux-system" -prune -o \
+                -path "./clusters/talos-home/flux-system/*" -prune -o \
+                -type f -print0 \
+              | sort -z \
+              | while IFS= read -r -d '' f; do
+            
+                  size=$(wc -c < "$f" 2>/dev/null || echo 0)
+                  if (( size > MAX_BYTES )); then
+                    continue
+                  fi
+            
+                  if ! LC_ALL=C grep -Iq . "$f" 2>/dev/null; then
+                    continue
+                  fi
+            
+                  echo "----- FILE: $f -----"
+                  sed 's/^/    /' "$f"
+                  echo
+                done
+            } > "$OUT"
+            
+            echo "Wrote dump to: $OUT"
+        
+    
+    ----- FILE: ./infrastructure/kustomization.yaml -----
+        apiVersion: kustomize.config.k8s.io/v1beta1
+        kind: Kustomization
+        
+        resources:
+          # Storage
+          - storage/namespace.yaml
+          - storage/pv-media.yaml
+          - storage/pv-tank-configs.yaml
+          - storage/pvc-media.yaml
+          - storage/pvc-tank-configs.yaml
+        
+          # Controllers (Base)
+          - traefik/base
+          - metallb/base/namespace.yaml
+          - metallb/base/helmrelease.yaml
+          - metallb/base/helmrepository.yaml
+          - metallb/config/ipaddress-pools.yaml
+          - metallb/config/l2-advertisements.yaml
+    
+    ----- FILE: ./infrastructure/metallb/base/helmrelease.yaml -----
+        apiVersion: helm.toolkit.fluxcd.io/v2
+        kind: HelmRelease
+        metadata:
+          name: metallb
+          namespace: metallb-system
+        spec:
+          interval: 15m
+          chart:
+            spec:
+              chart: metallb
+              version: "0.14.5"
+              sourceRef:
+                kind: HelmRepository
+                name: metallb
+                namespace: flux-system
+        
+          values:
+            crds:
+              enabled: true
+        
+            controller:
+              resources:
+                requests:
+                  cpu: 50m
+                  memory: 64Mi
+                limits:
+                  cpu: 200m
+                  memory: 256Mi
+        
+            speaker:
+              hostNetwork: true
+              ignoreExcludeLB: true
+        
+              tolerations:
+                - key: node-role.kubernetes.io/control-plane
+                  operator: Exists
+                  effect: NoSchedule
+        
+              securityContext:
+                privileged: true
+                capabilities:
+                  add:
+                    - NET_ADMIN
+                    - NET_RAW
+        
+              resources:
+                requests:
+                  cpu: 50m
+                  memory: 64Mi
+                limits:
+                  cpu: 200m
+                  memory: 256Mi
+    
+    ----- FILE: ./infrastructure/metallb/base/helmrepository.yaml -----
+        apiVersion: source.toolkit.fluxcd.io/v1beta2
+        kind: HelmRepository
+        metadata:
+          name: metallb
+          namespace: flux-system
+        spec:
+          interval: 1h
+          url: https://metallb.github.io/metallb
+    
+    ----- FILE: ./infrastructure/metallb/base/namespace.yaml -----
+        apiVersion: v1
+        kind: Namespace
+        metadata:
+          name: metallb-system
+          labels:
+            pod-security.kubernetes.io/enforce: privileged
+    
+    ----- FILE: ./infrastructure/metallb/config/ipaddress-pools.yaml -----
+        apiVersion: metallb.io/v1beta1
+        kind: IPAddressPool
+        metadata:
+          name: dns-pool
+          namespace: metallb-system
+        spec:
+          addresses:
+            - 192.168.2.53/32
+        ---
+        apiVersion: metallb.io/v1beta1
+        kind: IPAddressPool
+        metadata:
+          name: lan-pool
+          namespace: metallb-system
+        spec:
+          addresses:
+            - 192.168.2.21-192.168.2.30
+        ---
+        apiVersion: metallb.io/v1beta1
+        kind: IPAddressPool
+        metadata:
+          name: traefik-pool
+          namespace: metallb-system
+        spec:
+          addresses:
+            - 192.168.2.20/32
+    
+    ----- FILE: ./infrastructure/metallb/config/ipaddress-pool-traefik.yaml -----
+        apiVersion: metallb.io/v1beta1
+        kind: IPAddressPool
+        metadata:
+          name: traefik-pool
+          namespace: metallb-system
+        spec:
+          addresses:
+            - 192.168.2.20/32
+        ---
+        apiVersion: metallb.io/v1beta1
+        kind: L2Advertisement
+        metadata:
+          name: traefik-l2
+          namespace: metallb-system
+        spec:
+          ipAddressPools:
+            - traefik-pool
+          nodeSelectors:
+            - matchLabels:
+                kubernetes.io/hostname: talos-cp-1
+            - matchLabels:
+                kubernetes.io/hostname: talos-cp-2
+            - matchLabels:
+                kubernetes.io/hostname: talos-cp-3
+    
+    ----- FILE: ./infrastructure/metallb/config/l2-advertisements.yaml -----
+        apiVersion: metallb.io/v1beta1
+        kind: L2Advertisement
+        metadata:
+          name: main-l2
+          namespace: metallb-system
+        spec:
+          ipAddressPools:
+            - dns-pool
+            - lan-pool
+          nodeSelectors:
+            - matchLabels:
+                kubernetes.io/hostname: talos-cp-1
+            - matchLabels:
+                kubernetes.io/hostname: talos-cp-2
+            - matchLabels:
+                kubernetes.io/hostname: talos-cp-3
+        ---
+        apiVersion: metallb.io/v1beta1
+        kind: L2Advertisement
+        metadata:
+          name: traefik-l2
+          namespace: metallb-system
+        spec:
+          ipAddressPools:
+            - traefik-pool
+          nodeSelectors:
+            - matchLabels:
+                kubernetes.io/hostname: talos-cp-1
+            - matchLabels:
+                kubernetes.io/hostname: talos-cp-2
+            - matchLabels:
+                kubernetes.io/hostname: talos-cp-3
+    
+    ----- FILE: ./infrastructure/storage/namespace.yaml -----
+        apiVersion: v1
+        kind: Namespace
+        metadata:
+          name: media
+    
+    ----- FILE: ./infrastructure/storage/pvc-media.yaml -----
+        apiVersion: v1
+        kind: PersistentVolumeClaim
+        metadata:
+          name: media
+          namespace: media
+        spec:
+          accessModes:
+            - ReadWriteMany
+          resources:
+            requests:
+              storage: 20Ti
+          volumeName: pv-media
+    
+    ----- FILE: ./infrastructure/storage/pvc-tank-configs.yaml -----
+        apiVersion: v1
+        kind: PersistentVolumeClaim
+        metadata:
+          name: tank-configs
+          namespace: media
+        spec:
+          accessModes:
+            - ReadWriteMany
+          resources:
+            requests:
+              storage: 20Gi
+          volumeName: pv-tank-configs
+    
+    ----- FILE: ./infrastructure/storage/pv-media.yaml -----
+        apiVersion: v1
+        kind: PersistentVolume
+        metadata:
+          name: pv-media
+        spec:
+          capacity:
+            storage: 20Ti
+          accessModes:
+            - ReadWriteMany
+          persistentVolumeReclaimPolicy: Retain
+          mountOptions:
+            - nfsvers=4.1
+            - hard
+            - noatime
+          nfs:
+            server: 192.168.2.5
+            path: /mnt/tank/media
+    
+    ----- FILE: ./infrastructure/storage/pv-tank-configs.yaml -----
+        apiVersion: v1
+        kind: PersistentVolume
+        metadata:
+          name: pv-tank-configs
+        spec:
+          capacity:
+            storage: 20Gi
+          volumeMode: Filesystem
+          accessModes:
+            - ReadWriteMany
+          persistentVolumeReclaimPolicy: Retain
+          mountOptions:
+            - nfsvers=4.1
+            - hard
+            - noatime
+          nfs:
+            server: 192.168.2.5
+            path: /mnt/tank/configs
+        
+    
+    ----- FILE: ./infrastructure/traefik/base/helmrelease.yaml -----
+        apiVersion: helm.toolkit.fluxcd.io/v2
+        kind: HelmRelease
+        metadata:
+          name: traefik
+          namespace: networking
+        spec:
+          interval: 15m
+          chart:
+            spec:
+              chart: traefik
+              version: "27.x"
+              sourceRef:
+                kind: HelmRepository
+                name: traefik
+                namespace: flux-system
+        
+          values:
+            deployment:
+              replicas: 2
+        
+            ingressClass:
+              enabled: true
+              isDefaultClass: true
+              name: traefik
+        
+            service:
+              type: LoadBalancer
+              loadBalancerIP: 192.168.2.20
+              annotations:
+                metallb.universe.tf/address-pool: traefik-pool
+        
+            ports:
+              web:
+                port: 80
+                expose:
+                  default: true
+                exposedPort: 80
+              websecure:
+                port: 443
+                expose:
+                  default: true
+                exposedPort: 443
+        
+            providers:
+              kubernetesIngress:
+                enabled: true
+              kubernetesCRD:
+                enabled: true
+        
+            additionalArguments:
+              - "--providers.kubernetesingress.ingressclass=traefik"
+        
+            logs:
+              general:
+                level: INFO
+    
+    ----- FILE: ./infrastructure/traefik/base/helmrepository.yaml -----
+        apiVersion: source.toolkit.fluxcd.io/v1beta2
+        kind: HelmRepository
+        metadata:
+          name: traefik
+          namespace: flux-system
+        spec:
+          interval: 1h
+          url: https://helm.traefik.io/traefik
+    
+    ----- FILE: ./infrastructure/traefik/base/kustomization.yaml -----
+        apiVersion: kustomize.config.k8s.io/v1beta1
+        kind: Kustomization
+        resources:
+          - namespace.yaml
+          - helmrepository.yaml
+          - helmrelease.yaml
+    
+    ----- FILE: ./infrastructure/traefik/base/namespace.yaml -----
+        apiVersion: v1
+        kind: Namespace
+        metadata:
+          name: networking
+          labels:
+            kubernetes.io/metadata.name: networking
+    
+    ----- FILE: ./infrastructure/traefik/resources/kustomization.yaml -----
+        apiVersion: kustomize.config.k8s.io/v1beta1
+        kind: Kustomization
+        resources:
+          - middlewares.yaml
+    
+    ----- FILE: ./infrastructure/traefik/resources/middlewares.yaml -----
+        apiVersion: traefik.io/v1alpha1
+        kind: Middleware
+        metadata:
+          name: lan-headers
+          namespace: networking
+        spec:
+          headers:
+            browserXssFilter: true
+            contentTypeNosniff: true
+            forceSTSHeader: false
+    
+    ----- FILE: ./README.md -----
+        # k8s-home-server
+    ----- FILE: ./repo_dump.sh -----
+        #!/usr/bin/env bash
+        set -Eeuo pipefail
+        
+        STAMP="$(date +'%Y-%m-%d_%H-%M-%S')"
+        OUT="${STAMP}_full_dump.txt"
+        
+        MAX_BYTES=$((512 * 1024))
+        
+        {
+          find . \
+            -path "./.git" -prune -o \
+            -path "./clusters/talos-home/flux-system" -prune -o \
+            -path "./clusters/talos-home/flux-system/*" -prune -o \
+            -type f -print0 \
+          | sort -z \
+          | while IFS= read -r -d '' f; do
+        
+              size=$(wc -c < "$f" 2>/dev/null || echo 0)
+              if (( size > MAX_BYTES )); then
+                continue
+              fi
+        
+              if ! LC_ALL=C grep -Iq . "$f" 2>/dev/null; then
+                continue
+              fi
+        
+              echo "----- FILE: $f -----"
+              sed 's/^/    /' "$f"
+              echo
+            done
+        } > "$OUT"
+        
+        echo "Wrote dump to: $OUT"
+    
+
+----- FILE: ./infrastructure/kustomization.yaml -----
     apiVersion: kustomize.config.k8s.io/v1beta1
     kind: Kustomization
     
@@ -902,12 +3602,14 @@ apps
       - storage/pvc-tank-configs.yaml
     
       # Controllers (Base)
-      - traefik/base/kustomization.yaml
+      - traefik/base
       - metallb/base/namespace.yaml
       - metallb/base/helmrelease.yaml
       - metallb/base/helmrepository.yaml
+      - metallb/config/ipaddress-pools.yaml
+      - metallb/config/l2-advertisements.yaml
 
------ FILE: infrastructure/metallb/base/helmrelease.yaml -----
+----- FILE: ./infrastructure/metallb/base/helmrelease.yaml -----
     apiVersion: helm.toolkit.fluxcd.io/v2
     kind: HelmRelease
     metadata:
@@ -961,7 +3663,7 @@ apps
               cpu: 200m
               memory: 256Mi
 
------ FILE: infrastructure/metallb/base/helmrepository.yaml -----
+----- FILE: ./infrastructure/metallb/base/helmrepository.yaml -----
     apiVersion: source.toolkit.fluxcd.io/v1beta2
     kind: HelmRepository
     metadata:
@@ -971,7 +3673,7 @@ apps
       interval: 1h
       url: https://metallb.github.io/metallb
 
------ FILE: infrastructure/metallb/base/namespace.yaml -----
+----- FILE: ./infrastructure/metallb/base/namespace.yaml -----
     apiVersion: v1
     kind: Namespace
     metadata:
@@ -979,7 +3681,7 @@ apps
       labels:
         pod-security.kubernetes.io/enforce: privileged
 
------ FILE: infrastructure/metallb/config/ipaddress-pool-dns.yaml -----
+----- FILE: ./infrastructure/metallb/config/ipaddress-pools.yaml -----
     apiVersion: metallb.io/v1beta1
     kind: IPAddressPool
     metadata:
@@ -988,8 +3690,16 @@ apps
     spec:
       addresses:
         - 192.168.2.53/32
-
------ FILE: infrastructure/metallb/config/ipaddress-pool-lan.yaml -----
+    ---
+    apiVersion: metallb.io/v1beta1
+    kind: IPAddressPool
+    metadata:
+      name: traefik-pool
+      namespace: metallb-system
+    spec:
+      addresses:
+        - 192.168.2.100/32
+    ---
     apiVersion: metallb.io/v1beta1
     kind: IPAddressPool
     metadata:
@@ -997,18 +3707,10 @@ apps
       namespace: metallb-system
     spec:
       addresses:
-        - 192.168.2.20-192.168.2.30
+        - 192.168.2.101-192.168.2.120
 
------ FILE: infrastructure/metallb/config/kustomization.yaml -----
-    apiVersion: kustomize.config.k8s.io/v1beta1
-    kind: Kustomization
-    
-    resources:
-      - ipaddress-pool-dns.yaml
-      - ipaddress-pool-lan.yaml
-      - l2-advertisement.yaml
-
------ FILE: infrastructure/metallb/config/l2-advertisement.yaml -----
+----- FILE: ./infrastructure/metallb/config/l2-advertisements.yaml -----
+    # FILE: ./infrastructure/metallb/config/l2-advertisements.yaml
     apiVersion: metallb.io/v1beta1
     kind: L2Advertisement
     metadata:
@@ -1025,14 +3727,30 @@ apps
             kubernetes.io/hostname: talos-cp-2
         - matchLabels:
             kubernetes.io/hostname: talos-cp-3
+    ---
+    apiVersion: metallb.io/v1beta1
+    kind: L2Advertisement
+    metadata:
+      name: traefik-l2
+      namespace: metallb-system
+    spec:
+      ipAddressPools:
+        - traefik-pool
+      nodeSelectors:
+        - matchLabels:
+            kubernetes.io/hostname: talos-cp-1
+        - matchLabels:
+            kubernetes.io/hostname: talos-cp-2
+        - matchLabels:
+            kubernetes.io/hostname: talos-cp-3
 
------ FILE: infrastructure/storage/namespace.yaml -----
+----- FILE: ./infrastructure/storage/namespace.yaml -----
     apiVersion: v1
     kind: Namespace
     metadata:
       name: media
 
------ FILE: infrastructure/storage/pvc-media.yaml -----
+----- FILE: ./infrastructure/storage/pvc-media.yaml -----
     apiVersion: v1
     kind: PersistentVolumeClaim
     metadata:
@@ -1046,7 +3764,7 @@ apps
           storage: 20Ti
       volumeName: pv-media
 
------ FILE: infrastructure/storage/pvc-tank-configs.yaml -----
+----- FILE: ./infrastructure/storage/pvc-tank-configs.yaml -----
     apiVersion: v1
     kind: PersistentVolumeClaim
     metadata:
@@ -1060,7 +3778,7 @@ apps
           storage: 20Gi
       volumeName: pv-tank-configs
 
------ FILE: infrastructure/storage/pv-media.yaml -----
+----- FILE: ./infrastructure/storage/pv-media.yaml -----
     apiVersion: v1
     kind: PersistentVolume
     metadata:
@@ -1079,7 +3797,7 @@ apps
         server: 192.168.2.5
         path: /mnt/tank/media
 
------ FILE: infrastructure/storage/pv-tank-configs.yaml -----
+----- FILE: ./infrastructure/storage/pv-tank-configs.yaml -----
     apiVersion: v1
     kind: PersistentVolume
     metadata:
@@ -1100,7 +3818,8 @@ apps
         path: /mnt/tank/configs
     
 
------ FILE: infrastructure/traefik/base/helmrelease.yaml -----
+----- FILE: ./infrastructure/traefik/base/helmrelease.yaml -----
+    # FILE: ./infrastructure/traefik/base/helmrelease.yaml
     apiVersion: helm.toolkit.fluxcd.io/v2
     kind: HelmRelease
     metadata:
@@ -1128,18 +3847,20 @@ apps
     
         service:
           type: LoadBalancer
-          loadBalancerIP: 192.168.2.22
+          loadBalancerIP: 192.168.2.100
           annotations:
-            metallb.universe.tf/address-pool: lan-pool
+            metallb.universe.tf/address-pool: traefik-pool
     
         ports:
           web:
             port: 80
-            expose: true
+            expose:
+              default: true
             exposedPort: 80
           websecure:
             port: 443
-            expose: true
+            expose:
+              default: true
             exposedPort: 443
     
         providers:
@@ -1155,7 +3876,7 @@ apps
           general:
             level: INFO
 
------ FILE: infrastructure/traefik/base/helmrepository.yaml -----
+----- FILE: ./infrastructure/traefik/base/helmrepository.yaml -----
     apiVersion: source.toolkit.fluxcd.io/v1beta2
     kind: HelmRepository
     metadata:
@@ -1165,7 +3886,7 @@ apps
       interval: 1h
       url: https://helm.traefik.io/traefik
 
------ FILE: infrastructure/traefik/base/kustomization.yaml -----
+----- FILE: ./infrastructure/traefik/base/kustomization.yaml -----
     apiVersion: kustomize.config.k8s.io/v1beta1
     kind: Kustomization
     resources:
@@ -1173,7 +3894,7 @@ apps
       - helmrepository.yaml
       - helmrelease.yaml
 
------ FILE: infrastructure/traefik/base/namespace.yaml -----
+----- FILE: ./infrastructure/traefik/base/namespace.yaml -----
     apiVersion: v1
     kind: Namespace
     metadata:
@@ -1181,13 +3902,13 @@ apps
       labels:
         kubernetes.io/metadata.name: networking
 
------ FILE: infrastructure/traefik/resources/kustomization.yaml -----
+----- FILE: ./infrastructure/traefik/resources/kustomization.yaml -----
     apiVersion: kustomize.config.k8s.io/v1beta1
     kind: Kustomization
     resources:
       - middlewares.yaml
 
------ FILE: infrastructure/traefik/resources/middlewares.yaml -----
+----- FILE: ./infrastructure/traefik/resources/middlewares.yaml -----
     apiVersion: traefik.io/v1alpha1
     kind: Middleware
     metadata:
@@ -1198,4 +3919,52 @@ apps
         browserXssFilter: true
         contentTypeNosniff: true
         forceSTSHeader: false
+    ---
+    apiVersion: traefik.io/v1alpha1
+    kind: Middleware
+    metadata:
+      name: lan-headers
+      namespace: media
+    spec:
+      headers:
+        browserXssFilter: true
+        contentTypeNosniff: true
+        forceSTSHeader: false
+
+----- FILE: ./README.md -----
+    # k8s-home-server
+----- FILE: ./repo_dump.sh -----
+    #!/usr/bin/env bash
+    set -Eeuo pipefail
+    
+    STAMP="$(date +'%Y-%m-%d_%H-%M-%S')"
+    OUT="${STAMP}_full_dump.txt"
+    
+    MAX_BYTES=$((512 * 1024))
+    
+    {
+      find . \
+        -path "./.git" -prune -o \
+        -path "./clusters/talos-home/flux-system" -prune -o \
+        -path "./clusters/talos-home/flux-system/*" -prune -o \
+        -type f -print0 \
+      | sort -z \
+      | while IFS= read -r -d '' f; do
+    
+          size=$(wc -c < "$f" 2>/dev/null || echo 0)
+          if (( size > MAX_BYTES )); then
+            continue
+          fi
+    
+          if ! LC_ALL=C grep -Iq . "$f" 2>/dev/null; then
+            continue
+          fi
+    
+          echo "----- FILE: $f -----"
+          sed 's/^/    /' "$f"
+          echo
+        done
+    } > "$OUT"
+    
+    echo "Wrote dump to: $OUT"
 
