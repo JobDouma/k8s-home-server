@@ -1,0 +1,36 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: recyclarr-config
+  namespace: media
+data:
+  recyclarr.yml: |
+    radarr:
+      movies:
+        base_url: !secret radarr_url
+        api_key: !secret radarr_apikey
+        replace_existing_custom_formats: true
+        delete_old_custom_formats: false
+        include:
+          - template: radarr-quality-definition-movie
+          # 2160p "smart upgrade" profile (Remux + WEB)
+          - template: radarr-quality-profile-remux-web-2160p
+          - template: radarr-custom-formats-remux-web-2160p
+          # 1080p "sweet spot" profile (HD Bluray + WEB)
+          - template: radarr-quality-profile-hd-bluray-web
+          - template: radarr-custom-formats-hd-bluray-web
+
+    sonarr:
+      series:
+        base_url: !secret sonarr_url
+        api_key: !secret sonarr_apikey
+        replace_existing_custom_formats: true
+        delete_old_custom_formats: false
+        include:
+          - template: sonarr-quality-definition-series
+          # 2160p "smart upgrade" profile (Remux + WEB)
+          - template: sonarr-v4-quality-profile-remux-web-2160p
+          - template: sonarr-v4-custom-formats-remux-web-2160p
+          # 1080p "sweet spot" profile (HD Bluray + WEB)
+          - template: sonarr-v4-quality-profile-hd-bluray-web
+          - template: sonarr-v4-custom-formats-hd-bluray-web
