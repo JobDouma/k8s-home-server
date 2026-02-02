@@ -40,7 +40,7 @@ spec:
               TZ: Europe/Amsterdam
               NODE_ENV: production
 
-            # ✅ CRITICAL: do NOT run the build step
+            # Run server only (no build)
             command:
               - node
             args:
@@ -76,10 +76,3 @@ spec:
           - path: /app/public/conf.yml
             subPath: conf.yml
             readOnly: true
-
-      # Keep this so /app/dist exists and is writable if the server touches it
-      dist:
-        enabled: true
-        type: emptyDir
-        globalMounts:
-          - path: /app/dist
