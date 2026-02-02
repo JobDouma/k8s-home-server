@@ -1,3 +1,10 @@
+# FILE: ./apps/talos-home/dashy/configmap.yaml
+# Replace your Dashy config with this to:
+# - Remove Getting Started / defaults
+# - Only show your Media section
+# - Use your LAN hostnames (or swap to raw IPs below if you prefer)
+# - Hide all help/announcements
+
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -7,31 +14,52 @@ data:
   conf.yml: |
     pageInfo:
       title: Home Dashboard
-      description: "Dashy on Talos Kubernetes"
-      navLinks:
-        - title: GitOps Repo
-          path: https://github.com/
+      description: Media stack
+      navLinks: []
+
     appConfig:
       theme: one-dark
       layout: auto
       iconSize: medium
       language: en
+      disableConfiguration: true
+      disableUpdateCheck: true
+      hideComponents:
+        - announcements
+        - getting-started
+        - tips
+        - config-info
+
+    # IMPORTANT: This is what stops “Getting Started”
+    # Only your defined sections will render.
     sections:
       - name: Media
         icon: fas fa-photo-video
+        displayData:
+          collapsed: false
+          hideForGuests: false
         items:
           - title: Jellyfin
             description: Media Server
-            url: http://jellyfin.lan
+            icon: fas fa-film
+            link: http://jellyfin.lan
           - title: Jellyseerr
             description: Requests
-            url: http://jellyseerr.lan
+            icon: fas fa-ticket-alt
+            link: http://jellyseerr.lan
           - title: qBittorrent
             description: Downloads
-            url: http://qbittorrent.lan
+            icon: fas fa-download
+            link: http://qbittorrent.lan
           - title: Sonarr
             description: TV Automation
-            url: http://sonarr.lan
+            icon: fas fa-tv
+            link: http://sonarr.lan
           - title: Radarr
             description: Movie Automation
-            url: http://radarr.lan
+            icon: fas fa-video
+            link: http://radarr.lan
+
+  # If you want raw IPs instead of DNS, replace the links above with:
+  # link: http://192.168.2.100  (and use Traefik host routing won’t work with IP)
+  # Better: keep .lan hostnames, since Traefik routes by Host header.
