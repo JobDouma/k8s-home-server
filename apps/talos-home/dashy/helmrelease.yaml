@@ -1,3 +1,7 @@
+# FILE: ./apps/talos-home/dashy/helmrelease.yaml
+# Ensure Dashy is actually reading the config from /app/public/conf.yml (this matches your mount)
+# If you already have this, keep it as-is.
+
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
@@ -6,7 +10,6 @@ metadata:
 spec:
   interval: 15m
   timeout: 10m
-
   chart:
     spec:
       chart: app-template
@@ -15,48 +18,24 @@ spec:
         kind: HelmRepository
         name: bjw-s
         namespace: flux-system
-
   values:
     controllers:
       main:
         replicas: 1
-
-        pod:
-          securityContext:
-            runAsNonRoot: true
-            runAsUser: 1000
-            runAsGroup: 1000
-            fsGroup: 1000
-            seccompProfile:
-              type: RuntimeDefault
-
         containers:
           main:
             image:
               repository: ghcr.io/lissy93/dashy
               tag: latest
-
             env:
               TZ: Europe/Amsterdam
               NODE_ENV: production
-
-            # Run server only (no build)
-            command:
-              - node
-            args:
-              - server
-
+            command: ["node"]
+            args: ["server"]
             ports:
               - name: http
                 containerPort: 8080
                 protocol: TCP
-
-            securityContext:
-              allowPrivilegeEscalation: false
-              capabilities:
-                drop:
-                  - ALL
-
     service:
       main:
         controller: main
@@ -66,7 +45,6 @@ spec:
             port: 8080
             protocol: TCP
             targetPort: http
-
     persistence:
       config:
         enabled: true
