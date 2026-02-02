@@ -1,0 +1,37 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: dashy-config
+  namespace: media
+data:
+  conf.yml: |
+    pageInfo:
+      title: Home Dashboard
+      description: "Dashy on Talos Kubernetes"
+      navLinks:
+        - title: GitOps Repo
+          path: https://github.com/
+    appConfig:
+      theme: one-dark
+      layout: auto
+      iconSize: medium
+      language: en
+    sections:
+      - name: Media
+        icon: fas fa-photo-video
+        items:
+          - title: Jellyfin
+            description: Media Server
+            url: http://jellyfin.lan
+          - title: Jellyseerr
+            description: Requests
+            url: http://jellyseerr.lan
+          - title: qBittorrent
+            description: Downloads
+            url: http://qbittorrent.lan
+          - title: Sonarr
+            description: TV Automation
+            url: http://sonarr.lan
+          - title: Radarr
+            description: Movie Automation
+            url: http://radarr.lan
