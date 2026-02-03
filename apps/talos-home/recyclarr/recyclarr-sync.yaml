@@ -14,6 +14,52 @@ spec:
       template:
         spec:
           restartPolicy: Never
+          volumes:
+            - name: config
+              configMap:
+                name: recyclarr-config
+            - name: secrets-kv
+              secret:
+                secretName: recyclarr-secrets
+            - name: work
+              emptyDir: {}
+          initContainers:
+            - name: render-secrets-yml
+              image: alpine:3.20
+              command:
+                - /bin/sh
+                - -ec
+                - |
+                  cat > /work/secrets.yml <<'EOF'
+                  radarr_url: ${RADARR_URL}
+                  radarr_apikey: ${RADARR_APIKEY}
+                  sonarr_url: ${SONARR_URL}
+                  sonarr_apikey: ${SONARR_APIKEY}
+                  EOF
+              env:
+                - name: RADARR_URL
+                  valueFrom:
+                    secretKeyRef:
+                      name: recyclarr-secrets
+                      key: radarr_url
+                - name: RADARR_APIKEY
+                  valueFrom:
+                    secretKeyRef:
+                      name: recyclarr-secrets
+                      key: radarr_apikey
+                - name: SONARR_URL
+                  valueFrom:
+                    secretKeyRef:
+                      name: recyclarr-secrets
+                      key: sonarr_url
+                - name: SONARR_APIKEY
+                  valueFrom:
+                    secretKeyRef:
+                      name: recyclarr-secrets
+                      key: sonarr_apikey
+              volumeMounts:
+                - name: work
+                  mountPath: /work
           containers:
             - name: recyclarr
               image: ghcr.io/recyclarr/recyclarr:latest
@@ -27,13 +73,6 @@ spec:
                 - name: config
                   mountPath: /config/recyclarr.yml
                   subPath: recyclarr.yml
-                - name: secrets
+                - name: work
                   mountPath: /config/secrets.yml
                   subPath: secrets.yml
-          volumes:
-            - name: config
-              configMap:
-                name: recyclarr-config
-            - name: secrets
-              secret:
-                secretName: recyclarr-secrets
