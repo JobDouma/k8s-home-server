@@ -6,7 +6,6 @@ metadata:
 spec:
   interval: 1h
   timeout: 20m
-
   chart:
     spec:
       chart: renovate
@@ -18,7 +17,6 @@ spec:
 
   values:
     cronjob:
-      # Daily at 03:10 Amsterdam time (cluster timezone dependent; CronJob uses controller time/UTC typically)
       schedule: "10 3 * * *"
       concurrencyPolicy: Forbid
       successfulJobsHistoryLimit: 2
@@ -28,55 +26,54 @@ spec:
       - secretRef:
           name: renovate-secret
 
-        renovate:
-          config: |
+    renovate:
+      config: |
+        {
+          "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+          "platform": "github",
+          "token": "${RENOVATE_TOKEN}",
+
+          "repositories": [
+            "jobdouma/k8s-home-server"
+          ],
+
+          "extends": ["config:recommended"],
+
+          "baseBranchPatterns": ["main"],
+
+          "dependencyDashboard": true,
+          "dependencyDashboardAutoclose": true,
+
+          "enabledManagers": ["kubernetes", "flux"],
+
+          "kubernetes": {
+            "managerFilePatterns": [
+              "/clusters/.+\\.ya?ml$/",
+              "/infrastructure/.+\\.ya?ml$/",
+              "/apps/.+\\.ya?ml$/"
+            ]
+          },
+
+          "flux": {
+            "managerFilePatterns": [
+              "/clusters/.+\\.ya?ml$/",
+              "/infrastructure/.+\\.ya?ml$/",
+              "/apps/.+\\.ya?ml$/"
+            ]
+          },
+
+          "prConcurrentLimit": 5,
+          "branchConcurrentLimit": 5,
+          "automerge": false,
+
+          "packageRules": [
             {
-              "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-              "platform": "github",
-              "token": "${RENOVATE_TOKEN}",
-
-              "repositories": [
-                "jobdouma/k8s-home-server"
-              ],
-
-              "extends": ["config:recommended"],
-
-              "baseBranchPatterns": ["main"],
-
-              "dependencyDashboard": true,
-              "dependencyDashboardAutoclose": true,
-
-              "enabledManagers": ["kubernetes", "flux"],
-
-              "kubernetes": {
-                "fileMatch": [
-                  "clusters/.+\\.ya?ml$",
-                  "infrastructure/.+\\.ya?ml$",
-                  "apps/.+\\.ya?ml$"
-                ]
-              },
-
-              "flux": {
-                "fileMatch": [
-                  "clusters/.+\\.ya?ml$",
-                  "infrastructure/.+\\.ya?ml$",
-                  "apps/.+\\.ya?ml$"
-                ]
-              },
-
-              "prConcurrentLimit": 5,
-              "branchConcurrentLimit": 5,
-              "automerge": false,
-
-              "packageRules": [
-                {
-                  "matchUpdateTypes": ["minor", "patch", "digest"],
-                  "groupName": "all non-major updates",
-                  "groupSlug": "all-non-major"
-                }
-              ]
+              "matchUpdateTypes": ["minor", "patch", "digest"],
+              "groupName": "all non-major updates",
+              "groupSlug": "all-non-major"
             }
-
+          ]
+        }
 
     resources:
       requests:
