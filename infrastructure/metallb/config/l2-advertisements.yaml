@@ -10,11 +10,7 @@ spec:
     - lan-pool
   nodeSelectors:
     - matchLabels:
-        kubernetes.io/hostname: talos-cp-1
-    - matchLabels:
-        kubernetes.io/hostname: talos-cp-2
-    - matchLabels:
-        kubernetes.io/hostname: talos-cp-3
+        node-role.kubernetes.io/control-plane: ""
 ---
 apiVersion: metallb.io/v1beta1
 kind: L2Advertisement
@@ -26,8 +22,4 @@ spec:
     - traefik-pool
   nodeSelectors:
     - matchLabels:
-        kubernetes.io/hostname: talos-cp-1
-    - matchLabels:
-        kubernetes.io/hostname: talos-cp-2
-    - matchLabels:
-        kubernetes.io/hostname: talos-cp-3
+        node-role.kubernetes.io/control-plane: ""
