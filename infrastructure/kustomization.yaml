@@ -11,11 +11,11 @@ resources:
 
   # Controllers (Base)
   - traefik/base
-  # - metallb/base/namespace.yaml
-  # - metallb/base/helmrelease.yaml
-  # - metallb/base/helmrepository.yaml
-  # - metallb/config/ipaddress-pools.yaml
-  # - metallb/config/l2-advertisements.yaml
+  - metallb/base/namespace.yaml
+  - metallb/base/helmrelease.yaml
+  - metallb/base/helmrepository.yaml
+  - metallb/config/ipaddress-pools.yaml
+  - metallb/config/l2-advertisements.yaml
 
   # Traefik resources
   - traefik/resources/middlewares.yaml
