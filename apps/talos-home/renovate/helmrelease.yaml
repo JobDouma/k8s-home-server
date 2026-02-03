@@ -36,7 +36,7 @@ spec:
           "token": "${RENOVATE_TOKEN}",
 
           "repositories": [
-            "YOUR_GITHUB_ORG_OR_USER/k8s-home-server"
+            "jobdouma/k8s-home-server"
           ],
 
           "extends": [
