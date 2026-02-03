@@ -4,7 +4,7 @@ metadata:
   name: metallb
   namespace: metallb-system
 spec:
-  interval: 15m
+  interval: 10m
   chart:
     spec:
       chart: metallb
@@ -13,40 +13,16 @@ spec:
         kind: HelmRepository
         name: metallb
         namespace: flux-system
-
   values:
-    crds:
-      enabled: true
-
     controller:
       resources:
         requests:
           cpu: 50m
           memory: 64Mi
-        limits:
-          cpu: 200m
-          memory: 256Mi
 
     speaker:
       hostNetwork: true
-      ignoreExcludeLB: true
-
-      tolerations:
-        - key: node-role.kubernetes.io/control-plane
-          operator: Exists
-          effect: NoSchedule
-
-      securityContext:
-        privileged: true
-        capabilities:
-          add:
-            - NET_ADMIN
-            - NET_RAW
-
       resources:
         requests:
           cpu: 50m
           memory: 64Mi
-        limits:
-          cpu: 200m
-          memory: 256Mi
