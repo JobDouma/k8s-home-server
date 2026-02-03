@@ -55,11 +55,11 @@ spec:
             "flux"
           ],
 
-          "flux": {
+          "kubernetes": {
             "fileMatch": [
-              "clusters/.+\\\\.ya?ml$",
-              "infrastructure/.+\\\\.ya?ml$",
-              "apps/.+\\\\.ya?ml$"
+              "clusters/.+\\.ya?ml$",
+              "infrastructure/.+\\.ya?ml$",
+              "apps/.+\\.ya?ml$"
             ]
           },
 
