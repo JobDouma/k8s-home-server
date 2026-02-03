@@ -28,61 +28,55 @@ spec:
       - secretRef:
           name: renovate-secret
 
-    renovate:
-      config: |
-        {
-          "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-          "platform": "github",
-          "token": "${RENOVATE_TOKEN}",
-
-          "repositories": [
-            "jobdouma/k8s-home-server"
-          ],
-
-          "extends": [
-            "config:recommended"
-          ],
-
-          "baseBranchPatterns": [
-            "main"
-          ],
-
-          "dependencyDashboard": true,
-          "dependencyDashboardAutoclose": true,
-
-          "enabledManagers": [
-            "kubernetes",
-            "flux"
-          ],
-
-          "kubernetes": {
-            "fileMatch": [
-              "clusters/.+\\.ya?ml$",
-              "infrastructure/.+\\.ya?ml$",
-              "apps/.+\\.ya?ml$"
-            ]
-          },
-
-          "kubernetes": {
-            "fileMatch": [
-              "clusters/.+\\\\.ya?ml$",
-              "infrastructure/.+\\\\.ya?ml$",
-              "apps/.+\\\\.ya?ml$"
-            ]
-          },
-
-          "prConcurrentLimit": 5,
-          "branchConcurrentLimit": 5,
-          "automerge": false,
-
-          "packageRules": [
+        renovate:
+          config: |
             {
-              "matchUpdateTypes": ["minor", "patch", "digest"],
-              "groupName": "all non-major updates",
-              "groupSlug": "all-non-major"
+              "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+              "platform": "github",
+              "token": "${RENOVATE_TOKEN}",
+
+              "repositories": [
+                "jobdouma/k8s-home-server"
+              ],
+
+              "extends": ["config:recommended"],
+
+              "baseBranchPatterns": ["main"],
+
+              "dependencyDashboard": true,
+              "dependencyDashboardAutoclose": true,
+
+              "enabledManagers": ["kubernetes", "flux"],
+
+              "kubernetes": {
+                "fileMatch": [
+                  "clusters/.+\\.ya?ml$",
+                  "infrastructure/.+\\.ya?ml$",
+                  "apps/.+\\.ya?ml$"
+                ]
+              },
+
+              "flux": {
+                "fileMatch": [
+                  "clusters/.+\\.ya?ml$",
+                  "infrastructure/.+\\.ya?ml$",
+                  "apps/.+\\.ya?ml$"
+                ]
+              },
+
+              "prConcurrentLimit": 5,
+              "branchConcurrentLimit": 5,
+              "automerge": false,
+
+              "packageRules": [
+                {
+                  "matchUpdateTypes": ["minor", "patch", "digest"],
+                  "groupName": "all non-major updates",
+                  "groupSlug": "all-non-major"
+                }
+              ]
             }
-          ]
-        }
+
 
     resources:
       requests:
