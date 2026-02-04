@@ -13,14 +13,17 @@ spec:
         kind: HelmRepository
         name: metallb
         namespace: flux-system
+
   values:
     controller:
+      enabled: true
       resources:
         requests:
           cpu: 50m
           memory: 64Mi
 
     speaker:
+      enabled: true
       hostNetwork: true
       resources:
         requests:
