@@ -48,6 +48,7 @@ resources:
   - networkpolicies/allow-media-namespace-internal.yaml
   - networkpolicies/renovate-egress.yaml
   - networkpolicies/allow-dns-from-lan.yaml
+  - networkpolicies/allow-all-metallb.yaml
 
   # ──────────────────────────────────────
   # Sonarr
