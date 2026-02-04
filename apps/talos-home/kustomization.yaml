@@ -46,6 +46,8 @@ resources:
   - networkpolicies/allow-traefik.yaml
   - networkpolicies/allow-monitoring.yaml
   - networkpolicies/allow-media-namespace-internal.yaml
+  - renovate-egress.yaml
+  - allow-dns-from-lan.yaml
 
   # ──────────────────────────────────────
   # Sonarr
