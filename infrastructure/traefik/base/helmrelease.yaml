@@ -32,12 +32,13 @@ spec:
     ports:
       web:
         port: 80
+        protocol: TCP
         expose:
           enabled: true
           port: 80
-
       websecure:
         port: 443
+        protocol: TCP
         expose:
           enabled: true
           port: 443

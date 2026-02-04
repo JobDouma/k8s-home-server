@@ -1,5 +1,3 @@
-# FILE: ./apps/talos-home/networkpolicies/allow-traefik.yaml
-# Allows Traefik (in networking namespace) to reach only the app ports you expose.
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
@@ -16,12 +14,12 @@ spec:
               kubernetes.io/metadata.name: networking
       ports:
         - protocol: TCP
-          port: 8096  # jellyfin
+          port: 8080   # dashy + qbittorrent
         - protocol: TCP
-          port: 5055  # jellyseerr
+          port: 8096   # jellyfin
         - protocol: TCP
-          port: 8080  # qbittorrent web
+          port: 5055   # jellyseerr
         - protocol: TCP
-          port: 8989  # sonarr
+          port: 8989   # sonarr
         - protocol: TCP
-          port: 7878  # radarr
+          port: 7878   # radarr
