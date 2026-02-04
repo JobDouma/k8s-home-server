@@ -9,4 +9,4 @@ spec:
     - traefik-pool
     - lan-pool
   interfaces:
-    - ens18
+    - eth0
