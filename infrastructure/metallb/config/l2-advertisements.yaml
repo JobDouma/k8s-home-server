@@ -4,9 +4,16 @@ metadata:
   name: main-l2
   namespace: metallb-system
 spec:
+  interfaces:
+    - ens18
   ipAddressPools:
     - dns-pool
     - lan-pool
+  nodeSelectors:
+    - matchLabels:
+        kubernetes.io/hostname: talos-cp-1
+    - matchLabels:
+        kubernetes.io/hostname: talos-cp-3
 ---
 apiVersion: metallb.io/v1beta1
 kind: L2Advertisement
@@ -14,5 +21,12 @@ metadata:
   name: traefik-l2
   namespace: metallb-system
 spec:
+  interfaces:
+    - ens18
   ipAddressPools:
     - traefik-pool
+  nodeSelectors:
+    - matchLabels:
+        kubernetes.io/hostname: talos-cp-1
+    - matchLabels:
+        kubernetes.io/hostname: talos-cp-3
