@@ -1,27 +1,10 @@
 apiVersion: metallb.io/v1beta1
 kind: L2Advertisement
 metadata:
-  name: dns-l2
+  name: lan
   namespace: metallb-system
 spec:
   ipAddressPools:
     - dns-pool
-  nodeSelectors:
-    - matchLabels:
-        kubernetes.io/hostname: talos-cp-1
-    - matchLabels:
-        kubernetes.io/hostname: talos-cp-3
----
-apiVersion: metallb.io/v1beta1
-kind: L2Advertisement
-metadata:
-  name: traefik-l2
-  namespace: metallb-system
-spec:
-  ipAddressPools:
     - traefik-pool
-  nodeSelectors:
-    - matchLabels:
-        kubernetes.io/hostname: talos-cp-1
-    - matchLabels:
-        kubernetes.io/hostname: talos-cp-3
+    - lan-pool
