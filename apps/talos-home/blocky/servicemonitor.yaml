@@ -6,7 +6,7 @@ metadata:
 spec:
   selector:
     matchLabels:
-      app.kubernetes.io/name: blocky
+      app.kubernetes.io/instance: blocky
   endpoints:
     - port: http
       path: /metrics
