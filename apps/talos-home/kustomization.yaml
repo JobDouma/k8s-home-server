@@ -42,11 +42,8 @@ resources:
   # ──────────────────────────────────────
   # Network Policies
   # ──────────────────────────────────────
-  - networkpolicies/default-deny.yaml
-  - networkpolicies/allow-traefik.yaml
-  - networkpolicies/allow-monitoring.yaml
-  - networkpolicies/allow-media-namespace-internal.yaml
-  - networkpolicies/renovate-egress.yaml
+  - networkpolicies/allow-all-kube-system.yaml
+  - networkpolicies/allow-renovate-egress.yaml
   - networkpolicies/allow-dns-from-lan.yaml
   - networkpolicies/allow-all-metallb.yaml
 
