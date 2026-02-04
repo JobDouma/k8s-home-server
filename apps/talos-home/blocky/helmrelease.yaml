@@ -23,6 +23,8 @@ spec:
 
         pod:
           dnsPolicy: ClusterFirst
+          nodeSelector:
+            kubernetes.io/hostname: talos-cp-1
           annotations:
             configmap.reloader.stakater.com/reload: "blocky-config"
           securityContext:
@@ -65,6 +67,7 @@ spec:
         enabled: true
         type: LoadBalancer
         loadBalancerIP: 192.168.2.53
+        externalTrafficPolicy: Local
         annotations:
           metallb.universe.tf/address-pool: dns-pool
         ports:
