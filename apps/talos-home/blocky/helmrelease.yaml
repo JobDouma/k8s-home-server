@@ -22,8 +22,7 @@ spec:
         replicas: 2
 
         pod:
-          hostNetwork: true
-          dnsPolicy: ClusterFirstWithHostNet
+          dnsPolicy: ClusterFirst
           annotations:
             configmap.reloader.stakater.com/reload: "blocky-config"
           securityContext:
@@ -62,7 +61,24 @@ spec:
 
     service:
       main:
-        enabled: false
+        enabled: true
+        type: LoadBalancer
+        loadBalancerIP: 192.168.2.53
+        annotations:
+          metallb.universe.tf/address-pool: dns-pool
+        ports:
+          dns-udp:
+            port: 53
+            protocol: UDP
+            targetPort: dns-udp
+          dns-tcp:
+            port: 53
+            protocol: TCP
+            targetPort: dns-tcp
+          http:
+            port: 4000
+            protocol: TCP
+            targetPort: http
 
     persistence:
       config:
