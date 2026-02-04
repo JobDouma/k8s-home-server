@@ -8,3 +8,5 @@ spec:
     - dns-pool
     - traefik-pool
     - lan-pool
+  interfaces:
+    - ens18
