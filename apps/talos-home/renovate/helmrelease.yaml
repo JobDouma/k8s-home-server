@@ -25,6 +25,8 @@ spec:
     envFrom:
       - secretRef:
           name: renovate-secret
+    env:
+      LOG_LEVEL: debug
 
     renovate:
       config: |
