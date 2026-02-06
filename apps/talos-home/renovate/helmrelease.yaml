@@ -6,6 +6,7 @@ metadata:
 spec:
   interval: 1h
   timeout: 20m
+
   chart:
     spec:
       chart: renovate
@@ -25,23 +26,38 @@ spec:
     envFrom:
       - secretRef:
           name: renovate-secret
-    # env:
-    #   LOG_LEVEL: debug
+
+    env:
+      LOG_LEVEL: info
+
+    securityContext:
+      runAsNonRoot: true
+      runAsUser: 1000
+      seccompProfile:
+        type: RuntimeDefault
+
+    containerSecurityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop:
+          - ALL
 
     renovate:
       config: |
         {
           "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+
           "platform": "github",
           "token": "${RENOVATE_TOKEN}",
+
+          "onboarding": false,
+          "requireConfig": false,
 
           "repositories": [
             "jobdouma/k8s-home-server"
           ],
 
-          "extends": ["config:recommended"],
-
-          "baseBranchPatterns": ["main"],
+          "baseBranches": ["main"],
 
           "dependencyDashboard": true,
           "dependencyDashboardAutoclose": true,
@@ -66,15 +82,24 @@ spec:
 
           "prConcurrentLimit": 5,
           "branchConcurrentLimit": 5,
-          "automerge": false,
+
+          "automergeStrategy": "pr",
 
           "packageRules": [
             {
               "matchUpdateTypes": ["minor", "patch", "digest"],
               "groupName": "all non-major updates",
-              "groupSlug": "all-non-major"
+              "groupSlug": "all-non-major",
+              "automerge": true,
+              "automergeType": "pr"
+            },
+            {
+              "matchUpdateTypes": ["major"],
+              "automerge": false
             }
-          ]
+          ],
+
+          "schedule": ["every day"]
         }
 
     resources:
