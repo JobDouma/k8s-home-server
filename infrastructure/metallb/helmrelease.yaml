@@ -22,9 +22,12 @@ spec:
           cpu: 50m
           memory: 64Mi
 
-    speaker:
-      enabled: true
-      hostNetwork: true
+    values:
+      speaker:
+        enabled: true
+        hostNetwork: true
+        extraArgs:
+          - --node-address-autodetection=interface=ens18
       resources:
         requests:
           cpu: 50m
