@@ -5,4 +5,13 @@ metadata:
   namespace: metallb-system
 spec:
   ipAddressPools:
+    - dns-pool
+    - traefik-pool
     - core-pool
+  nodeSelectors:
+    - matchLabels:
+        kubernetes.io/hostname: talos-cp-1
+    - matchLabels:
+        kubernetes.io/hostname: talos-cp-2
+    - matchLabels:
+        kubernetes.io/hostname: talos-cp-3
