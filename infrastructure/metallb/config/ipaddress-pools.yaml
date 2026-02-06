@@ -23,4 +23,4 @@ metadata:
   namespace: metallb-system
 spec:
   addresses:
-    - 192.168.2.96-192.168.2.110
+    - 192.168.2.101-192.168.2.110
