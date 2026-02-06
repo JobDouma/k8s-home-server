@@ -7,4 +7,6 @@ spec:
   ipAddressPools:
     - dns-pool
     - traefik-pool
-    - lan-pool
+  nodeSelectors:
+    - matchLabels:
+        metallb-speaker: "true"
