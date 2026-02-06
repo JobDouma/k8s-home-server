@@ -8,7 +8,7 @@ spec:
   chart:
     spec:
       chart: metallb
-      version: "0.14.5"
+      version: "0.13.12"
       sourceRef:
         kind: HelmRepository
         name: metallb
@@ -17,18 +17,7 @@ spec:
   values:
     controller:
       enabled: true
-      resources:
-        requests:
-          cpu: 50m
-          memory: 64Mi
 
-    values:
-      speaker:
-        enabled: true
-        hostNetwork: true
-        extraArgs:
-          - --node-address-autodetection=interface=ens18
-      resources:
-        requests:
-          cpu: 50m
-          memory: 64Mi
+    speaker:
+      enabled: true
+      hostNetwork: true
