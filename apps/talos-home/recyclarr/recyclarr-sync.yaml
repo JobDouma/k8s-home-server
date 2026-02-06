@@ -25,7 +25,7 @@ spec:
               emptyDir: {}
           initContainers:
             - name: render-secrets-yml
-              image: alpine:3.20
+              image: alpine:3.23
               command:
                 - /bin/sh
                 - -ec
