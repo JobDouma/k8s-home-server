@@ -8,5 +8,3 @@ spec:
     - dns-pool
     - traefik-pool
     - lan-pool
-  interfaces:
-    - eth0
