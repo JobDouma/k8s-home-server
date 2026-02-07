@@ -82,3 +82,6 @@ resources:
 
   - prowlarr/helmrelease.yaml
   - prowlarr/ingressroute.yaml
+
+  - stakater-reloader/helmrepository.yaml
+  - stakater-reloader/helmrelease.yaml
