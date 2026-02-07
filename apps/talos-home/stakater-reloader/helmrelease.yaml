@@ -1,0 +1,35 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: reloader
+  namespace: kube-system
+spec:
+  interval: 15m
+  timeout: 10m
+
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    remediation:
+      retries: 3
+
+  chart:
+    spec:
+      chart: reloader
+      version: "*"
+      sourceRef:
+        kind: HelmRepository
+        name: stakater
+        namespace: flux-system
+
+  values:
+    reloader:
+      watchGlobally: true
+      reloadOnCreate: true
+
+    podSecurityContext:
+      runAsNonRoot: true
+
+    securityContext:
+      allowPrivilegeEscalation: false
