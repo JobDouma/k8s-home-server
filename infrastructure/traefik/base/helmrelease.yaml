@@ -40,6 +40,9 @@ spec:
       spec:
         externalTrafficPolicy: Local
         allocateLoadBalancerNodePorts: false
+      nodePorts:
+        web: null
+        websecure: null
 
 
     ports:
