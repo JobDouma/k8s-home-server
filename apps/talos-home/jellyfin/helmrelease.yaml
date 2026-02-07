@@ -5,6 +5,15 @@ metadata:
   namespace: media
 spec:
   interval: 15m
+  timeout: 10m
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    remediation:
+      retries: 3
+  maxHistory: 2
+
   chart:
     spec:
       chart: jellyfin
