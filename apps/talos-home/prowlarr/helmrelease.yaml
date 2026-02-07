@@ -36,6 +36,10 @@ spec:
               PUID: 1000
               PGID: 1000
               TZ: Europe/Amsterdam
+            ports:
+              - name: http
+                containerPort: 9696
+                protocol: TCP
             resources:
               requests:
                 cpu: 100m
