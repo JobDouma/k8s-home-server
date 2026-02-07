@@ -81,3 +81,5 @@ resources:
   - dashy/ingressroute.yaml
 
   - prowlarr/helmrelease.yaml
+  - prowlarr/ingressroute.yaml
+
