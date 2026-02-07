@@ -6,6 +6,11 @@ metadata:
 spec:
   interval: 15m
   timeout: 10m
+  upgrade:
+    remediation:
+      strategy: uninstall
+      retries: 3
+      
   chart:
     spec:
       chart: app-template

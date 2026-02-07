@@ -6,7 +6,6 @@ metadata:
 spec:
   interval: 15m
   timeout: 20m
-
   upgrade:
     remediation:
       strategy: uninstall
