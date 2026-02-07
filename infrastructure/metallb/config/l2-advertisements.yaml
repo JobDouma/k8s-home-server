@@ -14,5 +14,5 @@ spec:
         kubernetes.io/hostname: talos-cp-1
     # - matchLabels:
     #     kubernetes.io/hostname: talos-cp-2
-    # - matchLabels:
-    #     kubernetes.io/hostname: talos-cp-3
+    - matchLabels:
+        kubernetes.io/hostname: talos-cp-3
