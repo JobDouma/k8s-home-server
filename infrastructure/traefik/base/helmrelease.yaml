@@ -37,6 +37,9 @@ spec:
       loadBalancerIP: 192.168.2.100
       annotations:
         metallb.universe.tf/address-pool: traefik-pool
+      spec:
+        externalTrafficPolicy: Local
+        allocateLoadBalancerNodePorts: false
 
 
     ports:
