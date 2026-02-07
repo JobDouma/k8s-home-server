@@ -52,6 +52,7 @@ spec:
       enabled: true
       type: ClusterIP
       port: 8096
+      name: jellyfin
 
     affinity:
       nodeAffinity:
