@@ -82,4 +82,3 @@ resources:
 
   - prowlarr/helmrelease.yaml
   - prowlarr/ingressroute.yaml
-
