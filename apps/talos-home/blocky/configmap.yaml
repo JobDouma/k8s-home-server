@@ -58,4 +58,5 @@ data:
         radarr.lan: 192.168.2.100
         qbittorrent.lan: 192.168.2.100
         dashy.lan: 192.168.2.100
+        prowlarr.lan: 192.168.2.100
         truenas.lan: 192.168.2.5

@@ -79,3 +79,5 @@ resources:
   - dashy/configmap.yaml
   - dashy/helmrelease.yaml
   - dashy/ingressroute.yaml
+
+  - prowlarr/helmrelease.yaml
