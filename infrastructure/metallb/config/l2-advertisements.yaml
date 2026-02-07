@@ -8,6 +8,7 @@ spec:
     - dns-pool
     - traefik-pool
     - core-pool
+    - jellyfin-pool
   nodeSelectors:
     - matchLabels:
         kubernetes.io/hostname: talos-cp-1
