@@ -28,6 +28,7 @@ spec:
       jellyseerr:
         containers:
           app:
+            enabled: true
             image:
               repository: ghcr.io/fallenbagel/jellyseerr
               tag: latest
