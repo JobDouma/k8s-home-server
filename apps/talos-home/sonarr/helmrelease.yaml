@@ -69,5 +69,3 @@ spec:
 # Container path:	Maps to TrueNAS:
 # /config	        /mnt/tank/tank-configs/sonarr
 # /media	        /mnt/tank/media
-# /downloads	    /mnt/tank/media/downloads
-# /usenet         /mnt/tank/media/usenet
