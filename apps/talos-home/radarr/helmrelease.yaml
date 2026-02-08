@@ -37,7 +37,8 @@ spec:
               allowPrivilegeEscalation: false
               capabilities:
                 drop:
-                  - ALL
+                  - SETUID
+                  - SETGID
             image:
               repository: ghcr.io/linuxserver/radarr
               tag: latest

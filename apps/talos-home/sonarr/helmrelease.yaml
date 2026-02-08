@@ -32,15 +32,15 @@ spec:
 
         containers:
           app:
-            enabled: true
-            securityContext:
-              allowPrivilegeEscalation: false
-              capabilities:
-                drop:
-                  - ALL
             image:
               repository: ghcr.io/linuxserver/sonarr
               tag: latest
+            securityContext:
+              allowPrivilegeEscalation: false
+              capabilities:
+                add:
+                  - SETUID
+                  - SETGID
             env:
               PUID: 1000
               PGID: 1000
