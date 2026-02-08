@@ -26,6 +26,7 @@ spec:
       radarr:
         containers:
           app:
+            enabled: true
             image:
               repository: ghcr.io/linuxserver/radarr
               tag: latest

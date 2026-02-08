@@ -37,10 +37,6 @@ spec:
               PGID: 1000
               TZ: Europe/Amsterdam
               PROWLARR__SERVER__BINDADDRESS: 0.0.0.0
-            ports:
-              - name: http
-                containerPort: 9696
-                protocol: TCP
             resources:
               requests:
                 cpu: 100m
