@@ -85,3 +85,6 @@ resources:
 
   - stakater-reloader/helmrepository.yaml
   - stakater-reloader/helmrelease.yaml
+
+  - sabnzbd/helmrelease.yaml
+  - sabnzbd/ingressroute.yaml
