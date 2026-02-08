@@ -44,11 +44,9 @@ spec:
             image:
               repository: ghcr.io/onedr0p/qbittorrent
               tag: 5.0.4
-
             envFrom:
               - secretRef:
                   name: qbittorrent-webui
-
             env:
               TZ: Europe/Amsterdam
               QBITTORRENT__PORT: "8080"
@@ -56,14 +54,12 @@ spec:
               QBITTORRENT__WEBUI__ADDRESS: "0.0.0.0"
               QBITTORRENT__WEBUI__HOST_HEADER_VALIDATION: "false"
               QBITTORRENT__WEBUI__CSRF_PROTECTION: "false"
-
             resources:
               requests:
                 cpu: 100m
                 memory: 256Mi
               limits:
                 memory: 1Gi
-
             ports:
               - name: http
                 containerPort: 8080
@@ -71,27 +67,22 @@ spec:
               - name: bt
                 containerPort: 6881
                 protocol: TCP
-
           exporter:
             image:
               repository: ghcr.io/esanchezm/prometheus-qbittorrent-exporter
               tag: v1.6.0
-
             envFrom:
               - secretRef:
                   name: qbittorrent-webui
-
             env:
               QBITTORRENT_HOST: "127.0.0.1"
               QBITTORRENT_PORT: "8080"
               QBITTORRENT_URL_BASE: ""
               EXPORTER_PORT: "8000"
-
             ports:
               - name: metrics
                 containerPort: 8000
                 protocol: TCP
-
     service:
       main:
         controller: main
@@ -109,7 +100,6 @@ spec:
             port: 8000
             protocol: TCP
             targetPort: metrics
-
     persistence:
       config:
         enabled: true
