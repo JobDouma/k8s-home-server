@@ -124,5 +124,5 @@ spec:
         type: persistentVolumeClaim
         existingClaim: media
         globalMounts:
-          - path: /media
+          - path: /downloads
             subPath: downloads
