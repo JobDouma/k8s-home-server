@@ -27,6 +27,11 @@ spec:
         containers:
           app:
             enabled: true
+            securityContext:
+              allowPrivilegeEscalation: false
+              capabilities:
+                drop:
+                  - ALL
             image:
               repository: ghcr.io/linuxserver/prowlarr
               tag: latest
