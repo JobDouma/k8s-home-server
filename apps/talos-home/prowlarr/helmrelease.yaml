@@ -30,11 +30,11 @@ spec:
               repository: ghcr.io/linuxserver/prowlarr
               tag: latest
             securityContext:
-                runAsNonRoot: true
-                allowPrivilegeEscalation: false
-                capabilities:
-                  drop: [ALL]
-                readOnlyRootFilesystem: true
+              allowPrivilegeEscalation: true
+              capabilities:
+                add:
+                  - SETUID
+                  - SETGID
             env:
               PUID: 1000
               PGID: 1000
