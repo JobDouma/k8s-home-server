@@ -6,6 +6,12 @@ metadata:
 spec:
   interval: 15m
   timeout: 10m
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    remediation:
+      retries: 3
 
   chart:
     spec:
@@ -26,6 +32,7 @@ spec:
 
         containers:
           app:
+            enabled: true
             securityContext:
               allowPrivilegeEscalation: false
               capabilities:
