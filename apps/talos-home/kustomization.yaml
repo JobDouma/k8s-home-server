@@ -88,3 +88,10 @@ resources:
 
   - sabnzbd/helmrelease.yaml
   - sabnzbd/ingressroute.yaml
+
+  # ──────────────────────────────────────
+  # Recyclarr
+  # ──────────────────────────────────────
+  - recyclarr/recyclarr-config.yaml
+  - recyclarr/recyclarr-secrets.yaml
+  - recyclarr/recyclarr-sync.yaml
