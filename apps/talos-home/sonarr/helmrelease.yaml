@@ -36,11 +36,11 @@ spec:
               repository: ghcr.io/linuxserver/sonarr
               tag: latest
             securityContext:
-              allowPrivilegeEscalation: false
-              capabilities:
-                add:
-                  - SETUID
-                  - SETGID
+                runAsNonRoot: true
+                allowPrivilegeEscalation: false
+                capabilities:
+                  drop: [ALL]
+                readOnlyRootFilesystem: true
             env:
               PUID: 1000
               PGID: 1000
