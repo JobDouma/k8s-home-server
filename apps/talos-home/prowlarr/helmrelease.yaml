@@ -26,16 +26,15 @@ spec:
       prowlarr:
         containers:
           app:
-            enabled: true
-            securityContext:
-              allowPrivilegeEscalation: false
-              capabilities:
-                drop:
-                  - SETUID
-                  - SETGID
             image:
               repository: ghcr.io/linuxserver/prowlarr
               tag: latest
+            securityContext:
+                runAsNonRoot: true
+                allowPrivilegeEscalation: false
+                capabilities:
+                  drop: [ALL]
+                readOnlyRootFilesystem: true
             env:
               PUID: 1000
               PGID: 1000
