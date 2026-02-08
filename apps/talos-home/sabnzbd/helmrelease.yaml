@@ -6,6 +6,7 @@ metadata:
 spec:
   interval: 15m
   timeout: 10m
+
   install:
     remediation:
       retries: 3
@@ -32,22 +33,21 @@ spec:
 
         containers:
           app:
-            enabled: true
-            securityContext:
-              allowPrivilegeEscalation: false
-              capabilities:
-                drop:
-                  - ALL
             image:
               repository: ghcr.io/linuxserver/sabnzbd
               tag: latest
+            securityContext:
+              allowPrivilegeEscalation: true
+              capabilities:
+                add:
+                  - SETUID
+                  - SETGID
             env:
               PUID: 1000
               PGID: 1000
               TZ: Europe/Amsterdam
               SABNZBD__HOST: 0.0.0.0
               SABNZBD__PORT: 8080
-              SABNZBD__LOCAL_ONLY: "false"
             ports:
               - name: http
                 containerPort: 8080
