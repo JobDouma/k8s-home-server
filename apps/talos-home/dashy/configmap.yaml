@@ -33,22 +33,32 @@ data:
             description: Media Server
             icon: fas fa-film
             url: http://jellyfin.lan
+
           - title: Jellyseerr
             description: Requests
             icon: fas fa-ticket-alt
             url: http://jellyseerr.lan
+
           - title: qBittorrent
-            description: Downloads
+            description: Torrent Downloads
             icon: fas fa-download
             url: http://qbittorrent.lan
+
+          - title: SABnzbd
+            description: Usenet Downloads
+            icon: fas fa-cloud-download-alt
+            url: http://sabnzbd.lan
+
           - title: Sonarr
             description: TV Automation
             icon: fas fa-tv
             url: http://sonarr.lan
+
           - title: Radarr
             description: Movie Automation
             icon: fas fa-video
             url: http://radarr.lan
+
           - title: Prowlarr
             description: Indexer Management
             icon: fas fa-search
