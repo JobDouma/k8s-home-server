@@ -62,8 +62,16 @@ spec:
         globalMounts:
           - path: /downloads
             subPath: downloads
+      usenet:
+        enabled: true
+        type: persistentVolumeClaim
+        existingClaim: media
+        globalMounts:
+          - path: /usenet
+            subPath: usenet
 
 # Container path:	Maps to TrueNAS:
 # /config	        /mnt/tank/tank-configs/sonarr
 # /media	        /mnt/tank/media
 # /downloads	    /mnt/tank/media/downloads
+# /usenet         /mnt/tank/media/usenet

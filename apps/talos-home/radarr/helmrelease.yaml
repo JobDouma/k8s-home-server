@@ -63,3 +63,10 @@ spec:
         globalMounts:
           - path: /downloads
             subPath: downloads
+      usenet:
+        enabled: true
+        type: persistentVolumeClaim
+        existingClaim: media
+        globalMounts:
+          - path: /usenet
+            subPath: usenet
