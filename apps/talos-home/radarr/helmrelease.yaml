@@ -6,13 +6,7 @@ metadata:
 spec:
   interval: 15m
   timeout: 10m
-  install:
-    remediation:
-      retries: 3
-  upgrade:
-    remediation:
-      retries: 3
-      
+
   chart:
     spec:
       chart: app-template
@@ -21,18 +15,27 @@ spec:
         kind: HelmRepository
         name: bjw-s
         namespace: flux-system
+
   values:
     controllers:
       radarr:
         pod:
-        securityContext:
-          runAsUser: 1000
-          runAsGroup: 1000
-          fsGroup: 1000
-          fsGroupChangePolicy: OnRootMismatch
+          securityContext:
+            runAsUser: 1000
+            runAsGroup: 1000
+            fsGroup: 1000
+            fsGroupChangePolicy: OnRootMismatch
+            runAsNonRoot: true
+            seccompProfile:
+              type: RuntimeDefault
+
         containers:
           app:
-            enabled: true
+            securityContext:
+              allowPrivilegeEscalation: false
+              capabilities:
+                drop:
+                  - ALL
             image:
               repository: ghcr.io/linuxserver/radarr
               tag: latest
@@ -42,16 +45,18 @@ spec:
               TZ: Europe/Amsterdam
               RADARR__SERVER__BINDADDRESS: 0.0.0.0
             ports:
-            - name: http
-              containerPort: 7878
-              protocol: TCP
+              - name: http
+                containerPort: 7878
+                protocol: TCP
+
     service:
       app:
-        type: ClusterIP
         controller: radarr
+        type: ClusterIP
         ports:
           http:
             port: 7878
+
     persistence:
       config:
         enabled: true
@@ -60,6 +65,7 @@ spec:
         globalMounts:
           - path: /config
             subPath: radarr
+
       media:
         enabled: true
         type: persistentVolumeClaim
