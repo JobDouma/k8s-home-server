@@ -25,11 +25,4 @@ data:
         replace_existing_custom_formats: true
         delete_old_custom_formats: false
         include:
-          # Required base definition
           - template: sonarr-quality-definition-series
-
-          # Profile 1: HD-1080p (default / sweet spot)
-          - template: sonarr-quality-profile-hd-1080p
-
-          # Profile 2: HD-2160p (4K)
-          - template: sonarr-quality-profile-hd-2160p
