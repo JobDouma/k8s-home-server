@@ -13,10 +13,8 @@ data:
         delete_old_custom_formats: false
         include:
           - template: radarr-quality-definition-movie
-          # 2160p "smart upgrade" profile (Remux + WEB)
           - template: radarr-quality-profile-remux-web-2160p
           - template: radarr-custom-formats-remux-web-2160p
-          # 1080p "sweet spot" profile (HD Bluray + WEB)
           - template: radarr-quality-profile-hd-bluray-web
           - template: radarr-custom-formats-hd-bluray-web
 
@@ -28,9 +26,7 @@ data:
         delete_old_custom_formats: false
         include:
           - template: sonarr-quality-definition-series
-          # 2160p "smart upgrade" profile (Remux + WEB)
-          - template: sonarr-v4-quality-profile-remux-web-2160p
-          - template: sonarr-v4-custom-formats-remux-web-2160p
-          # 1080p "sweet spot" profile (HD Bluray + WEB)
-          - template: sonarr-v4-quality-profile-hd-bluray-web
-          - template: sonarr-v4-custom-formats-hd-bluray-web
+          - template: sonarr-quality-profile-remux-web-2160p
+          - template: sonarr-custom-formats-remux-web-2160p
+          - template: sonarr-quality-profile-hd-bluray-web
+          - template: sonarr-custom-formats-hd-bluray-web
