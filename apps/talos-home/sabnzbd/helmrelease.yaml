@@ -31,6 +31,7 @@ spec:
               SABNZBD__HOST: 0.0.0.0
               SABNZBD__PORT: 8080
               SABNZBD__HOST_WHITELIST: sabnzbd.lan
+              SABNZBD__LOCAL_ONLY: "false"
             ports:
               - name: http
                 containerPort: 8080
