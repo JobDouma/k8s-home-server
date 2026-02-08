@@ -1,12 +1,18 @@
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
-  name: radarr
+  name: sonarr
   namespace: media
 spec:
   interval: 15m
   timeout: 10m
-
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    remediation:
+      retries: 3
+      
   chart:
     spec:
       chart: app-template
@@ -15,43 +21,39 @@ spec:
         kind: HelmRepository
         name: bjw-s
         namespace: flux-system
-
   values:
     controllers:
-      radarr:
+      sonarr:
         pod:
           securityContext:
+            runAsUser: 1000
+            runAsGroup: 1000
+            fsGroup: 1000
+            fsGroupChangePolicy: OnRootMismatch
+            runAsNonRoot: true
             seccompProfile:
               type: RuntimeDefault
-
         containers:
           app:
-            securityContext:
-              allowPrivilegeEscalation: false
-              capabilities:
-                drop:
-                  - ALL
             image:
-              repository: ghcr.io/linuxserver/radarr
+              repository: ghcr.io/linuxserver/sonarr
               tag: latest
             env:
               PUID: 1000
               PGID: 1000
               TZ: Europe/Amsterdam
-              RADARR__SERVER__BINDADDRESS: 0.0.0.0
+              SONARR__SERVER__BINDADDRESS: 0.0.0.0
             ports:
-              - name: http
-                containerPort: 7878
-                protocol: TCP
-
+            - name: http
+              containerPort: 8989
+              protocol: TCP
     service:
       app:
-        controller: radarr
         type: ClusterIP
+        controller: sonarr
         ports:
           http:
-            port: 7878
-
+            port: 8989
     persistence:
       config:
         enabled: true
@@ -59,11 +61,14 @@ spec:
         existingClaim: tank-configs
         globalMounts:
           - path: /config
-            subPath: radarr
-
+            subPath: sonarr
       media:
         enabled: true
         type: persistentVolumeClaim
         existingClaim: media
         globalMounts:
           - path: /media
+
+# Container path:	Maps to TrueNAS:
+# /config	        /mnt/tank/tank-configs/sonarr
+# /media	        /mnt/tank/media
