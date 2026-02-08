@@ -31,7 +31,8 @@ spec:
               allowPrivilegeEscalation: false
               capabilities:
                 drop:
-                  - ALL
+                  - SETUID
+                  - SETGID
             image:
               repository: ghcr.io/linuxserver/prowlarr
               tag: latest
@@ -46,7 +47,6 @@ spec:
                 memory: 128Mi
               limits:
                 memory: 256Mi
-
 
     service:
       app:
