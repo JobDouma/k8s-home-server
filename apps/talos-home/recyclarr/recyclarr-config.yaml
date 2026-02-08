@@ -25,8 +25,17 @@ data:
         replace_existing_custom_formats: true
         delete_old_custom_formats: false
         include:
+          # Core definitions
           - template: sonarr-quality-definition-series
-          - template: sonarr-quality-profile-remux-web-2160p
-          - template: sonarr-custom-formats-remux-web-2160p
+
+          # Profile 1: HD Bluray + WEB (1080p+ sweet spot)
           - template: sonarr-quality-profile-hd-bluray-web
           - template: sonarr-custom-formats-hd-bluray-web
+
+          # Profile 2: WEB-1080p only (lighter, fast releases)
+          - template: sonarr-quality-profile-web-1080p
+          - template: sonarr-custom-formats-web-1080p
+
+          # Profile 3: WEB-2160p (4K WEB only, no Bluray)
+          - template: sonarr-quality-profile-web-2160p
+          - template: sonarr-custom-formats-web-2160p
