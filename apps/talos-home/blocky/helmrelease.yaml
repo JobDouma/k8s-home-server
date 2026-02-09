@@ -31,8 +31,14 @@ spec:
 
         pod:
           dnsPolicy: ClusterFirst
-          nodeSelector:
-            kubernetes.io/hostname: talos-cp-1
+          affinity:
+            podAntiAffinity:
+              requiredDuringSchedulingIgnoredDuringExecution:
+                - labelSelector:
+                    matchLabels:
+                      app.kubernetes.io/name: blocky
+                  topologyKey: kubernetes.io/hostname
+
           annotations:
             configmap.reloader.stakater.com/reload: "blocky-config"
           securityContext:
