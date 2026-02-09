@@ -26,3 +26,9 @@ data:
         delete_old_custom_formats: false
         include:
           - template: sonarr-quality-definition-series
+
+          - template: sonarr-quality-profile-web-1080p
+          - template: sonarr-custom-formats-web-1080p
+
+          - template: sonarr-quality-profile-web-2160p
+          - template: sonarr-custom-formats-web-2160p
