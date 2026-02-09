@@ -58,7 +58,7 @@ spec:
             "jobdouma/k8s-home-server"
           ],
 
-          "baseBranchPatterns": ["^main$"],
+          "baseBranches": ["main"],
 
           "dependencyDashboard": true,
           "dependencyDashboardAutoclose": true,
