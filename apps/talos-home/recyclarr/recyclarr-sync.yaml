@@ -30,7 +30,7 @@ spec:
                 - /bin/sh
                 - -ec
                 - |
-                  cat > /work/secrets.yml <<'EOF'
+                  cat > /work/secrets.yml <<EOF
                   radarr_url: ${RADARR_URL}
                   radarr_apikey: ${RADARR_APIKEY}
                   sonarr_url: ${SONARR_URL}
