@@ -41,12 +41,20 @@ spec:
       template:
         spec:
           serviceAccountName: cleanup-completed-pods
-          restartPolicy: OnFailure
+          restartPolicy: Never
           containers:
             - name: kubectl
-              image: bitnami/kubectl:latest
+              image: bitnami/kubectl:1.30.2
               command:
                 - /bin/sh
-                - -c
+                - -ec
                 - |
-                  kubectl delete pod -A --field-selector=status.phase==Succeeded,status.phase==Failed
+                  for ns in $(kubectl get ns -o jsonpath='{.items[*].metadata.name}' | tr ' ' '\n' | grep -Ev '^(kube-system|monitoring)$'); do
+                    kubectl get pods -n "$ns" \
+                      --field-selector=status.phase==Succeeded \
+                      -o name | xargs -r kubectl delete
+
+                    kubectl get pods -n "$ns" \
+                      --field-selector=status.phase==Failed \
+                      -o name | xargs -r kubectl delete
+                  done
