@@ -6,8 +6,7 @@ metadata:
 spec:
   type: ClusterIP
   selector:
-    app.kubernetes.io/name: prometheus
-    app.kubernetes.io/instance: kube-prometheus-stack
+    prometheus: kube-prometheus-stack-prometheus
   ports:
     - name: http
       port: 9090
