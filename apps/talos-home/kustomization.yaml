@@ -32,6 +32,8 @@ resources:
   - monitoring/monitoring-release.yaml
   - monitoring/monitoring-repo.yaml
   - monitoring/servicemonitor.yaml
+  - monitoring/ingressroute.yaml
+  - monitoring/service.yaml
 
   # ──────────────────────────────────────
   # Jellyseerr

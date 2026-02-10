@@ -8,5 +8,5 @@ spec:
     matchLabels:
       app.kubernetes.io/name: qbittorrent
   endpoints:
-    - port: metrics
+    - targetPort: 8080
       interval: 30s

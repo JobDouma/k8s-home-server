@@ -30,7 +30,16 @@ spec:
   values:
     prometheus:
       service:
-        type: NodePort
-        nodePort: 30090
+        type: ClusterIP
+        port: 9090
+
       prometheusSpec:
-        serviceMonitorSelectorNilUsesHelmValues: false
+        serviceMonitorSelector: {}
+        serviceMonitorNamespaceSelector: {}
+        podMonitorSelector: {}
+        podMonitorNamespaceSelector: {}
+
+    prometheus-node-exporter:
+      enabled: true
+      hostRootFsMount:
+        enabled: false
