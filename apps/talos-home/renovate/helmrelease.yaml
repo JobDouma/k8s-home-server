@@ -22,6 +22,9 @@ spec:
       concurrencyPolicy: Forbid
       successfulJobsHistoryLimit: 2
       failedJobsHistoryLimit: 2
+      jobTemplate:
+        spec:
+          ttlSecondsAfterFinished: 36000   # 10 hours
 
     envFrom:
       - secretRef:
