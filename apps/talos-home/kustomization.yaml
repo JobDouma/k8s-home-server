@@ -35,6 +35,7 @@ resources:
   - monitoring/ingressroute.yaml
   - monitoring/grafana-ingressroute.yaml
   - monitoring/service.yaml
+  - monitoring/grafana-admin-secret.yaml
 
   # ──────────────────────────────────────
   # Jellyseerr

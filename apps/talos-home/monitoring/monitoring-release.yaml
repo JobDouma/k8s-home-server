@@ -43,3 +43,8 @@ spec:
       enabled: true
       hostRootFsMount:
         enabled: false
+    
+    grafana:
+      admin:
+        existingSecret: grafana-admin
+
