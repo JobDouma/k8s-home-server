@@ -33,6 +33,7 @@ resources:
   - monitoring/monitoring-repo.yaml
   - monitoring/servicemonitor.yaml
   - monitoring/ingressroute.yaml
+  - monitoring/grafana-ingressroute.yaml
   - monitoring/service.yaml
 
   # ──────────────────────────────────────

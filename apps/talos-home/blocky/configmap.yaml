@@ -61,4 +61,5 @@ data:
         prowlarr.lan: 192.168.2.100
         sabnzbd.lan: 192.168.2.100
         prometheus.lan: 192.168.2.100
+        grafana.lan: 192.168.2.100
         truenas.lan: 192.168.2.5
