@@ -1,0 +1,66 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: joplin
+  namespace: joplin
+spec:
+  interval: 15m
+
+  chart:
+    spec:
+      chart: app-template
+      version: "4.6.2"
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s
+        namespace: flux-system
+
+  values:
+    controllers:
+      joplin:
+        containers:
+          app:
+            image:
+              repository: joplin/server
+              tag: latest
+
+            envFrom:
+              - secretRef:
+                  name: joplin-secret
+
+            env:
+              DB_CLIENT: pg
+              POSTGRES_HOST: joplin-postgres
+              POSTGRES_PORT: "5432"
+
+            securityContext:
+              runAsUser: 1000
+              runAsGroup: 1000
+              fsGroup: 1000
+
+            ports:
+              - name: http
+                containerPort: 22300
+
+            resources:
+              requests:
+                cpu: 100m
+                memory: 256Mi
+              limits:
+                memory: 512Mi
+
+    service:
+      app:
+        controller: joplin
+        ports:
+          http:
+            port: 22300
+
+    persistence:
+      data:
+        enabled: true
+        type: persistentVolumeClaim
+        existingClaim: tank-configs
+        globalMounts:
+          - path: /home/joplin/.joplin
+            subPath: joplin/server/data
