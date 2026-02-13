@@ -37,16 +37,14 @@ spec:
         - nconnect=8
 
     storageClass:
-      name: truenas-nfs
+      name: truenas-nfs-v2
       defaultClass: false
       reclaimPolicy: Retain
       archiveOnDelete: true
       allowVolumeExpansion: true
-      accessModes:
-        - ReadWriteMany
 
-      # Clean directory layout:
-      # /mnt/tank/configs/<namespace>/<pvc-name>
+      accessModes: ReadWriteMany
+
       pathPattern: "${.PVC.namespace}/${.PVC.name}"
 
       mountOptions:
