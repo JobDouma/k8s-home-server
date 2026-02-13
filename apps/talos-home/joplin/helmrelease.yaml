@@ -24,14 +24,15 @@ spec:
               repository: joplin/server
               tag: latest
 
-            envFrom:
-              - secretRef:
-                  name: joplin-secret
-
             env:
               DB_CLIENT: pg
               POSTGRES_HOST: joplin-postgres
               POSTGRES_PORT: "5432"
+              POSTGRES_DATABASE: joplindb
+              POSTGRES_USER: joplin
+              POSTGRES_PASSWORD: joplinpassword
+              APP_PORT: "22300"
+              APP_BASE_URL: http://joplin.lan
 
             securityContext:
               runAsUser: 1000
