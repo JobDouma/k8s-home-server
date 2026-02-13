@@ -42,6 +42,7 @@ resources:
   # ──────────────────────────────────────
   - jellyseerr/helmrelease.yaml
   - jellyseerr/ingressroute.yaml
+  - jellyseerr/pvc.yaml
 
   # ──────────────────────────────────────
   # Network Policies

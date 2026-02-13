@@ -68,21 +68,11 @@ spec:
     persistence:
       config:
         enabled: true
-        type: custom
-        identifier: config
-        volumeSpec:
-          persistentVolumeClaim:
-            claimName: jellyseerr-config
-            accessModes:
-              - ReadWriteMany
-            storageClassName: truenas-nfs
-            resources:
-              requests:
-                storage: 5Gi
-
+        type: persistentVolumeClaim
+        existingClaim: jellyseerr-config
         globalMounts:
           - path: /config
-            volumeName: config
+
 
 
 

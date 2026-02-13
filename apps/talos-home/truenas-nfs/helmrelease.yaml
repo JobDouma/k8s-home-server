@@ -37,6 +37,8 @@ spec:
       archiveOnDelete: true
       accessModes:
         - ReadWriteMany
+      
+      pathPattern: "${.PVC.namespace}/${.PVC.name}"
 
     podSecurityContext:
       runAsUser: 0
