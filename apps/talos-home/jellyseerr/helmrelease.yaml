@@ -69,10 +69,9 @@ spec:
       config:
         enabled: true
         type: persistentVolumeClaim
-        name: config
-        storageClass: truenas-nfs
         accessMode: ReadWriteMany
         size: 5Gi
+        storageClassName: truenas-nfs
         globalMounts:
           - path: /config
 
