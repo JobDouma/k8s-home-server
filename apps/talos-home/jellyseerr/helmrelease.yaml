@@ -40,13 +40,6 @@ spec:
             image:
               repository: ghcr.io/fallenbagel/jellyseerr
               tag: 2.7.3
-            securityContext:
-              runAsUser: 1000
-              runAsGroup: 1000
-              allowPrivilegeEscalation: false
-              capabilities:
-                drop:
-                  - ALL
             env:
               TZ: Europe/Amsterdam
               LOG_LEVEL: info
@@ -71,7 +64,7 @@ spec:
         type: persistentVolumeClaim
         existingClaim: jellyseerr-config
         globalMounts:
-          - path: /config
+          - path: /app/config
 
 
 
