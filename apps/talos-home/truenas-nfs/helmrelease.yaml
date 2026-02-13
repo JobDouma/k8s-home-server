@@ -29,26 +29,47 @@ spec:
     nfs:
       server: 192.168.2.5
       path: /mnt/tank/configs
+      mountOptions:
+        - vers=4.1
+        - noatime
+        - nodiratime
+        - hard
+        - nconnect=8
 
     storageClass:
       name: truenas-nfs
       defaultClass: false
       reclaimPolicy: Retain
       archiveOnDelete: true
+      allowVolumeExpansion: true
       accessModes:
         - ReadWriteMany
-      
+
+      # Clean directory layout:
+      # /mnt/tank/configs/<namespace>/<pvc-name>
       pathPattern: "${.PVC.namespace}/${.PVC.name}"
+
+      mountOptions:
+        - vers=4.1
+        - noatime
+        - nodiratime
+        - hard
+        - nconnect=8
 
     podSecurityContext:
       runAsUser: 0
       runAsGroup: 0
       fsGroup: 0
+      fsGroupChangePolicy: "OnRootMismatch"
 
     securityContext:
       allowPrivilegeEscalation: true
+      runAsUser: 0
+      runAsGroup: 0
 
     resources:
       requests:
         cpu: 50m
         memory: 64Mi
+      limits:
+        memory: 256Mi
