@@ -72,6 +72,7 @@ spec:
         identifier: config
         volumeSpec:
           persistentVolumeClaim:
+            claimName: jellyseerr-config
             accessModes:
               - ReadWriteMany
             storageClassName: truenas-nfs
