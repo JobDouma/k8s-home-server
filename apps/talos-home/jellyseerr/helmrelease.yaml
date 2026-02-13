@@ -69,6 +69,7 @@ spec:
       config:
         enabled: true
         type: custom
+        identifier: config
         volumeSpec:
           persistentVolumeClaim:
             accessModes:
@@ -80,6 +81,7 @@ spec:
 
         globalMounts:
           - path: /config
+            volumeName: config
 
 
 
