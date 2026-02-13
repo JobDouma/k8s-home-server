@@ -28,14 +28,14 @@ resources:
   # ──────────────────────────────────────
   # monitoring / prometheus
   # ──────────────────────────────────────
-  - monitoring/namespace.yaml
-  - monitoring/monitoring-release.yaml
-  - monitoring/monitoring-repo.yaml
-  - monitoring/servicemonitor.yaml
-  - monitoring/ingressroute.yaml
-  - monitoring/grafana-ingressroute.yaml
-  - monitoring/service.yaml
-  - monitoring/grafana-admin-secret.yaml
+  # - monitoring/namespace.yaml
+  # - monitoring/monitoring-release.yaml
+  # - monitoring/monitoring-repo.yaml
+  # - monitoring/servicemonitor.yaml
+  # - monitoring/ingressroute.yaml
+  # - monitoring/grafana-ingressroute.yaml
+  # - monitoring/service.yaml
+  # - monitoring/grafana-admin-secret.yaml
 
   # ──────────────────────────────────────
   # Jellyseerr
