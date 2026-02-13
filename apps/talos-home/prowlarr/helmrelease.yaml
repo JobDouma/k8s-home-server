@@ -6,6 +6,7 @@ metadata:
 spec:
   interval: 15m
   timeout: 10m
+  
   install:
     remediation:
       retries: 3
@@ -21,6 +22,7 @@ spec:
         kind: HelmRepository
         name: bjw-s
         namespace: flux-system
+ 
   values:
     controllers:
       prowlarr:

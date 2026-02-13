@@ -6,14 +6,13 @@ metadata:
 spec:
   interval: 15m
   timeout: 10m
+  
   install:
     remediation:
       retries: 3
   upgrade:
     remediation:
-      strategy: uninstall
       retries: 3
-
       
   chart:
     spec:
@@ -23,15 +22,31 @@ spec:
         kind: HelmRepository
         name: bjw-s
         namespace: flux-system
+  
   values:
     controllers:
       jellyseerr:
+        pod:
+          securityContext:
+            runAsUser: 1000
+            runAsGroup: 1000
+            fsGroup: 1000
+            fsGroupChangePolicy: OnRootMismatch
+            seccompProfile:
+              type: RuntimeDefault
+        
         containers:
           app:
-            enabled: true
             image:
               repository: ghcr.io/fallenbagel/jellyseerr
               tag: 2.7.3
+            securityContext:
+              runAsUser: 1000
+              runAsGroup: 1000
+              allowPrivilegeEscalation: false
+              capabilities:
+                drop:
+                  - ALL
             env:
               TZ: Europe/Amsterdam
               LOG_LEVEL: info
@@ -54,7 +69,10 @@ spec:
       config:
         enabled: true
         type: persistentVolumeClaim
-        existingClaim: tank-configs
+        name: config
+        storageClass: truenas-nfs
+        accessMode: ReadWriteMany
+        size: 5Gi
         globalMounts:
-          - path: /app/config
-            subPath: jellyseerr
+          - path: /config
+

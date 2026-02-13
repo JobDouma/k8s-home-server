@@ -27,18 +27,14 @@ spec:
   values:
 
     nfs:
-      server: truenas.lan
+      server: 192.168.2.5
       path: /mnt/tank/configs
 
     storageClass:
       name: truenas-nfs
-
       defaultClass: false
-
       reclaimPolicy: Retain
-
       archiveOnDelete: true
-
       accessModes:
         - ReadWriteMany
 
