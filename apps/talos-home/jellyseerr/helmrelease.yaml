@@ -68,15 +68,18 @@ spec:
     persistence:
       config:
         enabled: true
-        type: persistentVolumeClaim
-        volumeClaimTemplate:
-          spec:
+        type: custom
+        volumeSpec:
+          persistentVolumeClaim:
             accessModes:
               - ReadWriteMany
             storageClassName: truenas-nfs
             resources:
               requests:
                 storage: 5Gi
+
         globalMounts:
           - path: /config
+
+
 
