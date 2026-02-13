@@ -84,6 +84,9 @@ resources:
   - dashy/helmrelease.yaml
   - dashy/ingressroute.yaml
 
+  # ──────────────────────────────────────
+  # Prowlarr
+  # ──────────────────────────────────────
   - prowlarr/helmrelease.yaml
   - prowlarr/ingressroute.yaml
 
@@ -99,3 +102,12 @@ resources:
   - recyclarr/recyclarr-config.yaml
   - recyclarr/recyclarr-secrets.yaml
   - recyclarr/recyclarr-sync.yaml
+
+  # ──────────────────────────────────────
+  # Joplin
+  # ──────────────────────────────────────
+  - joplin/namespace.yaml
+  - joplin/secret.yaml
+  - joplin/postgres.yaml
+  - joplin/helmrelease.yaml
+  - joplin/ingressroute.yaml
