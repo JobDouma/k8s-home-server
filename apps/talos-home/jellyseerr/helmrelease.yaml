@@ -43,8 +43,6 @@ spec:
             env:
               TZ: Europe/Amsterdam
               LOG_LEVEL: info
-              JELLYFIN_URL: http://jellyfin.media.svc.cluster.local:8096
-              JELLYFIN_API_KEY: "1c87951811c44a499199f6e137a777f3"
             resources:
               requests:
                 cpu: 100m
