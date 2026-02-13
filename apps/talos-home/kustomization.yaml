@@ -111,3 +111,9 @@ resources:
   - joplin/hr-postgres.yaml
   - joplin/hr-joplin.yaml
   - joplin/ingressroute.yaml
+
+  # ──────────────────────────────────────
+  # TrueNAS NFS dynamic provisioner
+  # ──────────────────────────────────────
+  - truenas-nfs/helmrepository.yaml
+  - truenas-nfs/helmrelease.yaml
