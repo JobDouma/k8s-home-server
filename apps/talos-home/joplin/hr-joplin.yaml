@@ -1,0 +1,121 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: joplin
+  namespace: joplin
+spec:
+  interval: 15m
+  timeout: 10m
+
+  install:
+    remediation:
+      retries: 3
+
+  upgrade:
+    remediation:
+      strategy: uninstall
+      retries: 3
+
+  chart:
+    spec:
+      chart: app-template
+      version: "4.6.2"
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s
+        namespace: flux-system
+
+  values:
+    controllers:
+      joplin:
+
+        pod:
+          securityContext:
+            runAsUser: 1000
+            runAsGroup: 1000
+            fsGroup: 1000
+            runAsNonRoot: true
+            fsGroupChangePolicy: OnRootMismatch
+            seccompProfile:
+              type: RuntimeDefault
+
+        containers:
+          app:
+            image:
+              repository: joplin/server
+              tag: "3.5.2"
+              pullPolicy: IfNotPresent
+
+            securityContext:
+              runAsUser: 1000
+              runAsGroup: 1000
+              allowPrivilegeEscalation: false
+              capabilities:
+                drop:
+                  - ALL
+
+            env:
+              APP_BASE_URL: http://joplin.lan
+              APP_PORT: "22300"
+
+              DB_CLIENT: pg
+              POSTGRES_HOST: joplin-postgres
+              POSTGRES_PORT: "5432"
+
+              PM2_HOME: /mnt/tank/configs/joplin/server/pm2
+
+            envFrom:
+              - secretRef:
+                  name: joplin-secret
+
+            ports:
+              - name: http
+                containerPort: 22300
+
+            resources:
+              requests:
+                cpu: 100m
+                memory: 256Mi
+              limits:
+                memory: 512Mi
+
+            probes:
+              startup:
+                enabled: true
+                spec:
+                  httpGet:
+                    path: /api/ping
+                    port: http
+                  failureThreshold: 30
+                  periodSeconds: 10
+
+              readiness:
+                enabled: true
+                spec:
+                  httpGet:
+                    path: /api/ping
+                    port: http
+
+              liveness:
+                enabled: true
+                spec:
+                  httpGet:
+                    path: /api/ping
+                    port: http
+
+    service:
+      app:
+        controller: joplin
+        type: ClusterIP
+        ports:
+          http:
+            port: 22300
+            targetPort: http
+
+    persistence:
+      data:
+        enabled: true
+        type: persistentVolumeClaim
+        existingClaim: tank-configs
+        globalMounts:
+          - path: /mnt/tank/configs
