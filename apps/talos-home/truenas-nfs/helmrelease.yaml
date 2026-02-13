@@ -37,7 +37,7 @@ spec:
         - nconnect=8
 
     storageClass:
-      name: truenas-nfs-v2
+      name: truenas-nfs
       defaultClass: false
       reclaimPolicy: Retain
       archiveOnDelete: true
