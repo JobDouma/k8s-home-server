@@ -22,7 +22,7 @@ spec:
           app:
             image:
               repository: joplin/server
-              tag: 3.5.12
+              tag: 3.5.2
 
             env:
               DB_CLIENT: pg
