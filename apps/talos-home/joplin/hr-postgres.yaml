@@ -5,6 +5,16 @@ metadata:
   namespace: joplin
 spec:
   interval: 15m
+  timeout: 10m
+
+  install:
+    remediation:
+      retries: 3
+
+  upgrade:
+    remediation:
+      strategy: uninstall
+      retries: 3
 
   chart:
     spec:
@@ -18,23 +28,39 @@ spec:
   values:
     controllers:
       postgres:
+
+        pod:
+          securityContext:
+            runAsUser: 999
+            runAsGroup: 999
+            fsGroup: 999
+            runAsNonRoot: true
+            fsGroupChangePolicy: OnRootMismatch
+            seccompProfile:
+              type: RuntimeDefault
+
         containers:
           app:
             image:
               repository: postgres
-              tag: 16
+              tag: "16"
+              pullPolicy: IfNotPresent
+
+            securityContext:
+              runAsUser: 999
+              runAsGroup: 999
+              runAsNonRoot: true
+              allowPrivilegeEscalation: false
+              capabilities:
+                drop:
+                  - ALL
 
             envFrom:
               - secretRef:
                   name: joplin-secret
 
             env:
-              PGDATA: /var/lib/postgresql/data
-
-            securityContext:
-              runAsUser: 1000
-              runAsGroup: 1000
-              fsGroup: 1000
+              PGDATA: /mnt/tank/configs/joplin/postgres/data
 
             resources:
               requests:
@@ -45,9 +71,11 @@ spec:
     service:
       postgres:
         controller: postgres
+        type: ClusterIP
         ports:
           db:
             port: 5432
+            targetPort: 5432
 
     persistence:
       data:
@@ -55,5 +83,4 @@ spec:
         type: persistentVolumeClaim
         existingClaim: tank-configs
         globalMounts:
-          - path: /var/lib/postgresql/data
-            subPath: joplin/postgres/data
+          - path: /mnt/tank/configs

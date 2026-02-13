@@ -108,6 +108,6 @@ resources:
   # ──────────────────────────────────────
   - joplin/namespace.yaml
   - joplin/secret.yaml
-  - joplin/postgres.yaml
-  - joplin/helmrelease.yaml
+  - joplin/hr-postgres.yaml
+  - joplin/hr-joplin.yaml
   - joplin/ingressroute.yaml
