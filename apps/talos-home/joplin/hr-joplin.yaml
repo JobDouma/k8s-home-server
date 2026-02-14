@@ -37,7 +37,6 @@ spec:
 
     controllers:
       joplin:
-
         containers:
           app:
             image:
@@ -45,7 +44,7 @@ spec:
               tag: 3.5.2
 
             ports:
-              http:
+              - name: http
                 containerPort: 22300
                 protocol: TCP
 
@@ -58,6 +57,8 @@ spec:
               POSTGRES_HOST: joplin-postgres
               POSTGRES_PORT: "5432"
 
+              SIGNUP_ENABLED: "0" # make 1 if we need to register a new admin account
+
               PM2_HOME: /home/joplin/.pm2
 
               TZ: Europe/Amsterdam
@@ -67,14 +68,6 @@ spec:
             envFrom:
               - secretRef:
                   name: joplin-secret
-
-            probes:
-              liveness:
-                enabled: false
-              readiness:
-                enabled: false
-              startup:
-                enabled: false
 
     service:
       app:
