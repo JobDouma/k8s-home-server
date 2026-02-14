@@ -116,6 +116,7 @@ resources:
   # ──────────────────────────────────────
   # Joplin
   # ──────────────────────────────────────
+  - joplin/pvc.yaml
   - joplin/namespace.yaml
   - joplin/secret.yaml
   - joplin/hr-postgres.yaml

@@ -5,16 +5,6 @@ metadata:
   namespace: joplin
 spec:
   interval: 15m
-  timeout: 10m
-
-  install:
-    remediation:
-      retries: 3
-
-  upgrade:
-    remediation:
-      strategy: uninstall
-      retries: 3
 
   chart:
     spec:
@@ -26,61 +16,41 @@ spec:
         namespace: flux-system
 
   values:
+
+    defaultPodOptions:
+      securityContext:
+        runAsUser: 999
+        runAsGroup: 999
+        runAsNonRoot: false
+        fsGroup: 999
+        fsGroupChangePolicy: OnRootMismatch
+
     controllers:
       postgres:
-
-        pod:
-          securityContext:
-            runAsUser: 1000
-            runAsGroup: 1000
-            fsGroup: 1000
-            runAsNonRoot: true
-            fsGroupChangePolicy: OnRootMismatch
-            seccompProfile:
-              type: RuntimeDefault
-
         containers:
           app:
             image:
               repository: postgres
               tag: "16"
-              pullPolicy: IfNotPresent
-
-            securityContext:
-              runAsUser: 999
-              runAsGroup: 999
-              runAsNonRoot: true
-              allowPrivilegeEscalation: false
-              capabilities:
-                drop:
-                  - ALL
 
             envFrom:
               - secretRef:
                   name: joplin-secret
 
             env:
-              PGDATA: /mnt/tank/configs/joplin/postgres/data
-
-            resources:
-              requests:
-                memory: 256Mi
-              limits:
-                memory: 512Mi
+              PGDATA: /var/lib/postgresql/data
 
     service:
       postgres:
         controller: postgres
-        type: ClusterIP
         ports:
           db:
             port: 5432
-            targetPort: 5432
 
     persistence:
       data:
         enabled: true
         type: persistentVolumeClaim
-        existingClaim: tank-configs
+        existingClaim: joplin-postgres-config
         globalMounts:
-          - path: /mnt/tank/configs
+          - path: /var/lib/postgresql/data
