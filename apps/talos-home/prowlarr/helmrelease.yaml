@@ -25,14 +25,20 @@ spec:
         namespace: flux-system
 
   values:
+
+    defaultPodOptions:
+      securityContext:
+        runAsUser: 0
+        runAsGroup: 0
+        runAsNonRoot: false
+        fsGroup: null
+        fsGroupChangePolicy: null
+        supplementalGroups: []
+
     controllers:
       prowlarr:
         pod:
           securityContext:
-            runAsUser: 1000
-            runAsGroup: 1000
-            fsGroup: 1000
-            fsGroupChangePolicy: OnRootMismatch
             seccompProfile:
               type: RuntimeDefault
 
@@ -41,13 +47,24 @@ spec:
             image:
               repository: ghcr.io/linuxserver/prowlarr
               tag: 1.16.2
+
+            securityContext:
+              runAsUser: 0
+              runAsGroup: 0
+              allowPrivilegeEscalation: false
+
             env:
+              TZ: Europe/Amsterdam
               PUID: 1000
               PGID: 1000
-              TZ: Europe/Amsterdam
-            ports:
-              - name: http
-                containerPort: 9696
+              UMASK: 002
+
+            resources:
+              requests:
+                cpu: 50m
+                memory: 128Mi
+              limits:
+                memory: 512Mi
 
     service:
       app:
