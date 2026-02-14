@@ -26,33 +26,22 @@ spec:
         namespace: flux-system
 
   values:
+
+    defaultPodOptions:
+      securityContext:
+        runAsUser: 0
+        runAsGroup: 0
+        runAsNonRoot: false
+        fsGroup: 0
+        fsGroupChangePolicy: OnRootMismatch
+
     controllers:
       joplin:
-
-        pod:
-          securityContext:
-            runAsUser: 1000
-            runAsGroup: 1000
-            fsGroup: 1000
-            runAsNonRoot: true
-            fsGroupChangePolicy: OnRootMismatch
-            seccompProfile:
-              type: RuntimeDefault
-
         containers:
           app:
             image:
               repository: joplin/server
-              tag: "3.5.2"
-              pullPolicy: IfNotPresent
-
-            securityContext:
-              runAsUser: 1000
-              runAsGroup: 1000
-              allowPrivilegeEscalation: false
-              capabilities:
-                drop:
-                  - ALL
+              tag: 3.5.2
 
             env:
               APP_BASE_URL: http://joplin.lan
@@ -62,22 +51,15 @@ spec:
               POSTGRES_HOST: joplin-postgres
               POSTGRES_PORT: "5432"
 
-              PM2_HOME: /mnt/tank/configs/joplin/server/pm2
+              PM2_HOME: /home/joplin/.pm2
+
+              TZ: Europe/Amsterdam
+              PUID: 1000
+              PGID: 1000
 
             envFrom:
               - secretRef:
                   name: joplin-secret
-
-            ports:
-              - name: http
-                containerPort: 22300
-
-            resources:
-              requests:
-                cpu: 100m
-                memory: 256Mi
-              limits:
-                memory: 512Mi
 
             probes:
               startup:
@@ -113,9 +95,22 @@ spec:
             targetPort: http
 
     persistence:
-      data:
+
+      pm2:
         enabled: true
         type: persistentVolumeClaim
-        existingClaim: tank-configs
-        globalMounts:
-          - path: /mnt/tank/configs
+        existingClaim: joplin-app-config
+        advancedMounts:
+          joplin:
+            app:
+              - path: /home/joplin/.pm2
+
+      logs:
+        enabled: true
+        type: emptyDir
+        advancedMounts:
+          joplin:
+            app:
+              - path: /home/joplin/packages/server/logs
+
+
