@@ -26,32 +26,20 @@ spec:
 
   values:
 
-    defaultPodOptions:
-      securityContext:
-        runAsUser: 0
-        runAsGroup: 0
-        runAsNonRoot: false
-        fsGroup: null
-        fsGroupChangePolicy: null
-        supplementalGroups: []
-
     controllers:
       prowlarr:
+
         pod:
           securityContext:
-            seccompProfile:
-              type: RuntimeDefault
+            runAsUser: 0
+            runAsGroup: 0
+            runAsNonRoot: false
 
         containers:
           app:
             image:
               repository: ghcr.io/linuxserver/prowlarr
               tag: 1.16.2
-
-            securityContext:
-              runAsUser: 0
-              runAsGroup: 0
-              allowPrivilegeEscalation: false
 
             env:
               TZ: Europe/Amsterdam
@@ -64,7 +52,7 @@ spec:
                 cpu: 50m
                 memory: 128Mi
               limits:
-                memory: 512Mi
+                 memory: 512Mi
 
     service:
       app:

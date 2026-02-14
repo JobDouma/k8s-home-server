@@ -26,32 +26,20 @@ spec:
 
   values:
 
-    defaultPodOptions:
-      securityContext:
-        runAsUser: 0
-        runAsGroup: 0
-        runAsNonRoot: false
-        fsGroup: null
-        fsGroupChangePolicy: null
-        supplementalGroups: []
-
     controllers:
       sonarr:
+
         pod:
           securityContext:
-            seccompProfile:
-              type: RuntimeDefault
+            runAsUser: 0
+            runAsGroup: 0
+            runAsNonRoot: false
 
         containers:
           app:
             image:
               repository: ghcr.io/linuxserver/sonarr
               tag: 4.0.11
-
-            securityContext:
-              runAsUser: 0
-              runAsGroup: 0
-              allowPrivilegeEscalation: false
 
             env:
               TZ: Europe/Amsterdam
