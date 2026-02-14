@@ -5,6 +5,16 @@ metadata:
   namespace: joplin
 spec:
   interval: 15m
+  timeout: 10m
+
+  install:
+    remediation:
+      retries: 3
+
+  upgrade:
+    remediation:
+      strategy: uninstall
+      retries: 3
 
   chart:
     spec:
@@ -21,17 +31,21 @@ spec:
       securityContext:
         runAsUser: 999
         runAsGroup: 999
-        runAsNonRoot: false
         fsGroup: 999
+        runAsNonRoot: false
         fsGroupChangePolicy: OnRootMismatch
 
     controllers:
       postgres:
+
+        strategy: Recreate
+
         containers:
           app:
             image:
               repository: postgres
               tag: "16"
+              pullPolicy: IfNotPresent
 
             envFrom:
               - secretRef:
@@ -40,12 +54,59 @@ spec:
             env:
               PGDATA: /var/lib/postgresql/data
 
+              # Proper secure initialization
+              POSTGRES_INITDB_ARGS: "--auth-host=scram-sha-256 --auth-local=trust"
+              # Ensure postgres listens on pod network
+              POSTGRES_HOST: 0.0.0.0
+
+              TZ: Europe/Amsterdam
+
+            resources:
+              requests:
+                cpu: 50m
+                memory: 128Mi
+              limits:
+                memory: 512Mi
+
+            probes:
+
+              startup:
+                enabled: true
+                spec:
+                  exec:
+                    command:
+                      - sh
+                      - -c
+                      - pg_isready -U "$POSTGRES_USER"
+                  failureThreshold: 30
+                  periodSeconds: 5
+
+              readiness:
+                enabled: true
+                spec:
+                  exec:
+                    command:
+                      - sh
+                      - -c
+                      - pg_isready -U "$POSTGRES_USER"
+
+              liveness:
+                enabled: true
+                spec:
+                  exec:
+                    command:
+                      - sh
+                      - -c
+                      - pg_isready -U "$POSTGRES_USER"
+
     service:
       postgres:
         controller: postgres
+        type: ClusterIP
         ports:
           db:
             port: 5432
+            targetPort: 5432
 
     persistence:
       data:

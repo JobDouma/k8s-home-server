@@ -37,15 +37,22 @@ spec:
 
     controllers:
       joplin:
+
         containers:
           app:
             image:
               repository: joplin/server
               tag: 3.5.2
 
+            ports:
+              http:
+                containerPort: 22300
+                protocol: TCP
+
             env:
               APP_BASE_URL: http://joplin.lan
               APP_PORT: "22300"
+              APP_LISTEN_ADDRESS: 0.0.0.0
 
               DB_CLIENT: pg
               POSTGRES_HOST: joplin-postgres
@@ -62,28 +69,12 @@ spec:
                   name: joplin-secret
 
             probes:
-              startup:
-                enabled: true
-                spec:
-                  httpGet:
-                    path: /api/ping
-                    port: http
-                  failureThreshold: 30
-                  periodSeconds: 10
-
-              readiness:
-                enabled: true
-                spec:
-                  httpGet:
-                    path: /api/ping
-                    port: http
-
               liveness:
-                enabled: true
-                spec:
-                  httpGet:
-                    path: /api/ping
-                    port: http
+                enabled: false
+              readiness:
+                enabled: false
+              startup:
+                enabled: false
 
     service:
       app:
@@ -112,5 +103,3 @@ spec:
           joplin:
             app:
               - path: /home/joplin/packages/server/logs
-
-
