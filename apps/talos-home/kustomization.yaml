@@ -62,7 +62,7 @@ resources:
   # ──────────────────────────────────────
   # Radarr
   # ──────────────────────────────────────
-  - radarr.pvc.yaml
+  - radarr/pvc.yaml
   - radarr/helmrelease.yaml
   - radarr/ingressroute.yaml
 
