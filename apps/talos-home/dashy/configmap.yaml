@@ -70,6 +70,15 @@ data:
             icon: fas fa-chart-area
             url: http://grafana.lan
 
+      - name: Productivity
+        icon: fas fa-brain
+        items:
+          - title: Joplin
+            description: Notes & Sync Server
+            icon: fas fa-sticky-note
+            url: http://joplin.lan
+
+
 
 # If you want raw IPs instead of DNS, replace the links above with:
 # link: http://192.168.2.100  (and use Traefik host routing won’t work with IP)
