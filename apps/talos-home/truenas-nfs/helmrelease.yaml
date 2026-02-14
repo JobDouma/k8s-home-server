@@ -62,7 +62,7 @@ spec:
 
     securityContext:
       allowPrivilegeEscalation: true
-      runAsUser: 0z`
+      runAsUser: 0
       runAsGroup: 0
 
     resources:
