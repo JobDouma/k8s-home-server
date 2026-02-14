@@ -10,6 +10,7 @@ spec:
   install:
     remediation:
       retries: 3
+
   upgrade:
     remediation:
       retries: 3
@@ -28,6 +29,10 @@ spec:
       radarr:
         pod:
           securityContext:
+            runAsUser: 1000
+            runAsGroup: 1000
+            fsGroup: 1000
+            fsGroupChangePolicy: OnRootMismatch
             seccompProfile:
               type: RuntimeDefault
 
@@ -36,12 +41,6 @@ spec:
             image:
               repository: ghcr.io/linuxserver/radarr
               tag: 5.3.6
-            securityContext:
-              allowPrivilegeEscalation: true
-              capabilities:
-                add:
-                  - SETUID
-                  - SETGID
             env:
               PUID: 1000
               PGID: 1000
@@ -49,13 +48,6 @@ spec:
             ports:
               - name: http
                 containerPort: 7878
-                protocol: TCP
-            resources:
-              requests:
-                cpu: 100m
-                memory: 256Mi
-              limits:
-                memory: 512Mi
 
     service:
       app:
@@ -69,10 +61,9 @@ spec:
       config:
         enabled: true
         type: persistentVolumeClaim
-        existingClaim: tank-configs
+        existingClaim: radarr-config
         globalMounts:
           - path: /config
-            subPath: radarr
 
       media:
         enabled: true

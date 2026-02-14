@@ -55,12 +55,14 @@ resources:
   # ──────────────────────────────────────
   # Sonarr
   # ──────────────────────────────────────
+  - sonarr/pvc.yaml
   - sonarr/helmrelease.yaml
   - sonarr/ingressroute.yaml
 
   # ──────────────────────────────────────
   # Radarr
   # ──────────────────────────────────────
+  - radarr.pvc.yaml
   - radarr/helmrelease.yaml
   - radarr/ingressroute.yaml
 
@@ -88,12 +90,19 @@ resources:
   # ──────────────────────────────────────
   # Prowlarr
   # ──────────────────────────────────────
+  - prowlarr/pvc.yaml
   - prowlarr/helmrelease.yaml
   - prowlarr/ingressroute.yaml
 
+  # ──────────────────────────────────────
+  # Reloader
+  # ──────────────────────────────────────
   - stakater-reloader/helmrepository.yaml
   - stakater-reloader/helmrelease.yaml
 
+  # ──────────────────────────────────────
+  # Sabnzbd
+  # ──────────────────────────────────────
   - sabnzbd/helmrelease.yaml
   - sabnzbd/ingressroute.yaml
 
