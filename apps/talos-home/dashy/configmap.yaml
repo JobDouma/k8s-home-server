@@ -132,6 +132,10 @@ data:
       - name: Networking
         icon: fas fa-network-wired
         items:
+          - title: Blocky
+            description: DNS Ad Blocking & Resolver
+            icon: fas fa-shield-virus
+            url: http://blocky.lan
 
           - title: UniFi Controller
             description: Network Controller
