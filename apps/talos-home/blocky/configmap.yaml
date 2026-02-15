@@ -52,16 +52,21 @@ data:
 
     customDNS:
       mapping:
+        # Kubernetes ingress
+        dashy.lan: 192.168.2.100
         jellyfin.lan: 192.168.2.100
-        sonarr.lan: 192.168.2.100
         jellyseerr.lan: 192.168.2.100
         radarr.lan: 192.168.2.100
-        qbittorrent.lan: 192.168.2.100
-        dashy.lan: 192.168.2.100
-        prowlarr.lan: 192.168.2.100
+        sonarr.lan: 192.168.2.100
         sabnzbd.lan: 192.168.2.100
+        qbittorrent.lan: 192.168.2.100
+        prowlarr.lan: 192.168.2.100
         prometheus.lan: 192.168.2.100
         grafana.lan: 192.168.2.100
         joplin.lan: 192.168.2.100
+        traefik.lan: 192.168.2.100
+        blocky.lan: 192.168.2.100
+
+        # external infra
+        proxmox.lan: 192.168.2.10
         truenas.lan: 192.168.2.5
-        router.lan: 192.168.2.1
