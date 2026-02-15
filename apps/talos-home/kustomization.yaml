@@ -10,6 +10,7 @@ resources:
   - blocky/helmrepository.yaml
   - blocky/helmrelease.yaml
   - blocky/servicemonitor.yaml
+  - blocky.ingressroute.yaml
 
   # ──────────────────────────────────────
   # Jellyfin
@@ -128,3 +129,9 @@ resources:
   # ──────────────────────────────────────
   - truenas-nfs/helmrepository.yaml
   - truenas-nfs/helmrelease.yaml
+
+  # ──────────────────────────────────────
+  # Proxmox
+  # ──────────────────────────────────────
+  - proxmox/service.yaml
+  - proxmox/ingressroute.yaml
