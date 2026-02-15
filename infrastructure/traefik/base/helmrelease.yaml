@@ -69,7 +69,24 @@ spec:
 
     additionalArguments:
       - "--providers.kubernetesingress.ingressclass=traefik"
+      # Enable dashboard
+      - "--api.dashboard=true"
+      - "--api=true"
+
+      # Enable access logs
+      - "--accesslog=true"
+      - "--accesslog.format=json"
+
+      # Trust internal forwarded headers
+      - "--entrypoints.web.forwardedHeaders.insecure=true"
+      - "--entrypoints.websecure.forwardedHeaders.insecure=true"
+
+      # Explicit entrypoints
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.websecure.address=:443"
 
     logs:
       general:
         level: INFO
+      access:
+        enabled: true
