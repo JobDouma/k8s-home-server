@@ -1,0 +1,16 @@
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: proxmox
+  namespace: networking
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: Host(`proxmox.lan`)
+      kind: Rule
+      services:
+        - name: proxmox-external
+          port: 8006
+  tls:
+    passthrough: true
