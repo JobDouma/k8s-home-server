@@ -10,7 +10,7 @@ resources:
   - blocky/helmrepository.yaml
   - blocky/helmrelease.yaml
   - blocky/servicemonitor.yaml
-  - blocky.ingressroute.yaml
+  - blocky/ingressroute.yaml
 
   # ──────────────────────────────────────
   # Jellyfin

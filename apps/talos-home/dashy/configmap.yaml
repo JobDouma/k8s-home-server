@@ -96,17 +96,17 @@ data:
           - title: Kubernetes Dashboard
             description: Cluster Management
             icon: fas fa-cubes
-            url: https://kubernetes.lan
+            url: http://kubernetes.lan
 
           - title: FluxCD
             description: GitOps Controller
             icon: fas fa-code-branch
-            url: https://flux.lan
+            url: http://flux.lan
 
           - title: Traefik
             description: Ingress Controller
             icon: fas fa-route
-            url: https://traefik.lan
+            url: http://traefik.lan
 
 
       - name: Infrastructure
@@ -121,7 +121,7 @@ data:
           - title: Proxmox
             description: Hypervisor
             icon: fas fa-layer-group
-            url: https://proxmox.lan
+            url: http://proxmox.lan
 
           - title: Portainer
             description: Container Management
@@ -136,7 +136,7 @@ data:
           - title: UniFi Controller
             description: Network Controller
             icon: fas fa-wifi
-            url: https://unifi.lan
+            url: http://unifi.lan
 
           - title: Router
             description: Gateway Management
@@ -151,12 +151,12 @@ data:
           - title: Authentik
             description: Identity Provider
             icon: fas fa-user-lock
-            url: https://auth.lan
+            url: http://auth.lan
 
           - title: Vaultwarden
             description: Password Manager
             icon: fas fa-key
-            url: https://vaultwarden.lan
+            url: http://vaultwarden.lan
 
 
       - name: Storage
