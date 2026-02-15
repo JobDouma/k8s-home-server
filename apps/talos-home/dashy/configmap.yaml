@@ -19,28 +19,24 @@ data:
       disableUpdateCheck: true
 
     sections:
+
       - name: Media
         icon: fas fa-photo-video
+        displayData:
+          sortBy: default
+          rows: 2
+          cols: 4
         items:
+
           - title: Jellyfin
             description: Media Server
             icon: fas fa-film
             url: http://jellyfin.lan
 
           - title: Jellyseerr
-            description: Requests
+            description: Media Requests
             icon: fas fa-ticket-alt
             url: http://jellyseerr.lan
-
-          - title: qBittorrent
-            description: Torrent Downloads
-            icon: fas fa-download
-            url: http://qbittorrent.lan
-
-          - title: SABnzbd
-            description: Usenet Downloads
-            icon: fas fa-cloud-download-alt
-            url: http://sabnzbd.lan
 
           - title: Sonarr
             description: TV Automation
@@ -57,26 +53,136 @@ data:
             icon: fas fa-search
             url: http://prowlarr.lan
 
+          - title: qBittorrent
+            description: Torrent Client
+            icon: fas fa-download
+            url: http://qbittorrent.lan
+
+          - title: SABnzbd
+            description: Usenet Client
+            icon: fas fa-cloud-download-alt
+            url: http://sabnzbd.lan
+
+
+      - name: Productivity
+        icon: fas fa-brain
+        items:
+
+          - title: Joplin
+            description: Notes & Sync Server
+            icon: fas fa-sticky-note
+            url: http://joplin.lan
+
+
       - name: Monitoring
         icon: fas fa-chart-line
         items:
-          - title: Prometheus
-            description: Metrics & Targets
-            icon: fas fa-fire
-            url: http://prometheus.lan
 
           - title: Grafana
             description: Dashboards
             icon: fas fa-chart-area
             url: http://grafana.lan
 
-      - name: Productivity
-        icon: fas fa-brain
+          - title: Prometheus
+            description: Metrics & Alerting
+            icon: fas fa-fire
+            url: http://prometheus.lan
+
+
+      - name: Kubernetes
+        icon: fas fa-dharmachakra
         items:
-          - title: Joplin
-            description: Notes & Sync Server
-            icon: fas fa-sticky-note
-            url: http://joplin.lan
+
+          - title: Kubernetes Dashboard
+            description: Cluster Management
+            icon: fas fa-cubes
+            url: https://kubernetes.lan
+
+          - title: FluxCD
+            description: GitOps Controller
+            icon: fas fa-code-branch
+            url: https://flux.lan
+
+          - title: Traefik
+            description: Ingress Controller
+            icon: fas fa-route
+            url: https://traefik.lan
+
+
+      - name: Infrastructure
+        icon: fas fa-server
+        items:
+
+          - title: TrueNAS
+            description: Storage System
+            icon: fas fa-database
+            url: http://truenas.lan
+
+          - title: Proxmox
+            description: Hypervisor
+            icon: fas fa-layer-group
+            url: https://proxmox.lan
+
+          - title: Portainer
+            description: Container Management
+            icon: fas fa-box
+            url: http://portainer.lan
+
+
+      - name: Networking
+        icon: fas fa-network-wired
+        items:
+
+          - title: UniFi Controller
+            description: Network Controller
+            icon: fas fa-wifi
+            url: https://unifi.lan
+
+          - title: Router
+            description: Gateway Management
+            icon: fas fa-ethernet
+            url: http://router.lan
+
+
+      - name: Security
+        icon: fas fa-shield-alt
+        items:
+
+          - title: Authentik
+            description: Identity Provider
+            icon: fas fa-user-lock
+            url: https://auth.lan
+
+          - title: Vaultwarden
+            description: Password Manager
+            icon: fas fa-key
+            url: https://vaultwarden.lan
+
+
+      - name: Storage
+        icon: fas fa-hdd
+        items:
+
+          - title: TrueNAS Datasets
+            description: Storage Pools
+            icon: fas fa-database
+            url: http://truenas.lan/ui/storage
+
+
+      - name: System
+        icon: fas fa-microchip
+        items:
+
+          - title: Node Exporter Metrics
+            description: Host Metrics
+            icon: fas fa-heartbeat
+            url: http://prometheus.lan/targets
+
+          - title: Alertmanager
+            description: Alert Routing
+            icon: fas fa-bell
+            url: http://alertmanager.lan
+
 
 
 

@@ -64,3 +64,4 @@ data:
         grafana.lan: 192.168.2.100
         joplin.lan: 192.168.2.100
         truenas.lan: 192.168.2.5
+        router.lan: 192.168.2.1
