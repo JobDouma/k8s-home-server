@@ -133,5 +133,5 @@ resources:
   # ──────────────────────────────────────
   # Proxmox
   # ──────────────────────────────────────
-  - proxmox/service.yaml
-  - proxmox/ingressroute.yaml
+  # - proxmox/service.yaml
+  # - proxmox/ingressroute.yaml
