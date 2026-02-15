@@ -6,10 +6,9 @@ metadata:
 spec:
   entryPoints:
     - web
-
   routes:
     - match: Host(`traefik.lan`)
       kind: Rule
       services:
-        - name: api@internal
-          kind: TraefikService
+        - name: traefik
+          port: 9000
