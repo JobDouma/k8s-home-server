@@ -12,7 +12,7 @@ resources:
   # Controllers (Base)
   - traefik/base
   - traefik/resources/middlewares.yaml
-  
+
   - metallb/namespace.yaml
   - metallb/helmrelease.yaml
   - metallb/helmrepository.yaml
@@ -23,3 +23,4 @@ resources:
   - headlamp/helmrepository.yaml
   - headlamp/helmrelease.yaml
   - headlamp/ingressroute.yaml
+  - headlamp/serviceaccount.yaml
