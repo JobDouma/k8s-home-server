@@ -93,10 +93,10 @@ data:
         icon: fas fa-dharmachakra
         items:
 
-          - title: Kubernetes Dashboard
+          - title: Headlamp
             description: Cluster Management
             icon: fas fa-cubes
-            url: http://kubernetes.lan
+            url: http://headlamp.lan
 
           - title: FluxCD
             description: GitOps Controller
