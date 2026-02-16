@@ -10,5 +10,5 @@ spec:
     - match: Host(`blocky.lan`)
       kind: Rule
       services:
-        - name: blocky-main
+        - name: blocky
           port: 4000
