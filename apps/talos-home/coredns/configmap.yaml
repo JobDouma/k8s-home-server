@@ -38,6 +38,8 @@ data:
 # Query → Blocky
 #       ↓ (if fails)
 #       → 1.1.1.1
-#       ↓ (if fails)
+#        (if fails)
 #       → 8.8.8.8
+#       ↓ (if Blocky is back after 5s health check)
+#       → Blocky
 
