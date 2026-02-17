@@ -10,84 +10,77 @@ spec:
   chart:
     spec:
       chart: renovate
-      version: "46.x"
+      version: "43.18.0"
       sourceRef:
         kind: HelmRepository
         name: renovate
         namespace: flux-system
 
   values:
+
     cronjob:
       schedule: "10 3 * * *"
       concurrencyPolicy: Forbid
-      successfulJobsHistoryLimit: 2
-      failedJobsHistoryLimit: 2
-      jobTemplate:
-        spec:
-          ttlSecondsAfterFinished: 36000   # 10 hours
 
     envFrom:
       - secretRef:
           name: renovate-secret
 
     env:
-      LOG_LEVEL: info
-      RENOVATE_AUTODISCOVER: "false"
-
-    securityContext:
-      runAsNonRoot: true
-      runAsUser: 1000
-      seccompProfile:
-        type: RuntimeDefault
-
-    containerSecurityContext:
-      allowPrivilegeEscalation: false
-      capabilities:
-        drop:
-          - ALL
+      LOG_LEVEL: debug
 
     renovate:
+
+      image:
+        repository: ghcr.io/renovatebot/renovate
+        tag: "43.18.0"
+
       config: |
         {
           "$schema": "https://docs.renovatebot.com/renovate-schema.json",
 
           "platform": "github",
-          "token": "${RENOVATE_TOKEN}",
+
+          "repositories": ["jobdouma/k8s-home-server"],
+
+          "autodiscover": false,
 
           "onboarding": false,
           "requireConfig": "optional",
 
-          "repositories": [
-            "jobdouma/k8s-home-server"
+          "dependencyDashboard": true,
+
+          "baseBranchPatterns": ["main"],
+
+          "enabledManagers": [
+            "flux",
+            "helm-values",
+            "kubernetes"
           ],
 
-          "baseBranches": ["main"],
+          "flux": {
+            "fileMatch": [
+              "(^|/)clusters/.+\\.ya?ml$",
+              "(^|/)infrastructure/.+\\.ya?ml$",
+              "(^|/)apps/.+\\.ya?ml$"
+            ],
+            "pinDigests": true
+          },
 
-          "dependencyDashboard": true,
-          "dependencyDashboardAutoclose": true,
-
-          "enabledManagers": ["kubernetes", "flux"],
+          "helm-values": {
+            "fileMatch": [
+              "(^|/)apps/.+\\.ya?ml$",
+              "(^|/)infrastructure/.+\\.ya?ml$"
+            ]
+          },
 
           "kubernetes": {
-            "managerFilePatterns": [
-              "/clusters/.+\\.ya?ml$",
-              "/infrastructure/.+\\.ya?ml$",
-              "/apps/.+\\.ya?ml$"
+            "fileMatch": [
+              "(^|/)apps/.+\\.ya?ml$",
+              "(^|/)infrastructure/.+\\.ya?ml$",
+              "(^|/)clusters/.+\\.ya?ml$"
             ]
           },
-
-          "flux": {
-            "managerFilePatterns": [
-              "/clusters/.+\\.ya?ml$",
-              "/infrastructure/.+\\.ya?ml$",
-              "/apps/.+\\.ya?ml$"
-            ]
-          },
-
-          "prConcurrentLimit": 5,
-          "branchConcurrentLimit": 5,
-
-          "automergeStrategy": "pr",
 
           "packageRules": [
             {
@@ -95,8 +88,7 @@ spec:
               "groupName": "all non-major updates",
               "groupSlug": "all-non-major",
               "automerge": true,
-              "automergeType": "pr",
-              "ignoreTests": false
+              "automergeType": "pr"
             },
             {
               "matchUpdateTypes": ["major"],
@@ -104,10 +96,3 @@ spec:
             }
           ]
         }
-
-    resources:
-      requests:
-        cpu: 100m
-        memory: 256Mi
-      limits:
-        memory: 1Gi
