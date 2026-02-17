@@ -27,7 +27,7 @@ spec:
           name: renovate-secret
 
     env:
-      LOG_LEVEL: debug
+      LOG_LEVEL: info
 
     renovate:
 
