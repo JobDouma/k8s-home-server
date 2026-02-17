@@ -121,7 +121,7 @@ data:
           - title: Proxmox
             description: Hypervisor
             icon: fas fa-layer-group
-            url: http://proxmox.lan
+            url: https://proxmox.lan:8006
 
           - title: Portainer
             description: Container Management
@@ -145,7 +145,7 @@ data:
           - title: Router
             description: Gateway Management
             icon: fas fa-ethernet
-            url: http://router.lan
+            url: https://router.lan
 
 
       - name: Security
