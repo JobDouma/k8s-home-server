@@ -69,6 +69,6 @@ data:
         headlamp.lan: 192.168.2.100
 
         # external infra
-        proxmox.lan: 192.168.2.10
+        proxmox.lan: 192.168.2.100
         truenas.lan: 192.168.2.5
         router.lan: 192.168.2.254
