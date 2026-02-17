@@ -135,3 +135,5 @@ resources:
   # ──────────────────────────────────────
   # - proxmox/service.yaml
   # - proxmox/ingressroute.yaml
+
+  - coredns/configmap.yaml
