@@ -4,8 +4,8 @@ metadata:
   name: proxmox-external
   namespace: networking
 spec:
-  type: ExternalName
-  externalName: 192.168.2.10
+  type: ClusterIP
   ports:
-    - port: 8006
+    - name: https
+      port: 8006
       targetPort: 8006
