@@ -25,6 +25,6 @@ resources:
   - headlamp/ingressroute.yaml
   - headlamp/serviceaccount.yaml
   
-  
+  - longhorn/namespace.yaml
   - longhorn/helmrepository.yaml
   - longhorn/helmrelease.yaml
