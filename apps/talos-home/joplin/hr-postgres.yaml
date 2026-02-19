@@ -37,18 +37,7 @@ spec:
 
     controllers:
       postgres:
-
         strategy: Recreate
-        pod:
-          affinity:
-            nodeAffinity:
-              requiredDuringSchedulingIgnoredDuringExecution:
-                nodeSelectorTerms:
-                  - matchExpressions:
-                      - key: kubernetes.io/hostname
-                        operator: In
-                        values:
-                          - talos-cp-1
         containers:
           app:
             image:
@@ -121,13 +110,17 @@ spec:
       data:
         enabled: true
         type: persistentVolumeClaim
+        
         accessMode: ReadWriteOnce
         size: 10Gi
-        storageClass: local-path
-        globalMounts:
-          - path: /var/lib/postgresql/data
+        storageClass: longhorn
 
-        #persistence for truenas
+        advancedMounts:
+          postgres:
+            app:
+              - path: /var/lib/postgresql/data
+
+        
         # type: persistentVolumeClaim
         # existingClaim: joplin-postgres-config
         # globalMounts:

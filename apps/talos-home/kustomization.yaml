@@ -133,9 +133,9 @@ resources:
   # ──────────────────────────────────────
   # Proxmox
   # ──────────────────────────────────────
-  - proxmox/service.yaml
-  - proxmox/ingressroute.yaml
-  - proxmox/endpoints.yaml
+  # - proxmox/service.yaml
+  # - proxmox/ingressroute.yaml
+  # - proxmox/endpoints.yaml
 
   # ──────────────────────────────────────
   # CoreDNS to Blocky
