@@ -1,7 +1,7 @@
 apiVersion: source.toolkit.fluxcd.io/v1
 kind: HelmRepository
 metadata:
-  name: rancher
+  name: local-path-provisioner
   namespace: flux-system
 spec:
   interval: 1h
