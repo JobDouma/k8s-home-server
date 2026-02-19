@@ -39,7 +39,16 @@ spec:
       postgres:
 
         strategy: Recreate
-
+        pod:
+          affinity:
+            nodeAffinity:
+              requiredDuringSchedulingIgnoredDuringExecution:
+                nodeSelectorTerms:
+                  - matchExpressions:
+                      - key: kubernetes.io/hostname
+                        operator: In
+                        values:
+                          - talos-cp-1
         containers:
           app:
             image:
@@ -52,7 +61,7 @@ spec:
                   name: joplin-secret
 
             env:
-              PGDATA: /var/lib/postgresql/data
+              PGDATA: /var/lib/postgresql/data/pgdata
 
               # Proper secure initialization
               POSTGRES_INITDB_ARGS: "--auth-host=scram-sha-256 --auth-local=trust"
@@ -112,6 +121,14 @@ spec:
       data:
         enabled: true
         type: persistentVolumeClaim
-        existingClaim: joplin-postgres-config
+        accessMode: ReadWriteOnce
+        size: 10Gi
+        storageClass: local-path
         globalMounts:
           - path: /var/lib/postgresql/data
+
+        #persistence for truenas
+        # type: persistentVolumeClaim
+        # existingClaim: joplin-postgres-config
+        # globalMounts:
+        #   - path: /var/lib/postgresql/data
