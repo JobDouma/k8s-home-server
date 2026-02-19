@@ -104,8 +104,8 @@ resources:
   # ──────────────────────────────────────
   # Sabnzbd
   # ──────────────────────────────────────
-  - sabnzbd/helmrelease.yaml
-  - sabnzbd/ingressroute.yaml
+  # - sabnzbd/helmrelease.yaml
+  # - sabnzbd/ingressroute.yaml
 
   # ──────────────────────────────────────
   # Recyclarr
