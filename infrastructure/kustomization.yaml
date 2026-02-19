@@ -24,3 +24,5 @@ resources:
   - headlamp/helmrelease.yaml
   - headlamp/ingressroute.yaml
   - headlamp/serviceaccount.yaml
+
+  - local-path-provisioner/helmrelease.yaml
