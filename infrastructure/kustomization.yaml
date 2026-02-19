@@ -25,4 +25,5 @@ resources:
   - headlamp/ingressroute.yaml
   - headlamp/serviceaccount.yaml
 
+  - local-path-provisioner/helmrepository.yaml
   - local-path-provisioner/helmrelease.yaml
