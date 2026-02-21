@@ -58,6 +58,11 @@ spec:
             "kubernetes"
           ],
 
+          "platformAutomerge": true,
+          "automergeStrategy": "squash",
+          "prCreation": "immediate",
+          "rebaseWhen": "never",
+
           "flux": {
             "fileMatch": [
               "(^|/)clusters/.+\\.ya?ml$",
