@@ -33,7 +33,7 @@ spec:
 
       image:
         repository: ghcr.io/renovatebot/renovate
-        tag: "43.18.0"
+        tag: "43.29.2"
 
       config: |
         {
