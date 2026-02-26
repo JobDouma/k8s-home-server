@@ -73,6 +73,11 @@ data:
             icon: fas fa-sticky-note
             url: http://joplin.lan
 
+          - title: FreshRSS
+            description: RSS Reader & News Aggregator
+            icon: fas fa-rss
+            url: http://freshrss.lan
+
 
       - name: Monitoring
         icon: fas fa-chart-line
@@ -161,35 +166,3 @@ data:
             description: Password Manager
             icon: fas fa-key
             url: http://vaultwarden.lan
-
-
-      - name: Storage
-        icon: fas fa-hdd
-        items:
-
-          - title: TrueNAS Datasets
-            description: Storage Pools
-            icon: fas fa-database
-            url: http://truenas.lan/ui/storage
-
-
-      - name: System
-        icon: fas fa-microchip
-        items:
-
-          - title: Node Exporter Metrics
-            description: Host Metrics
-            icon: fas fa-heartbeat
-            url: http://prometheus.lan/targets
-
-          - title: Alertmanager
-            description: Alert Routing
-            icon: fas fa-bell
-            url: http://alertmanager.lan
-
-
-
-
-# If you want raw IPs instead of DNS, replace the links above with:
-# link: http://192.168.2.100  (and use Traefik host routing won’t work with IP)
-# Better: keep .lan hostnames, since Traefik routes by Host header.
