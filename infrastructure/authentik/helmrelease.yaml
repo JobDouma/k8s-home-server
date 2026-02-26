@@ -30,6 +30,12 @@ spec:
       existingSecret:
         secretName: authentik-secret
 
+      postgresql:
+        host: authentik-postgresql.authentik.svc.cluster.local
+        port: 5432
+        name: authentik
+        user: authentik
+
       error_reporting:
         enabled: false
 
@@ -57,7 +63,7 @@ spec:
       primary:
         persistence:
           enabled: true
-          storageClass: truenas-nfs   # use this if longhorn unstable
+          storageClass: longhorn
           size: 10Gi
       readReplicas:
         replicaCount: 0
