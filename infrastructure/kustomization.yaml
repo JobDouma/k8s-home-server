@@ -9,10 +9,10 @@ resources:
   - storage/pvc-media.yaml
   - storage/pvc-tank-configs.yaml
 
-  - traefik/namespace.yaml
-  - traefik/helmrepository.yaml
-  - traefik/helmrelease.yaml
-  - traefik/ingressroute.yaml
+  - traefik/base/namespace.yaml
+  - traefik/base/helmrepository.yaml
+  - traefik/base/helmrelease.yaml
+  - traefik/base/ingressroute.yaml
   - traefik/resources/middlewares.yaml
 
   - metallb/namespace.yaml
