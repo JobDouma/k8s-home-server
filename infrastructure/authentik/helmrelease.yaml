@@ -38,12 +38,6 @@ spec:
 
     server:
       replicas: 2
-      service:
-        type: ClusterIP
-        servicePortHttp: 80
-        servicePortHttps: 443
-      ingress:
-        enabled: false
 
     worker:
       replicas: 1
@@ -59,8 +53,6 @@ spec:
           enabled: true
           storageClass: longhorn
           size: 10Gi
-      readReplicas:
-        replicaCount: 0
 
     redis:
       enabled: true
