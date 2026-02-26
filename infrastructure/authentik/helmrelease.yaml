@@ -1,0 +1,62 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: authentik
+  namespace: authentik
+spec:
+  interval: 15m
+  timeout: 20m
+
+  install:
+    remediation:
+      retries: 3
+
+  upgrade:
+    remediation:
+      retries: 3
+
+  chart:
+    spec:
+      chart: authentik
+      version: "2026.2.0"
+      sourceRef:
+        kind: HelmRepository
+        name: authentik
+        namespace: flux-system
+
+  values:
+    authentik:
+      secret_key: ""
+      existingSecret: authentik-secret
+
+      error_reporting:
+        enabled: false
+
+      web:
+        path: "/"
+
+    server:
+      replicas: 2
+      service:
+        type: ClusterIP
+        servicePortHttp: 80
+        servicePortHttps: 443
+      ingress:
+        enabled: false
+
+    worker:
+      replicas: 1
+
+    postgresql:
+      enabled: true
+      auth:
+        username: authentik
+        database: authentik
+        password: ""
+      primary:
+        persistence:
+          enabled: true
+          storageClass: longhorn
+          size: 10Gi
+      readReplicas:
+        replicaCount: 0

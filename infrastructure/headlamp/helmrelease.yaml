@@ -15,12 +15,23 @@ spec:
         namespace: flux-system
 
   values:
-
     replicaCount: 2
 
     service:
       type: ClusterIP
       port: 80
+
+    # Make Headlamp use in-cluster auth automatically (no manual token paste)
+    config:
+      inCluster: true
+
+    serviceAccount:
+      create: false
+      name: headlamp-admin
+
+    # You already manage RBAC manually via serviceaccount.yaml
+    clusterRoleBinding:
+      create: false
 
     resources:
       requests:
