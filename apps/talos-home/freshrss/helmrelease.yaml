@@ -1,0 +1,97 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: freshrss
+  namespace: freshrss
+spec:
+  interval: 15m
+  timeout: 10m
+
+  install:
+    remediation:
+      retries: 3
+
+  upgrade:
+    remediation:
+      strategy: uninstall
+      retries: 3
+
+  chart:
+    spec:
+      chart: app-template
+      version: "4.6.2"
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s
+        namespace: flux-system
+
+  values:
+    controllers:
+      main:
+        replicas: 1
+
+        pod:
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 33
+            runAsGroup: 33
+            fsGroup: 33
+            seccompProfile:
+              type: RuntimeDefault
+
+        containers:
+          main:
+            image:
+              repository: freshrss/freshrss
+              tag: latest
+
+            env:
+              TZ: Europe/Amsterdam
+              CRON_MIN: "*/20"
+
+            ports:
+              - name: http
+                containerPort: 80
+                protocol: TCP
+
+            securityContext:
+              allowPrivilegeEscalation: false
+              capabilities:
+                drop:
+                  - ALL
+
+    service:
+      main:
+        controller: main
+        enabled: true
+        type: ClusterIP
+        ports:
+          http:
+            port: 80
+            targetPort: http
+
+    persistence:
+      data:
+        enabled: true
+        storageClass: longhorn
+        accessMode: ReadWriteOnce
+        size: 5Gi
+        globalMounts:
+          - path: /var/www/FreshRSS/data
+
+      extensions:
+        enabled: true
+        storageClass: longhorn
+        accessMode: ReadWriteOnce
+        size: 1Gi
+        globalMounts:
+          - path: /var/www/FreshRSS/extensions
+
+      opml:
+        enabled: true
+        type: configMap
+        name: freshrss-opml
+        globalMounts:
+          - path: /bootstrap/feeds.opml
+            subPath: feeds.opml
+            readOnly: true

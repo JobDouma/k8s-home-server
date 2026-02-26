@@ -1,0 +1,39 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: freshrss-opml
+  namespace: freshrss
+data:
+  feeds.opml: |
+    <?xml version="1.0" encoding="UTF-8"?>
+    <opml version="2.0">
+      <head>
+        <title>Preloaded Feeds</title>
+      </head>
+      <body>
+
+        <outline text="News">
+          <outline text="Reuters World" type="rss" xmlUrl="https://feeds.reuters.com/Reuters/worldNews"/>
+          <outline text="BBC World" type="rss" xmlUrl="http://feeds.bbci.co.uk/news/world/rss.xml"/>
+          <outline text="Associated Press" type="rss" xmlUrl="https://feeds.apnews.com/apnews"/>
+          <outline text="Politico" type="rss" xmlUrl="https://www.politico.com/rss/politics08.xml"/>
+        </outline>
+
+        <outline text="Cyber Security">
+          <outline text="Krebs on Security" type="rss" xmlUrl="https://krebsonsecurity.com/feed/"/>
+          <outline text="The Hacker News" type="rss" xmlUrl="https://feeds.feedburner.com/TheHackersNews"/>
+          <outline text="BleepingComputer" type="rss" xmlUrl="https://www.bleepingcomputer.com/feed/"/>
+          <outline text="Dark Reading" type="rss" xmlUrl="https://www.darkreading.com/rss.xml"/>
+          <outline text="SANS ISC" type="rss" xmlUrl="https://isc.sans.edu/rssfeed.xml"/>
+        </outline>
+
+        <outline text="Cloud Engineering">
+          <outline text="AWS News Blog" type="rss" xmlUrl="https://aws.amazon.com/blogs/aws/feed/"/>
+          <outline text="Google Cloud Blog" type="rss" xmlUrl="https://cloudblog.withgoogle.com/rss/"/>
+          <outline text="Microsoft Azure Blog" type="rss" xmlUrl="https://azure.microsoft.com/en-us/blog/feed/"/>
+          <outline text="CNCF Blog" type="rss" xmlUrl="https://www.cncf.io/feed/"/>
+          <outline text="Kubernetes Blog" type="rss" xmlUrl="https://kubernetes.io/feed.xml"/>
+        </outline>
+
+      </body>
+    </opml>
