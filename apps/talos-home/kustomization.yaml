@@ -141,3 +141,11 @@ resources:
   # CoreDNS to Blocky
   # ──────────────────────────────────────
   - coredns/configmap.yaml
+
+  # ──────────────────────────────────────
+  # FreshRSS
+  # ──────────────────────────────────────
+  - freshrss/namespace.yaml
+  - freshrss/opml-configmap.yaml
+  - freshrss/helmrelease.yaml
+  - freshrss/ingressroute.yaml
