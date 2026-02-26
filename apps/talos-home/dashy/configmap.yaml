@@ -103,11 +103,6 @@ data:
             icon: fas fa-cubes
             url: http://headlamp.lan
 
-          - title: FluxCD
-            description: GitOps Controller
-            icon: fas fa-code-branch
-            url: http://flux.lan
-
           - title: Traefik
             description: Ingress Controller
             icon: fas fa-route

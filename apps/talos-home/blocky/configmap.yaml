@@ -68,6 +68,7 @@ data:
         blocky.lan: 192.168.2.100
         headlamp.lan: 192.168.2.100
         freshrss.lan: 192.168.2.100
+        auth.lan: 192.168.2.100
 
         # external infra
         proxmox.lan: 192.168.2.100
