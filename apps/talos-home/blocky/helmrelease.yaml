@@ -30,7 +30,7 @@ spec:
         replicas: 2
 
         pod:
-          dnsPolicy: ClusterFirst
+          dnsPolicy: Default
           affinity:
             podAntiAffinity:
               requiredDuringSchedulingIgnoredDuringExecution:
