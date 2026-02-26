@@ -1,17 +1,17 @@
 apiVersion: traefik.io/v1alpha1
 kind: IngressRoute
 metadata:
-  name: traefik-dashboard
-  namespace: networking
+  name: authentik
+  namespace: authentik
 spec:
   entryPoints:
     - web
   routes:
-    - match: Host(`traefik.lan`)
+    - match: Host(`auth.lan`)
       kind: Rule
       services:
-        - name: api@internal
-          kind: TraefikService
+        - name: authentik-server
+          port: 80
       middlewares:
         - name: lan-headers
-        - name: authentik-forwardauth
+          namespace: networking
