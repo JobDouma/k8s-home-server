@@ -79,11 +79,13 @@ spec:
             targetPort: http
 
     persistence:
-
       pm2:
         enabled: true
         type: persistentVolumeClaim
-        existingClaim: joplin-app-config
+        accessMode: ReadWriteOnce
+        size: 5Gi
+        storageClass: longhorn
+
         advancedMounts:
           joplin:
             app:
