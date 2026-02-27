@@ -32,7 +32,7 @@ spec:
   values:
     defaultSettings:
       defaultReplicaCount: 1
-      createDefaultDiskLabeledNodes: false
+      createDefaultDiskLabeledNodes: true
       defaultDataPath: /var/lib/longhorn
       replicaAutoBalance: best-effort
 
