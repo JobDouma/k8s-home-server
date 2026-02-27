@@ -37,7 +37,7 @@ spec:
         path: "/"
 
     server:
-      replicas: 2
+      replicas: 1
 
     worker:
       replicas: 1
