@@ -19,26 +19,3 @@ spec:
   storageClassName: ""
 
   volumeName: pv-tank-configs-media
-
----
-# ============================================
-# PersistentVolumeClaim for JOPLIN namespace
-# ============================================
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: tank-configs
-  namespace: joplin
-spec:
-  accessModes:
-    - ReadWriteMany
-
-  volumeMode: Filesystem
-
-  resources:
-    requests:
-      storage: 20Gi
-
-  storageClassName: ""
-
-  volumeName: pv-tank-configs-joplin
