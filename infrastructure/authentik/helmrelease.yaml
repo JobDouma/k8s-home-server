@@ -51,7 +51,7 @@ spec:
       primary:
         persistence:
           enabled: true
-          storageClass: longhorn-1r
+          storageClass: longhorn
           size: 10Gi
 
     redis:
