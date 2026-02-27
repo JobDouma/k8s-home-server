@@ -47,11 +47,11 @@ spec:
       auth:
         username: authentik
         database: authentik
-        password: ""
+        existingSecret: authentik-postgresql-secret
       primary:
         persistence:
           enabled: true
-          storageClass: longhorn
+          storageClass: longhorn-1r
           size: 10Gi
 
     redis:
