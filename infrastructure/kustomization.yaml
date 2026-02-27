@@ -30,7 +30,6 @@ resources:
   - longhorn/namespace.yaml
   - longhorn/helmrepository.yaml
   - longhorn/helmrelease.yaml
-  - longhorn/storageclass-longhorn-1r.yaml
 
   - authentik/namespace.yaml
   - authentik/helmrepository.yaml
