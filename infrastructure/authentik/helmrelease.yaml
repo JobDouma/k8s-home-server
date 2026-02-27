@@ -25,8 +25,8 @@ spec:
         namespace: flux-system
 
   values:
+
     authentik:
-      secret_key: ""
       existingSecret:
         secretName: authentik-secret
 
@@ -42,6 +42,7 @@ spec:
     worker:
       replicas: 1
 
+    # 👇 THIS deploys the Postgres chart
     postgresql:
       enabled: true
       auth:
