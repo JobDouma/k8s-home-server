@@ -19,13 +19,13 @@ spec:
 
     configuration:
       backupStorageLocation:
-        name: default
-        provider: velero.io/fs
-        bucket: velero
-        config:
-          path: /backups
+        - name: default
+          provider: velero.io/fs
+          bucket: velero
+          config:
+            path: /backups
 
-    deployRestic: true
+    deployNodeAgent: true
 
     persistence:
       enabled: true

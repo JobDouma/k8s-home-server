@@ -16,34 +16,23 @@ spec:
         name: grafana
         namespace: flux-system
 
-  install:
-    remediation:
-      retries: 3
-
-  upgrade:
-    remediation:
-      retries: 3
-
   values:
 
     deploymentMode: SingleBinary
+
+    # Disable scalable mode components explicitly
+    backend:
+      replicas: 0
+    read:
+      replicas: 0
+    write:
+      replicas: 0
 
     loki:
       auth_enabled: false
 
       commonConfig:
         replication_factor: 1
-
-      storage:
-        type: filesystem
-
-      storage_config:
-        boltdb_shipper:
-          active_index_directory: /var/loki/index
-          cache_location: /var/loki/cache
-          shared_store: filesystem
-        filesystem:
-          directory: /var/loki/chunks
 
       schemaConfig:
         configs:
@@ -55,14 +44,27 @@ spec:
               prefix: index_
               period: 24h
 
+      storage_config:
+        boltdb_shipper:
+          active_index_directory: /var/loki/index
+          cache_location: /var/loki/cache
+          shared_store: filesystem
+        filesystem:
+          directory: /var/loki/chunks
+
+      limits_config:
+        retention_period: 168h  # 7 days
+
     singleBinary:
+      nodeSelector:
+        kubernetes.io/hostname: talos-cp-1
       replicas: 1
       persistence:
         enabled: true
         storageClass: longhorn
         accessModes:
           - ReadWriteOnce
-        size: 50Gi
+        size: 10Gi
 
     gateway:
       enabled: true
