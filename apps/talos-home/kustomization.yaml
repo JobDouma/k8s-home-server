@@ -164,4 +164,5 @@ resources:
   # ──────────────────────────────────────
   - velero/namespace.yaml
   - velero/pvc.yaml
+  - velero/helmrepository.yaml
   - velero/helmrelease.yaml
