@@ -1,6 +1,17 @@
 apiVersion: traefik.io/v1alpha1
 kind: Middleware
 metadata:
+  name: traefik-chain
+  namespace: networking
+spec:
+  chain:
+    middlewares:
+      - name: lan-headers
+      - name: authentik-forwardauth
+---
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
   name: lan-headers
   namespace: networking
 spec:
@@ -16,7 +27,7 @@ metadata:
   namespace: networking
 spec:
   forwardAuth:
-    address: http://authentik-server.authentik.svc.cluster.local/outpost.goauthentik.io/auth/traefik
+    address: http://authentik-server.authentik.svc.cluster.local:80/outpost.goauthentik.io/auth/traefik
     trustForwardHeader: true
     authResponseHeaders:
       - X-authentik-username
@@ -25,8 +36,3 @@ spec:
       - X-authentik-name
       - X-authentik-uid
       - X-authentik-jwt
-      - X-authentik-meta-jwks
-      - X-authentik-meta-outpost
-      - X-authentik-meta-provider
-      - X-authentik-meta-app
-      - X-authentik-meta-version
