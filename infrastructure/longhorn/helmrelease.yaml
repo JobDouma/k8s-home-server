@@ -48,3 +48,11 @@ spec:
 
     csi:
       kubeletRootDir: /var/lib/kubelet
+    
+    longhornDriver:
+      tolerations:
+        - operator: Exists
+
+    longhornUI:
+      tolerations:
+        - operator: Exists
