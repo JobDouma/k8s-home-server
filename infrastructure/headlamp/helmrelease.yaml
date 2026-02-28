@@ -21,15 +21,21 @@ spec:
       type: ClusterIP
       port: 80
 
-    # Make Headlamp use in-cluster auth automatically (no manual token paste)
     config:
-      inCluster: true
+      oidc:
+        clientID: "JCh5JqdWtaeixQDMyQbkdJBNxyUTuZtpXfBJDyPL"
+        clientSecret: "ezWKekHCxpbYltL2VemZG2Kw7uuSePMa94GBGGFfqqore9ta6hYjsXFQSB5J27t4m80Rgrp8JONZfNzditNfOazPhXRcWOgIUAQOI1yxwpnEJVhJSYe0hDvFS2p4TVTJ"
+        issuerURL: "http://auth.lan/application/o/headlamp-oidc/"
+        scopes:
+          - openid
+          - profile
+          - email
+        usernameClaim: preferred_username
+        groupsClaim: groups
 
     serviceAccount:
       create: false
-      name: headlamp-admin
 
-    # You already manage RBAC manually via serviceaccount.yaml
     clusterRoleBinding:
       create: false
 
