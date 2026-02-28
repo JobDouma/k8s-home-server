@@ -21,10 +21,14 @@ spec:
       type: ClusterIP
       port: 80
 
+    extraEnvFrom:
+      - secretRef:
+          name: headlamp-oidc-secret
+
     config:
       oidc:
-        clientID: "JCh5JqdWtaeixQDMyQbkdJBNxyUTuZtpXfBJDyPL"
-        clientSecret: "REDACTED"
+        clientID: ${OIDC_CLIENT_ID}
+        clientSecret: ${OIDC_CLIENT_SECRET}
         issuerURL: "http://auth.lan/application/o/headlamp-oidc/"
         scopes:
           - openid
