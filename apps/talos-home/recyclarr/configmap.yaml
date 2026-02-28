@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: recyclarr-config
+  namespace: media
+data:
+  recyclarr.yml: |
+    radarr:
+      movies:
+        base_url: ${RADARR_URL}
+        api_key: ${RADARR_APIKEY}
+        include:
+          - template: remux-web-2160p
+          - template: hd-bluray-web
+
+    sonarr:
+      series:
+        base_url: ${SONARR_URL}
+        api_key: ${SONARR_APIKEY}
+        include:
+          - template: web-1080p

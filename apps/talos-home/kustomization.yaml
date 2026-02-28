@@ -112,9 +112,9 @@ resources:
   # ──────────────────────────────────────
   # Recyclarr
   # ──────────────────────────────────────
-  - recyclarr/recyclarr-config.yaml
-  - recyclarr/recyclarr-secrets.yaml
-  - recyclarr/recyclarr-sync.yaml
+  - recyclarr/configmap.yaml
+  - recyclarr/secret.yaml
+  - recyclarr/cronjob.yaml
 
   # ──────────────────────────────────────
   # Joplin

@@ -1,7 +1,7 @@
 apiVersion: batch/v1
 kind: CronJob
 metadata:
-  name: recyclarr-sync
+  name: recyclarr-cronjob
   namespace: media
 spec:
   schedule: "0 */6 * * *"
@@ -10,34 +10,32 @@ spec:
   failedJobsHistoryLimit: 3
   jobTemplate:
     spec:
-      ttlSecondsAfterFinished: 7200   # 2 hours
+      ttlSecondsAfterFinished: 7200
       backoffLimit: 1
       template:
         spec:
           restartPolicy: Never
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 1000
+            fsGroup: 1000
+            seccompProfile:
+              type: RuntimeDefault
           volumes:
             - name: config
               configMap:
                 name: recyclarr-config
-            - name: secrets-kv
-              secret:
-                secretName: recyclarr-secrets
-            - name: work
-              emptyDir: {}
-          initContainers:
-            - name: render-secrets-yml
-              image: alpine:3.23
-              command:
-                - /bin/sh
-                - -ec
-                - |
-                  cat > /work/secrets.yml <<EOF
-                  radarr_url: ${RADARR_URL}
-                  radarr_apikey: ${RADARR_APIKEY}
-                  sonarr_url: ${SONARR_URL}
-                  sonarr_apikey: ${SONARR_APIKEY}
-                  EOF
+          containers:
+            - name: recyclarr
+              image: ghcr.io/recyclarr/recyclarr:latest
+              imagePullPolicy: IfNotPresent
+              securityContext:
+                allowPrivilegeEscalation: false
+                capabilities:
+                  drop: ["ALL"]
               env:
+                - name: TZ
+                  value: Europe/Amsterdam
                 - name: RADARR_URL
                   valueFrom:
                     secretKeyRef:
@@ -58,22 +56,9 @@ spec:
                     secretKeyRef:
                       name: recyclarr-secrets
                       key: sonarr_apikey
-              volumeMounts:
-                - name: work
-                  mountPath: /work
-          containers:
-            - name: recyclarr
-              image: ghcr.io/recyclarr/recyclarr:8.3.2
-              imagePullPolicy: IfNotPresent
-              env:
-                - name: TZ
-                  value: Europe/Amsterdam
               args:
                 - sync
               volumeMounts:
                 - name: config
                   mountPath: /config/recyclarr.yml
                   subPath: recyclarr.yml
-                - name: work
-                  mountPath: /config/secrets.yml
-                  subPath: secrets.yml
