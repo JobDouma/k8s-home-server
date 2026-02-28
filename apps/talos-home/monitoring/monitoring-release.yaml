@@ -28,23 +28,62 @@ spec:
       retries: 3
 
   values:
+
     prometheus:
       service:
         type: ClusterIP
         port: 9090
 
       prometheusSpec:
+        retention: 15d
+        walCompression: true
+
         serviceMonitorSelector: {}
         serviceMonitorNamespaceSelector: {}
         podMonitorSelector: {}
         podMonitorNamespaceSelector: {}
 
+        storageSpec:
+          volumeClaimTemplate:
+            spec:
+              storageClassName: longhorn
+              accessModes:
+                - ReadWriteOnce
+              resources:
+                requests:
+                  storage: 20Gi
+
+    alertmanager:
+      alertmanagerSpec:
+        storage:
+          volumeClaimTemplate:
+            spec:
+              storageClassName: longhorn
+              accessModes:
+                - ReadWriteOnce
+              resources:
+                requests:
+                  storage: 5Gi
+
     prometheus-node-exporter:
       enabled: true
       hostRootFsMount:
         enabled: false
-    
+
     grafana:
       admin:
         existingSecret: grafana-admin
 
+      persistence:
+        enabled: true
+        storageClassName: longhorn
+        accessModes:
+          - ReadWriteOnce
+        size: 5Gi
+
+      additionalDataSources:
+        - name: Loki
+          type: loki
+          access: proxy
+          url: http://loki-gateway.monitoring.svc.cluster.local
+          isDefault: false

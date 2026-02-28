@@ -156,3 +156,10 @@ resources:
   - falco/namespace.yaml
   - falco/helmrepository.yaml
   - falco/helmrelease.yaml
+
+  # ──────────────────────────────────────
+  # Velero (K8s-backup)
+  # ──────────────────────────────────────
+  - velero/namespace.yaml
+  - velero/pvc.yaml
+  - velero/helmrelease.yaml
