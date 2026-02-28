@@ -38,9 +38,21 @@ spec:
 
     server:
       replicas: 1
+      livenessProbe:
+        enabled: false
+      readinessProbe:
+        enabled: false
+      startupProbe:
+        enabled: false
 
     worker:
       replicas: 1
+      livenessProbe:
+        enabled: false
+      readinessProbe:
+        enabled: false
+      startupProbe:
+        enabled: false
 
     # 👇 THIS deploys the Postgres chart
     postgresql:

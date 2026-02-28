@@ -37,9 +37,10 @@ spec:
     persistence:
       config:
         enabled: true
-        storageClass: truenas-nfs
-        accessMode: ReadWriteMany
-        size: 5Gi
+        type: pvc
+        existingClaim: tank-configs
+        mountPath: /config
+        subPath: jellyfin
       media:
         enabled: true
         type: pvc
