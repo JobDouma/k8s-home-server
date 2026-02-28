@@ -17,6 +17,9 @@ data:
           <outline text="BBC World" type="rss" xmlUrl="http://feeds.bbci.co.uk/news/world/rss.xml"/>
           <outline text="Associated Press" type="rss" xmlUrl="https://feeds.apnews.com/apnews"/>
           <outline text="Politico" type="rss" xmlUrl="https://www.politico.com/rss/politics08.xml"/>
+          <outline text="Financial Times World" type="rss" xmlUrl="https://www.ft.com/world?format=rss"/>
+          <outline text="Al Jazeera English" type="rss" xmlUrl="https://www.aljazeera.com/xml/rss/all.xml"/>
+          <outline text="The Economist International" type="rss" xmlUrl="https://www.economist.com/international/rss.xml"/>
         </outline>
 
         <outline text="Cyber Security">
@@ -25,6 +28,11 @@ data:
           <outline text="BleepingComputer" type="rss" xmlUrl="https://www.bleepingcomputer.com/feed/"/>
           <outline text="Dark Reading" type="rss" xmlUrl="https://www.darkreading.com/rss.xml"/>
           <outline text="SANS ISC" type="rss" xmlUrl="https://isc.sans.edu/rssfeed.xml"/>
+          <outline text="Schneier on Security" type="rss" xmlUrl="https://www.schneier.com/blog/atom.xml"/>
+          <outline text="Google Project Zero" type="rss" xmlUrl="https://googleprojectzero.blogspot.com/feeds/posts/default"/>
+          <outline text="CISA Alerts" type="rss" xmlUrl="https://www.cisa.gov/uscert/ncas/alerts.xml"/>
+          <outline text="NVD Recent CVEs" type="rss" xmlUrl="https://nvd.nist.gov/feeds/xml/cve/misc/nvd-rss.xml"/>
+          <outline text="The DFIR Report" type="rss" xmlUrl="https://thedfirreport.com/feed/"/>
         </outline>
 
         <outline text="Cloud Engineering">
@@ -33,6 +41,29 @@ data:
           <outline text="Microsoft Azure Blog" type="rss" xmlUrl="https://azure.microsoft.com/en-us/blog/feed/"/>
           <outline text="CNCF Blog" type="rss" xmlUrl="https://www.cncf.io/feed/"/>
           <outline text="Kubernetes Blog" type="rss" xmlUrl="https://kubernetes.io/feed.xml"/>
+          <outline text="Cloudflare Blog" type="rss" xmlUrl="https://blog.cloudflare.com/rss/"/>
+          <outline text="Netflix Tech Blog" type="rss" xmlUrl="https://netflixtechblog.com/feed"/>
+          <outline text="Uber Engineering" type="rss" xmlUrl="https://eng.uber.com/feed/"/>
+        </outline>
+
+        <outline text="Homelab & Infrastructure">
+          <outline text="ServeTheHome" type="rss" xmlUrl="https://www.servethehome.com/feed/"/>
+          <outline text="Jeff Geerling" type="rss" xmlUrl="https://www.jeffgeerling.com/blog.xml"/>
+          <outline text="Level1Techs" type="rss" xmlUrl="https://level1techs.com/rss.xml"/>
+          <outline text="Ars Technica IT" type="rss" xmlUrl="http://feeds.arstechnica.com/arstechnica/technology-lab"/>
+        </outline>
+
+        <outline text="Scientific & Research">
+          <outline text="arXiv Cryptography" type="rss" xmlUrl="http://export.arxiv.org/rss/cs.CR"/>
+          <outline text="arXiv Distributed Systems" type="rss" xmlUrl="http://export.arxiv.org/rss/cs.DC"/>
+          <outline text="Nature Technology" type="rss" xmlUrl="https://www.nature.com/subjects/computer-science.rss"/>
+          <outline text="ScienceDaily Tech" type="rss" xmlUrl="https://www.sciencedaily.com/rss/computers_math.xml"/>
+        </outline>
+
+        <outline text="Governance & Compliance">
+          <outline text="ENISA News" type="rss" xmlUrl="https://www.enisa.europa.eu/news/rss"/>
+          <outline text="NIST News" type="rss" xmlUrl="https://www.nist.gov/news-events/news/rss.xml"/>
+          <outline text="OWASP Blog" type="rss" xmlUrl="https://owasp.org/feed.xml"/>
         </outline>
 
       </body>
