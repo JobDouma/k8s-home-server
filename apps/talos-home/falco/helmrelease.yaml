@@ -23,7 +23,6 @@ spec:
       retries: 3
 
   values:
-
     driver:
       kind: modern_ebpf
 
@@ -31,16 +30,26 @@ spec:
       jsonOutput: true
       logLevel: info
 
+    daemonset:
+      tolerations:
+        - operator: Exists
+
+      hostNetwork: true
+      hostPID: true
+
+      securityContext:
+        privileged: true
+
     falcosidekick:
       enabled: true
-
       config:
         loki:
-          hostport: "http://loki-gateway.monitoring.svc.cluster.local"
-          minimumpriority: "warning"
+          hostport: http://loki-gateway.monitoring.svc.cluster.local
+          minimumpriority: warning
+
     resources:
+      limits:
+        memory: 512Mi
       requests:
         cpu: 100m
         memory: 256Mi
-      limits:
-        memory: 512Mi
