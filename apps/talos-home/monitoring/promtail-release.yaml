@@ -5,28 +5,21 @@ metadata:
   namespace: monitoring
 spec:
   interval: 30m
+  timeout: 20m
 
   chart:
     spec:
       chart: promtail
-      version: "6.15.5"
+      version: "6.16.5"
       sourceRef:
         kind: HelmRepository
         name: grafana
         namespace: flux-system
 
   values:
+    tolerations:
+      - operator: Exists
 
     config:
       clients:
         - url: http://loki-gateway.monitoring.svc.cluster.local/loki/api/v1/push
-
-    tolerations:
-      - operator: Exists
-
-    resources:
-      requests:
-        cpu: 50m
-        memory: 64Mi
-      limits:
-        memory: 256Mi
