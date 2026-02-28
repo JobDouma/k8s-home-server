@@ -9,22 +9,18 @@ data:
       movies:
         base_url: !secret radarr_url
         api_key: !secret radarr_apikey
-        replace_existing_custom_formats: true
-        delete_old_custom_formats: false
         include:
-          - template: radarr-v4-quality-definition-movie
-          - template: radarr-v4-quality-profile-remux-web-2160p
-          - template: radarr-v4-custom-formats-remux-web-2160p
-          - template: radarr-v4-quality-profile-hd-bluray-web
-          - template: radarr-v4-custom-formats-hd-bluray-web
+          - template: radarr-quality-definition
+          - template: radarr-quality-profile-remux-web-2160p
+          - template: radarr-custom-formats-remux-web-2160p
+          - template: radarr-quality-profile-hd-bluray-web
+          - template: radarr-custom-formats-hd-bluray-web
 
     sonarr:
       series:
         base_url: !secret sonarr_url
         api_key: !secret sonarr_apikey
-        replace_existing_custom_formats: true
-        delete_old_custom_formats: false
         include:
-          - template: sonarr-v4-quality-definition-series
-          - template: sonarr-v4-quality-profile-web-1080p
-          - template: sonarr-v4-custom-formats-web-1080p
+          - template: sonarr-quality-definition-series
+          - template: sonarr-quality-profile-web-1080p
+          - template: sonarr-custom-formats-web-1080p

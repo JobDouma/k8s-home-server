@@ -63,7 +63,7 @@ spec:
                   mountPath: /work
           containers:
             - name: recyclarr
-              image: ghcr.io/recyclarr/recyclarr:latest
+              image: ghcr.io/recyclarr/recyclarr:8.3.2
               imagePullPolicy: IfNotPresent
               env:
                 - name: TZ
