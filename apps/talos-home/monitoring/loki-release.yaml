@@ -17,7 +17,6 @@ spec:
         namespace: flux-system
 
   values:
-
     deploymentMode: SingleBinary
 
     # Disable scalable mode components explicitly
@@ -28,16 +27,30 @@ spec:
     write:
       replicas: 0
 
+    chunksCache:
+      enabled: false
+    resultsCache:
+      enabled: false
+
     loki:
       auth_enabled: false
 
+      # REQUIRED by chart templates even if using filesystem
+      storage:
+        type: filesystem
+        bucketNames:
+          chunks: chunks
+          ruler: ruler
+          admin: admin
+
       commonConfig:
         replication_factor: 1
+        path_prefix: /var/loki
 
       schemaConfig:
         configs:
-          - from: 2024-01-01
-            store: boltdb-shipper
+          - from: "2024-01-01"
+            store: tsdb
             object_store: filesystem
             schema: v13
             index:
@@ -45,20 +58,20 @@ spec:
               period: 24h
 
       storage_config:
-        boltdb_shipper:
-          active_index_directory: /var/loki/index
-          cache_location: /var/loki/cache
-          shared_store: filesystem
         filesystem:
           directory: /var/loki/chunks
 
+      compactor:
+        working_directory: /var/loki/compactor
+        retention_enabled: true
+
       limits_config:
-        retention_period: 168h  # 7 days
+        retention_period: 168h
 
     singleBinary:
+      replicas: 1
       nodeSelector:
         kubernetes.io/hostname: talos-cp-1
-      replicas: 1
       persistence:
         enabled: true
         storageClass: longhorn
@@ -68,3 +81,4 @@ spec:
 
     gateway:
       enabled: true
+      replicas: 1

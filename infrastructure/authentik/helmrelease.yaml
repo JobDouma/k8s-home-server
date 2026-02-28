@@ -29,48 +29,36 @@ spec:
     authentik:
       existingSecret:
         secretName: authentik-secret
-
       error_reporting:
         enabled: false
-
       web:
         path: "/"
 
     server:
       replicas: 1
-
       strategy:
         type: Recreate
 
       startupProbe:
-        enabled: true
         failureThreshold: 120
         periodSeconds: 10
         timeoutSeconds: 3
 
-      readinessProbe:
-        enabled: true
-
-      livenessProbe:
-        enabled: true
+      readinessProbe: {}
+      livenessProbe: {}
 
     worker:
       replicas: 1
-
       strategy:
         type: Recreate
 
       startupProbe:
-        enabled: true
         failureThreshold: 120
         periodSeconds: 10
         timeoutSeconds: 3
 
-      readinessProbe:
-        enabled: true
-
-      livenessProbe:
-        enabled: true
+      readinessProbe: {}
+      livenessProbe: {}
 
     postgresql:
       enabled: true
