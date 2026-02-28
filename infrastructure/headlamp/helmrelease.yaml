@@ -21,14 +21,10 @@ spec:
       type: ClusterIP
       port: 80
 
-    # OIDC configuration (NO service account, NO inCluster auth)
     config:
       oidc:
         issuerURL: "http://auth.lan/application/o/headlamp/"
-        scopes:
-          - openid
-          - profile
-          - email
+        scopes: "openid profile email"
         usernameClaim: preferred_username
         groupsClaim: groups
 
