@@ -35,11 +35,9 @@ spec:
       enabled: true
 
       config:
-        slack:
-          webhookurl: ""  # optional
-        webhook:
-          address: "http://loki-gateway.monitoring.svc.cluster.local/loki/api/v1/push"
-
+        loki:
+          hostport: "http://loki-gateway.monitoring.svc.cluster.local"
+          minimumpriority: "warning"
     resources:
       requests:
         cpu: 100m

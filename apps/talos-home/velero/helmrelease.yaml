@@ -1,0 +1,39 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: velero
+  namespace: velero
+spec:
+  interval: 30m
+
+  chart:
+    spec:
+      chart: velero
+      version: "6.0.0"
+      sourceRef:
+        kind: HelmRepository
+        name: vmware-tanzu
+        namespace: flux-system
+
+  values:
+
+    configuration:
+      backupStorageLocation:
+        name: default
+        provider: velero.io/fs
+        bucket: velero
+        config:
+          path: /backups
+
+    deployRestic: true
+
+    persistence:
+      enabled: true
+      existingClaim: velero-backup-storage
+
+    schedules:
+      daily:
+        schedule: "0 3 * * *"
+        template:
+          ttl: 720h
+          snapshotVolumes: false
