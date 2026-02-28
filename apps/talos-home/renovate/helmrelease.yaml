@@ -21,6 +21,9 @@ spec:
     cronjob:
       schedule: "10 3 * * *"
       concurrencyPolicy: Forbid
+      successfulJobsHistoryLimit: 0
+      failedJobsHistoryLimit: 1
+      ttlSecondsAfterFinished: 36000
 
     envFrom:
       - secretRef:
