@@ -9,9 +9,8 @@ spec:
   routes:
     - match: Host(`traefik.lan`)
       kind: Rule
+      middlewares:
+        - name: traefik-chain
       services:
         - name: api@internal
           kind: TraefikService
-      middlewares:
-        - name: lan-headers
-        - name: authentik-forwardauth

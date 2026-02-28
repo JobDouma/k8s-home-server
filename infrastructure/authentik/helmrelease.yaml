@@ -5,7 +5,7 @@ metadata:
   namespace: authentik
 spec:
   interval: 15m
-  timeout: 20m
+  timeout: 30m
 
   install:
     remediation:
@@ -38,23 +38,40 @@ spec:
 
     server:
       replicas: 1
-      livenessProbe:
-        enabled: false
-      readinessProbe:
-        enabled: false
+
+      strategy:
+        type: Recreate
+
       startupProbe:
-        enabled: false
+        enabled: true
+        failureThreshold: 120
+        periodSeconds: 10
+        timeoutSeconds: 3
+
+      readinessProbe:
+        enabled: true
+
+      livenessProbe:
+        enabled: true
 
     worker:
       replicas: 1
-      livenessProbe:
-        enabled: false
-      readinessProbe:
-        enabled: false
-      startupProbe:
-        enabled: false
 
-    # 👇 THIS deploys the Postgres chart
+      strategy:
+        type: Recreate
+
+      startupProbe:
+        enabled: true
+        failureThreshold: 120
+        periodSeconds: 10
+        timeoutSeconds: 3
+
+      readinessProbe:
+        enabled: true
+
+      livenessProbe:
+        enabled: true
+
     postgresql:
       enabled: true
       auth:

@@ -12,6 +12,3 @@ spec:
       services:
         - name: authentik-server
           port: 80
-      middlewares:
-        - name: lan-headers
-          namespace: networking

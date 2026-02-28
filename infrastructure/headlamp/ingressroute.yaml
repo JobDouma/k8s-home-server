@@ -9,11 +9,8 @@ spec:
   routes:
     - match: Host(`headlamp.lan`)
       kind: Rule
+      middlewares:
+        - name: headlamp-chain
       services:
         - name: headlamp
           port: 80
-      middlewares:
-        - name: lan-headers
-          namespace: networking
-        - name: authentik-forwardauth
-          namespace: networking
