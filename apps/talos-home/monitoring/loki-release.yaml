@@ -5,12 +5,12 @@ metadata:
   namespace: monitoring
 spec:
   interval: 30m
-  timeout: 20m
+  timeout: 30m
 
   chart:
     spec:
       chart: loki
-      version: "6.6.3"
+      version: "3.6.7"
       sourceRef:
         kind: HelmRepository
         name: grafana
@@ -19,7 +19,6 @@ spec:
   values:
     deploymentMode: SingleBinary
 
-    # Disable scalable mode components explicitly
     backend:
       replicas: 0
     read:
@@ -27,22 +26,8 @@ spec:
     write:
       replicas: 0
 
-    chunksCache:
-      enabled: false
-    resultsCache:
-      enabled: false
-
     loki:
       auth_enabled: false
-
-      # REQUIRED by chart templates even if using filesystem
-      storage:
-        type: filesystem
-        bucketNames:
-          chunks: chunks
-          ruler: ruler
-          admin: admin
-
       commonConfig:
         replication_factor: 1
         path_prefix: /var/loki
@@ -57,21 +42,22 @@ spec:
               prefix: index_
               period: 24h
 
+      storage:
+        type: filesystem
+        bucketNames:
+          chunks: chunks
+          ruler: ruler
+          admin: admin
+
       storage_config:
         filesystem:
           directory: /var/loki/chunks
 
-      compactor:
-        working_directory: /var/loki/compactor
-        retention_enabled: true
-
-      limits_config:
-        retention_period: 168h
-
     singleBinary:
       replicas: 1
-      nodeSelector:
-        kubernetes.io/hostname: talos-cp-1
+      tolerations:
+        - operator: Exists
+
       persistence:
         enabled: true
         storageClass: longhorn
@@ -82,3 +68,5 @@ spec:
     gateway:
       enabled: true
       replicas: 1
+      tolerations:
+        - operator: Exists
