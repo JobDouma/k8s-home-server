@@ -5,6 +5,7 @@ metadata:
   namespace: velero
 spec:
   interval: 30m
+  timeout: 20m
 
   chart:
     spec:
@@ -22,8 +23,11 @@ spec:
         - name: default
           provider: velero.io/fs
           bucket: velero
+          default: true
           config:
             path: /backups
+
+      volumeSnapshotLocation: []
 
     deployNodeAgent: true
 
@@ -33,6 +37,7 @@ spec:
 
     schedules:
       daily:
+        disabled: false
         schedule: "0 3 * * *"
         template:
           ttl: 720h
