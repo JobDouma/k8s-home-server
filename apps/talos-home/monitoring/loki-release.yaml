@@ -10,7 +10,7 @@ spec:
   chart:
     spec:
       chart: loki
-      version: "3.6.7"
+      version: "6.6.3"
       sourceRef:
         kind: HelmRepository
         name: grafana
@@ -28,9 +28,13 @@ spec:
 
     loki:
       auth_enabled: false
+
       commonConfig:
         replication_factor: 1
         path_prefix: /var/loki
+        storage:
+          filesystem:
+            directory: /var/loki
 
       schemaConfig:
         configs:
@@ -52,6 +56,14 @@ spec:
       storage_config:
         filesystem:
           directory: /var/loki/chunks
+
+      compactor:
+        retention_enabled: true
+        working_directory: /var/loki/compactor
+        delete_request_store: filesystem
+
+      limits_config:
+        retention_period: 168h
 
     singleBinary:
       replicas: 1
