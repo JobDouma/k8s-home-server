@@ -11,6 +11,7 @@ spec:
       kind: Rule
       middlewares:
         - name: traefik-chain
+          namespace: networking
       services:
         - name: api@internal
           kind: TraefikService

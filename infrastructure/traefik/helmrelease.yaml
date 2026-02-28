@@ -66,6 +66,7 @@ spec:
 
       kubernetesCRD:
         enabled: true
+        allowCrossNamespace: true
 
     additionalArguments:
       - "--providers.kubernetesingress.ingressclass=traefik"
