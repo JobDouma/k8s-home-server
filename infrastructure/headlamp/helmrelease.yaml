@@ -21,15 +21,10 @@ spec:
       type: ClusterIP
       port: 80
 
-    extraEnvFrom:
-      - secretRef:
-          name: headlamp-oidc-secret
-
+    # OIDC configuration (NO service account, NO inCluster auth)
     config:
       oidc:
-        clientID: ${OIDC_CLIENT_ID}
-        clientSecret: ${OIDC_CLIENT_SECRET}
-        issuerURL: "http://auth.lan/application/o/headlamp-oidc/"
+        issuerURL: "http://auth.lan/application/o/headlamp/"
         scopes:
           - openid
           - profile
@@ -37,6 +32,21 @@ spec:
         usernameClaim: preferred_username
         groupsClaim: groups
 
+    # Inject client ID + secret securely from SOPS-encrypted secret
+    extraEnv:
+      - name: HEADLAMP_CONFIG_OIDC_CLIENT_ID
+        valueFrom:
+          secretKeyRef:
+            name: headlamp-oidc-secret
+            key: clientID
+
+      - name: HEADLAMP_CONFIG_OIDC_CLIENT_SECRET
+        valueFrom:
+          secretKeyRef:
+            name: headlamp-oidc-secret
+            key: clientSecret
+
+    # Disable service account creation completely
     serviceAccount:
       create: false
 
