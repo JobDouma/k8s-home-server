@@ -14,6 +14,7 @@ resources:
   - traefik/helmrelease.yaml
   - traefik/ingressroute.yaml
   - traefik/middlewares.yaml
+  - traefik/servicemonitor.yaml
 
   - metallb/namespace.yaml
   - metallb/helmrelease.yaml
