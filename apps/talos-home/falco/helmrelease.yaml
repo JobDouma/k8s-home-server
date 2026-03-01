@@ -31,16 +31,27 @@ spec:
     daemonset:
       tolerations:
         - operator: Exists
-      hostNetwork: true
-      hostPID: true
-      securityContext:
-        privileged: true
     falcosidekick:
       enabled: true
+      replicaCount: 1
+      webui:
+        enabled: true          # optional but nice
+        replicaCount: 1
       config:
         loki:
           hostport: http://loki-gateway.monitoring.svc.cluster.local
           minimumpriority: warning
+          # These labels make Falco events queryable in Grafana
+          customHeaders: "X-Scope-OrgID: 1"
+        prometheus:
+          # falcosidekick exposes /metrics on port 2801
+          # this is scraped by Prometheus via ServiceMonitor below
+          hostport: ""
+          minimumpriority: ""
+      # Expose metrics for Prometheus scraping
+      podAnnotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "2801"
     resources:
       limits:
         memory: 512Mi

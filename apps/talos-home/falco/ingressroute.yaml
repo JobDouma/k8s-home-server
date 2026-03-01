@@ -1,0 +1,14 @@
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: falcosidekick-ui
+  namespace: falco
+spec:
+  entryPoints:
+    - web
+  routes:
+    - match: Host(`falco.lan`)
+      kind: Rule
+      services:
+        - name: falco-falcosidekick-ui
+          port: 2802
