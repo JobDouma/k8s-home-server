@@ -11,7 +11,6 @@ spec:
   jobTemplate:
     spec:
       ttlSecondsAfterFinished: 7200
-      backoffLimit: 1
       template:
         spec:
           restartPolicy: Never
@@ -22,20 +21,31 @@ spec:
             seccompProfile:
               type: RuntimeDefault
           volumes:
-            - name: config
+            - name: config-file
               configMap:
                 name: recyclarr-config
+            # Writable space for Recyclarr's database, cache, and logs
+            - name: app-data
+              emptyDir: {}
           containers:
             - name: recyclarr
               image: ghcr.io/recyclarr/recyclarr:latest
               imagePullPolicy: IfNotPresent
+              args: ["sync"]
               securityContext:
                 allowPrivilegeEscalation: false
                 capabilities:
                   drop: ["ALL"]
+                readOnlyRootFilesystem: true # Best practice
               env:
                 - name: TZ
                   value: Europe/Amsterdam
+                # Use the new variable name instead of RECYCLARR_APP_DATA
+                - name: RECYCLARR_CONFIG_DIR
+                  value: /config
+                # Optional: specify a separate path for the cache/db if you want
+                - name: RECYCLARR_DATA_DIR
+                  value: /tmp/recyclarr
                 - name: RADARR_URL
                   valueFrom:
                     secretKeyRef:
@@ -56,9 +66,12 @@ spec:
                     secretKeyRef:
                       name: recyclarr-secrets
                       key: sonarr_apikey
-              args:
-                - sync
               volumeMounts:
-                - name: config
+                # Mount the config file specifically
+                - name: config-file
                   mountPath: /config/recyclarr.yml
                   subPath: recyclarr.yml
+                  readOnly: true
+                # Mount the writable scratch space
+                - name: app-data
+                  mountPath: /tmp/recyclarr
