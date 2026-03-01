@@ -32,13 +32,15 @@ resources:
   - monitoring/namespace.yaml
   - monitoring/monitoring-release.yaml
   - monitoring/promtail-release.yaml
-  - monitoring/loki-release.yaml
   - monitoring/monitoring-repo.yaml
-  - monitoring/monitoring-repo-loki.yaml
   - monitoring/ingressroute.yaml
   - monitoring/grafana-ingressroute.yaml
   - monitoring/service.yaml
   - monitoring/grafana-admin-secret.yaml
+
+  - loki/helmrepository.yaml
+  - loki/helmrelease.yaml
+  - loki/servicemonitor.yaml
 
   # ──────────────────────────────────────
   # Jellyseerr

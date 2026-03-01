@@ -18,13 +18,14 @@ spec:
 
   values:
     upgradeCRDs: false
-    
+
     configuration:
       backupStorageLocation:
         - name: default
           provider: velero.io/fs
           bucket: velero
           default: true
+          accessMode: ReadWrite
           config:
             path: /backups
 
