@@ -105,6 +105,7 @@ resources:
   # ──────────────────────────────────────
   - stakater-reloader/helmrepository.yaml
   - stakater-reloader/helmrelease.yaml
+  - stakater-reloader/servicemonitor.yaml
 
   # ──────────────────────────────────────
   # Sabnzbd
