@@ -157,7 +157,7 @@ data:
             icon: fas fa-user-lock
             url: http://auth.lan
 
-          - title: Vaultwarden
-            description: Password Manager
+          - title: Falco
+            description: -
             icon: fas fa-key
-            url: http://vaultwarden.lan
+            url: http://falco.lan
