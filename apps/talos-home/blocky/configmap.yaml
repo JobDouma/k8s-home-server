@@ -22,8 +22,8 @@ data:
           - https://raw.githubusercontent.com/hoshsadiq/adblock-nocoin-list/master/hosts.txt
           - https://raw.githubusercontent.com/EnergizedProtection/block/master/EnergizedBlu.hosts
         malware:
-          - https://mirror1.malwaredomains.com/files/justdomains
           - https://urlhaus.abuse.ch/downloads/hostfile/
+          - https://raw.githubusercontent.com/nicehash/NiceHash-blocklist/master/blocklist.txt
 
       clientGroupsBlock:
         default:
@@ -72,6 +72,5 @@ data:
         falco.lan: 192.168.2.100
 
         # external infra
-        proxmox.lan: 192.168.2.100
         truenas.lan: 192.168.2.5
         router.lan: 192.168.2.254
