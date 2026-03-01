@@ -25,7 +25,6 @@ spec:
     crds: CreateReplace
 
   values:
-
     grafana:
       additionalDataSources:
         - name: Loki
@@ -33,7 +32,18 @@ spec:
           url: http://loki-gateway.monitoring.svc.cluster.local
           access: proxy
           isDefault: false
-          
+
+      # Sidecar watches for ConfigMaps with grafana_dashboard: "1" label
+      sidecar:
+        dashboards:
+          enabled: true
+          searchNamespace: ALL
+          label: grafana_dashboard
+          labelValue: "1"
+          folderAnnotation: grafana_folder
+          provider:
+            foldersFromFilesStructure: true
+
       tolerations:
         - operator: Exists
 
@@ -51,6 +61,14 @@ spec:
       prometheusSpec:
         tolerations:
           - operator: Exists
+        # Allow Prometheus to find ServiceMonitors in all namespaces
+        serviceMonitorSelectorNilUsesHelmValues: false
+        serviceMonitorSelector: {}
+        serviceMonitorNamespaceSelector: {}
+        # Same for PodMonitors
+        podMonitorSelectorNilUsesHelmValues: false
+        podMonitorSelector: {}
+        podMonitorNamespaceSelector: {}
 
         storageSpec:
           volumeClaimTemplate:

@@ -37,6 +37,7 @@ resources:
   - monitoring/grafana-ingressroute.yaml
   - monitoring/service.yaml
   - monitoring/grafana-admin-secret.yaml
+  - monitoring/dashboards/
 
   - loki/helmrepository.yaml
   - loki/helmrelease.yaml
