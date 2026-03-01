@@ -10,3 +10,5 @@ resources:
   - blocky.yaml
   - kubernetes-cluster.yaml
   - loki.yaml
+  - authentik.yaml
+  #- velero.yaml
