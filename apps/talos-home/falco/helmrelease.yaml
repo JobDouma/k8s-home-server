@@ -5,6 +5,9 @@ metadata:
   namespace: falco
 spec:
   interval: 15m
+  dependsOn:
+    - name: loki
+      namespace: monitoring
   chart:
     spec:
       chart: falco
