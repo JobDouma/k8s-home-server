@@ -69,6 +69,7 @@ data:
         headlamp.lan: 192.168.2.100
         freshrss.lan: 192.168.2.100
         auth.lan: 192.168.2.100
+        falco.lan: 192.168.2.100
 
         # external infra
         proxmox.lan: 192.168.2.100
