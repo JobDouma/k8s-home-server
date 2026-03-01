@@ -3,10 +3,15 @@ kind: ServiceMonitor
 metadata:
   name: blocky
   namespace: dns
+  labels:
+    release: kube-prometheus-stack
 spec:
+  namespaceSelector:
+    matchNames:
+      - dns
   selector:
     matchLabels:
-      app.kubernetes.io/instance: blocky
+      app.kubernetes.io/name: blocky
   endpoints:
     - port: http
       path: /metrics

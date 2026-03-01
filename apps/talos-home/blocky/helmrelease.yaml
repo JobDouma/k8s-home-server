@@ -14,7 +14,6 @@ spec:
       strategy: uninstall
       retries: 3
 
-
   chart:
     spec:
       chart: app-template
@@ -41,6 +40,9 @@ spec:
 
           annotations:
             configmap.reloader.stakater.com/reload: "blocky-config"
+            prometheus.io/scrape: "true"
+            prometheus.io/port: "4000"
+            prometheus.io/path: "/metrics"
           securityContext:
             runAsNonRoot: true
             runAsUser: 1000
