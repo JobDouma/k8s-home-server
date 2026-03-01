@@ -158,6 +158,6 @@ data:
             url: http://auth.lan
 
           - title: Falco
-            description: -
-            icon: fas fa-key
+            description: Runtime Security & Threat Detection
+            icon: fas fa-shield-halved
             url: http://falco.lan
