@@ -144,6 +144,7 @@ resources:
   # CoreDNS to Blocky
   # ──────────────────────────────────────
   - coredns/configmap.yaml
+  - coredns/servicemonitor.yaml
 
   # ──────────────────────────────────────
   # FreshRSS
