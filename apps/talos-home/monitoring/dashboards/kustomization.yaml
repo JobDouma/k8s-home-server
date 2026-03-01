@@ -1,0 +1,12 @@
+# ~/k8s-home-server/apps/talos-home/monitoring/dashboards/kustomization.yaml
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - node-exporter.yaml
+  - longhorn.yaml
+  - traefik.yaml
+  - falco.yaml
+  - blocky.yaml
+  - kubernetes-cluster.yaml
+  - loki.yaml
