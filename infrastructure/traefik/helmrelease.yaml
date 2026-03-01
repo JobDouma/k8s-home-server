@@ -37,8 +37,6 @@ spec:
       loadBalancerIP: 192.168.2.100
       annotations:
         metallb.universe.tf/address-pool: traefik-pool
-      
-      #Traefik will be reachable only via: 192.168.2.100:80 & 192.168.2.100:443 :)
       spec:
         externalTrafficPolicy: Local
         allocateLoadBalancerNodePorts: false
@@ -58,11 +56,21 @@ spec:
         expose:
           enabled: true
           port: 443
+      metrics:
+        port: 9100
+        protocol: TCP
+        expose:
+          default: false  # internal only, no need to expose via LoadBalancer
+
+    metrics:
+      prometheus:
+        enabled: true
+        entryPoint: metrics
 
     providers:
       kubernetesIngress:
         enabled: true
-        namespaces: []   # required for chart 27.x
+        namespaces: []
 
       kubernetesCRD:
         enabled: true
@@ -70,21 +78,15 @@ spec:
 
     additionalArguments:
       - "--providers.kubernetesingress.ingressclass=traefik"
-      # Enable dashboard
       - "--api.dashboard=true"
       - "--api=true"
-
-      # Enable access logs
       - "--accesslog=true"
       - "--accesslog.format=json"
-
-      # Trust internal forwarded headers
       - "--entrypoints.web.forwardedHeaders.insecure=true"
       - "--entrypoints.websecure.forwardedHeaders.insecure=true"
-
-      # Explicit entrypoints
       - "--entrypoints.web.address=:80"
       - "--entrypoints.websecure.address=:443"
+      - "--entrypoints.metrics.address=:9100"
 
     logs:
       general:
