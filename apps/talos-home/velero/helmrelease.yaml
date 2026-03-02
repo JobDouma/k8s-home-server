@@ -37,6 +37,10 @@ spec:
       enabled: true
       existingClaim: velero-backup-storage
 
+    metrics:
+      enabled: true
+      serviceMonitor:
+        enabled: false  # we manage our own above
     schedules:
       daily:
         disabled: false
