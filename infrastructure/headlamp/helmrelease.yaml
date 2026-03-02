@@ -13,7 +13,6 @@ spec:
         kind: HelmRepository
         name: headlamp
         namespace: flux-system
-
   values:
     replicaCount: 2
 
@@ -23,10 +22,15 @@ spec:
 
     config:
       oidc:
+        clientID: "JCh5JqdWtaeixQDMyQbkdJBNxyUTuZtpXfBJDyPL"
+        issuerURL: "http://auth.lan/application/o/headlamp/"
+        scopes: "openid profile email groups"
         secret:
+          create: false
+        externalSecret:
+          enabled: true
           name: headlamp-oidc-credentials
 
-    # Disable service account creation completely
     serviceAccount:
       create: false
       name: headlamp
