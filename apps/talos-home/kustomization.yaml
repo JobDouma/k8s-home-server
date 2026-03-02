@@ -171,5 +171,8 @@ resources:
   # ──────────────────────────────────────
   - velero/namespace.yaml
   - velero/pvc.yaml
+  - velero/minio-secret.yaml
+  - velero/minio.yaml
   - velero/helmrepository.yaml
   - velero/helmrelease.yaml
+  - velero/servicemonitor.yaml
