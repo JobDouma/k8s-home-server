@@ -29,6 +29,7 @@ spec:
               kubernetes.io/metadata.name: networking
       ports:
         - port: 4466
+        - port: 80
   egress:
     # Kubernetes API only
     - to:
@@ -41,3 +42,11 @@ spec:
       ports:
         - port: 53
           protocol: UDP
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: authentik
+      ports:
+        - port: 9000
+        - port: 80
+        - port: 443

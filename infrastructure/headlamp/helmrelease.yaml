@@ -24,7 +24,7 @@ spec:
     config:
       oidc:
         issuerURL: "http://auth.lan/application/o/headlamp/"
-        scopes: "openid profile email"
+        scopes: "openid profile email groups"
         usernameClaim: preferred_username
         groupsClaim: groups
 
@@ -45,6 +45,7 @@ spec:
     # Disable service account creation completely
     serviceAccount:
       create: false
+      name: headlamp
 
     clusterRoleBinding:
       create: false
