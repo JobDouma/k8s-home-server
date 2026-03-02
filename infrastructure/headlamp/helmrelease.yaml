@@ -22,9 +22,6 @@ spec:
 
     config:
       oidc:
-        clientID: "JCh5JqdWtaeixQDMyQbkdJBNxyUTuZtpXfBJDyPL"
-        issuerURL: "http://auth.lan/application/o/headlamp"
-        scopes: "openid profile email groups"
         secret:
           create: false
         externalSecret:
