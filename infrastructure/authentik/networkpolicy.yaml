@@ -1,0 +1,82 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: default-deny
+  namespace: authentik
+spec:
+  podSelector: {}
+  policyTypes:
+    - Ingress
+    - Egress
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: authentik-server
+  namespace: authentik
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: authentik
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    # From Traefik only
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: networking
+      ports:
+        - port: 9000
+        - port: 9443
+    # Prometheus scraping
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: monitoring
+      ports:
+        - port: 9300
+  egress:
+    # Talk to its own postgres
+    - to:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: postgresql
+      ports:
+        - port: 5432
+    # DNS
+    - to:
+        - namespaceSelector: {}
+      ports:
+        - port: 53
+          protocol: UDP
+    # LDAP, OAuth, external identity providers
+    - to:
+        - ipBlock:
+            cidr: 0.0.0.0/0
+      ports:
+        - port: 443
+        - port: 80
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: authentik-postgresql
+  namespace: authentik
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: postgresql
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    # Only authentik pods can reach postgres
+    - from:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: authentik
+      ports:
+        - port: 5432
+  egress: []
