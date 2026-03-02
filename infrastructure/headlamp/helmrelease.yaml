@@ -23,10 +23,8 @@ spec:
 
     config:
       oidc:
-        issuerURL: "http://auth.lan/application/o/headlamp/"
-        scopes: "openid profile email groups"
-        usernameClaim: preferred_username
-        groupsClaim: groups
+        secret:
+          name: headlamp-oidc-secret
 
     # Inject client ID + secret securely from SOPS-encrypted secret
     extraEnv:
