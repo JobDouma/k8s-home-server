@@ -21,8 +21,13 @@ spec:
 
   install:
     crds: CreateReplace
+    remediation:
+      retries: 3
+
   upgrade:
     crds: CreateReplace
+    remediation:
+      retries: 3
 
   values:
     grafana:
@@ -33,7 +38,6 @@ spec:
           access: proxy
           isDefault: false
 
-      # Sidecar watches for ConfigMaps with grafana_dashboard: "1" label
       sidecar:
         dashboards:
           enabled: true
@@ -61,11 +65,9 @@ spec:
       prometheusSpec:
         tolerations:
           - operator: Exists
-        # Allow Prometheus to find ServiceMonitors in all namespaces
         serviceMonitorSelectorNilUsesHelmValues: false
         serviceMonitorSelector: {}
         serviceMonitorNamespaceSelector: {}
-        # Same for PodMonitors
         podMonitorSelectorNilUsesHelmValues: false
         podMonitorSelector: {}
         podMonitorNamespaceSelector: {}
