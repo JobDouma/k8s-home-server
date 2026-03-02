@@ -38,6 +38,8 @@ spec:
             region: minio
             s3ForcePathStyle: "true"
             s3Url: http://minio.velero.svc.cluster.local:9000
+      maintenanceJobConfig:
+        jobTTL: 1h0m0s
       volumeSnapshotLocation: []
 
     credentials:
