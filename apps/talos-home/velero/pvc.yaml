@@ -10,3 +10,6 @@ spec:
   resources:
     requests:
       storage: 500Gi
+
+# Velero → MinIO (S3 API at minio.velero.svc.cluster.local:9000) 
+# → MinIO stores files in /data → /data is mounted from velero-backup-storage PVC → PVC is on TrueNAS NFS
