@@ -24,21 +24,7 @@ spec:
     config:
       oidc:
         secret:
-          name: headlamp-oidc-secret
-
-    # Inject client ID + secret securely from SOPS-encrypted secret
-    extraEnv:
-      - name: HEADLAMP_CONFIG_OIDC_CLIENT_ID
-        valueFrom:
-          secretKeyRef:
-            name: headlamp-oidc-secret
-            key: clientID
-
-      - name: HEADLAMP_CONFIG_OIDC_CLIENT_SECRET
-        valueFrom:
-          secretKeyRef:
-            name: headlamp-oidc-secret
-            key: clientSecret
+          name: headlamp-oidc-credentials
 
     # Disable service account creation completely
     serviceAccount:
