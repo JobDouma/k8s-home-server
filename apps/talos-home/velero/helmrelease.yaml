@@ -6,7 +6,6 @@ metadata:
 spec:
   interval: 30m
   timeout: 20m
-
   chart:
     spec:
       chart: velero
@@ -15,32 +14,44 @@ spec:
         kind: HelmRepository
         name: vmware-tanzu
         namespace: flux-system
-
   values:
     upgradeCRDs: false
 
+    # AWS plugin is required to talk to MinIO (S3-compatible)
+    initContainers:
+      - name: velero-plugin-for-aws
+        image: velero/velero-plugin-for-aws:v1.10.1
+        imagePullPolicy: IfNotPresent
+        volumeMounts:
+          - mountPath: /target
+            name: plugins
+
     configuration:
+      defaultVolumesToFsBackup: true
       backupStorageLocation:
         - name: default
-          provider: velero.io/fs
+          provider: aws
           bucket: velero
           default: true
           accessMode: ReadWrite
           config:
-            path: /backups
-
+            region: minio
+            s3ForcePathStyle: "true"
+            s3Url: http://minio.velero.svc.cluster.local:9000
       volumeSnapshotLocation: []
 
-    deployNodeAgent: true
+    credentials:
+      useSecret: true
+      existingSecret: velero-minio-credentials
+      existingSecretKey: cloud
 
-    persistence:
-      enabled: true
-      existingClaim: velero-backup-storage
+    deployNodeAgent: true
 
     metrics:
       enabled: true
       serviceMonitor:
-        enabled: false  # we manage our own above
+        enabled: false  # managed by servicemonitor.yaml
+
     schedules:
       daily:
         disabled: false
@@ -48,3 +59,4 @@ spec:
         template:
           ttl: 720h
           snapshotVolumes: false
+          defaultVolumesToFsBackup: true
