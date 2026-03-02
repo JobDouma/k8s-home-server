@@ -1,0 +1,131 @@
+# Think of NetworkPolicy as a **firewall at the pod level** inside Kubernetes. Without it, every pod in your cluster can talk to every other pod freely.
+
+
+# Default deny all ingress and egress in velero namespace
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: default-deny
+  namespace: velero
+spec:
+  podSelector: {}
+  policyTypes:
+    - Ingress
+    - Egress
+---
+# Velero server: allow egress to MinIO and Kubernetes API
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: velero-server
+  namespace: velero
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: velero
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    # Allow Prometheus scraping from monitoring namespace
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: monitoring
+      ports:
+        - port: 8085
+  egress:
+    # Allow talking to MinIO
+    - to:
+        - podSelector:
+            matchLabels:
+              app: minio
+      ports:
+        - port: 9000
+    # Allow talking to Kubernetes API
+    - to:
+        - ipBlock:
+            cidr: 0.0.0.0/0
+      ports:
+        - port: 6443
+    # Allow DNS
+    - to:
+        - namespaceSelector: {}
+      ports:
+        - port: 53
+          protocol: UDP
+        - port: 53
+          protocol: TCP
+---
+# MinIO: only accept traffic from velero and node-agent
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: minio
+  namespace: velero
+spec:
+  podSelector:
+    matchLabels:
+      app: minio
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: velero
+        - podSelector:
+            matchLabels:
+              name: node-agent
+      ports:
+        - port: 9000
+    # Allow port-forward access for debugging (from within cluster)
+    - ports:
+        - port: 9001
+  egress:
+    # MinIO writes to NFS PVC — needs host network egress to TrueNAS
+    - to:
+        - ipBlock:
+            cidr: 192.168.2.0/24
+---
+# node-agent: needs broad egress to access host volumes and talk to velero
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: node-agent
+  namespace: velero
+spec:
+  podSelector:
+    matchLabels:
+      name: node-agent
+  policyTypes:
+    - Ingress
+    - Egress
+  egress:
+    # Talk to velero server
+    - to:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: velero
+    # Talk to MinIO
+    - to:
+        - podSelector:
+            matchLabels:
+              app: minio
+      ports:
+        - port: 9000
+    # DNS
+    - to:
+        - namespaceSelector: {}
+      ports:
+        - port: 53
+          protocol: UDP
+        - port: 53
+          protocol: TCP
+    # Kubernetes API
+    - to:
+        - ipBlock:
+            cidr: 0.0.0.0/0
+      ports:
+        - port: 6443

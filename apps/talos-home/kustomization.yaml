@@ -176,3 +176,4 @@ resources:
   - velero/helmrepository.yaml
   - velero/helmrelease.yaml
   - velero/servicemonitor.yaml
+  - velero/networkpolicy.yaml

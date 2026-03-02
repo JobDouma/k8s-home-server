@@ -3,5 +3,25 @@ kind: Namespace
 metadata:
   name: velero
   annotations:
+    # IMPORTANT: privileged is required for node-agent daemonset.
+    # node-agent mounts hostPath volumes (/var/lib/kubelet/pods and /var/lib/kubelet/plugins)
+    # to access pod volumes on the node for filesystem backups.
+    #
+    # This namespace annotation alone is NOT enough on Talos — you must also exempt
+    # the velero namespace from the cluster-level PodSecurity admission controller:
+    #
+    #   talosctl get machineconfig v1alpha1 -o jsonpath='{.spec}' --nodes 192.168.2.22 | sed 's/\\n/\n/g' | sed 's/\\t/\t/g' | sed 's/^"//;s/"$//' > controlplane.yaml
+    #   Find: cluster.apiServer.admissionControl.exemptions.namespaces
+    #   Add:  - velero
+    #   talosctl apply-config --nodes 192.168.2.22 --file controlplane.yaml
+    #
+    # Without this Talos exemption, node-agent pods will fail with:
+    # "violates PodSecurity baseline:latest: hostPath volumes"
+
     pod-security.kubernetes.io/enforce: privileged
     pod-security.kubernetes.io/enforce-version: latest
+
+
+    # To test:
+    # k exec -n velero deploy/velero -- /velero schedule get
+    # k exec -n velero deploy/velero -- /velero schedule describe velero-daily
