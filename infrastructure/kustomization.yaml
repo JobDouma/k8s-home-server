@@ -40,3 +40,4 @@ resources:
   - authentik/secret.yaml
   - authentik/postgresql-secret.yaml
   - authentik/servicemonitor.yaml
+  - authentik/networkpolicy.yaml
