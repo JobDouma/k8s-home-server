@@ -27,6 +27,7 @@ resources:
   - headlamp/helmrelease.yaml
   - headlamp/ingressroute.yaml
   - headlamp/oidc-secret.yaml
+  - headlamp/networkpolicy.yaml
 
   - longhorn/namespace.yaml
   - longhorn/helmrepository.yaml
