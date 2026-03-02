@@ -27,8 +27,6 @@ spec:
         scopes: "openid profile email groups"
         secret:
           create: false
-          clientID: ""
-          clientSecret: ""
         externalSecret:
           enabled: true
           name: headlamp-oidc-credentials
