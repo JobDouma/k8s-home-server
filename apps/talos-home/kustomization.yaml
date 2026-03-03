@@ -177,3 +177,9 @@ resources:
   - velero/helmrelease.yaml
   - velero/servicemonitor.yaml
   - velero/networkpolicy.yaml
+
+  # ──────────────────────────────────────
+  # Kube Metrics Server
+  # ──────────────────────────────────────
+  - metrics-server/helmrelease.yaml
+  - metrics-server/helmrelease.yaml
