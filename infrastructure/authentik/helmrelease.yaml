@@ -67,6 +67,8 @@ spec:
         database: authentik
         existingSecret: authentik-postgresql-secret
       primary:
+        podAnnotations:
+          backup.velero.io/backup-volumes-excludes: "data"
         persistence:
           enabled: true
           storageClass: longhorn
