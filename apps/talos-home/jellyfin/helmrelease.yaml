@@ -26,6 +26,8 @@ spec:
     image:
       repository: jellyfin/jellyfin
       tag: 10.11.6
+    podAnnotations:
+      backup.velero.io/backup-volumes-excludes: "media,cache"
     env:
       PUID: 1000
       PGID: 1000
