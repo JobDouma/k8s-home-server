@@ -39,6 +39,9 @@ resources:
   - monitoring/grafana-admin-secret.yaml
   - monitoring/dashboards/
 
+  # ──────────────────────────────────────
+  # Loki
+  # ──────────────────────────────────────
   - loki/helmrepository.yaml
   - loki/helmrelease.yaml
   - loki/servicemonitor.yaml
@@ -178,8 +181,3 @@ resources:
   - velero/servicemonitor.yaml
   - velero/networkpolicy.yaml
 
-  # ──────────────────────────────────────
-  # Kube Metrics Server
-  # ──────────────────────────────────────
-  - metrics-server/helmrelease.yaml
-  - metrics-server/helmrelease.yaml
