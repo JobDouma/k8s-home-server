@@ -62,3 +62,7 @@ spec:
           ttl: 720h
           snapshotVolumes: false
           defaultVolumesToFsBackup: true
+          excludedNamespaces:
+            - metallb-system
+            - networking
+            - velero
