@@ -28,9 +28,8 @@ spec:
 
     controllers:
       radarr:
-
         pod:
-           annotations:
+          annotations:
             backup.velero.io/backup-volumes-excludes: "media"
           securityContext:
             runAsUser: 0
