@@ -43,3 +43,9 @@ resources:
   - authentik/postgresql-secret.yaml
   - authentik/servicemonitor.yaml
   - authentik/networkpolicy.yaml
+
+  # ──────────────────────────────────────
+  # Kube Metrics Server
+  # ──────────────────────────────────────
+  - metrics-server/helmrepository.yaml
+  - metrics-server/helmrelease.yaml
