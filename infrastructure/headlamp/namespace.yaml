@@ -1,8 +1,8 @@
-# headlamp/namespace.yaml — currently has NO labels at all
+# headlamp/namespace.yaml
 apiVersion: v1
 kind: Namespace
 metadata:
   name: headlamp
-  annotations:
+  labels:
     pod-security.kubernetes.io/enforce: baseline
-    pod-security.kubernetes.io/warn: restricted   # warns but doesn't block
+    pod-security.kubernetes.io/warn: restricted

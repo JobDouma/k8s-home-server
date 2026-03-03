@@ -2,7 +2,7 @@ apiVersion: v1
 kind: Namespace
 metadata:
   name: velero
-  annotations:
+  labels:
     # IMPORTANT: privileged is required for node-agent daemonset.
     # node-agent mounts hostPath volumes (/var/lib/kubelet/pods and /var/lib/kubelet/plugins)
     # to access pod volumes on the node for filesystem backups.
