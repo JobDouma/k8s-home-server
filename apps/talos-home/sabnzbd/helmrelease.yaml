@@ -27,8 +27,6 @@ spec:
     controllers:
       sabnzbd:
         pod:
-          annotations:
-            backup.velero.io/backup-volumes-excludes: "downloads"
           securityContext:
             seccompProfile:
               type: RuntimeDefault

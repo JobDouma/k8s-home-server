@@ -17,7 +17,6 @@ spec:
   values:
     upgradeCRDs: false
 
-    # AWS plugin is required to talk to MinIO (S3-compatible)
     initContainers:
       - name: velero-plugin-for-aws
         image: velero/velero-plugin-for-aws:v1.13.2
@@ -27,7 +26,8 @@ spec:
             name: plugins
 
     configuration:
-      defaultVolumesToFsBackup: true
+      # Disable filesystem backup entirely
+      defaultVolumesToFsBackup: false
       backupStorageLocation:
         - name: default
           provider: aws
@@ -47,12 +47,13 @@ spec:
       existingSecret: velero-minio-credentials
       existingSecretKey: cloud
 
-    deployNodeAgent: true
+    # No node-agent needed — no filesystem backup
+    deployNodeAgent: false
 
     metrics:
       enabled: true
       serviceMonitor:
-        enabled: false  # managed by servicemonitor.yaml
+        enabled: false
 
     schedules:
       daily:
@@ -61,7 +62,11 @@ spec:
         template:
           ttl: 720h
           snapshotVolumes: false
-          defaultVolumesToFsBackup: true
+          defaultVolumesToFsBackup: false
+          # Skip PVC/PV data — Longhorn handles that
+          excludedResources:
+            - persistentvolumes
+            - persistentvolumeclaims
           excludedNamespaces:
             - metallb-system
             - networking

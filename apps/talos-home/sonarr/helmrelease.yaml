@@ -29,8 +29,6 @@ spec:
     controllers:
       sonarr:
         pod:
-          annotations:
-            backup.velero.io/backup-volumes-excludes: "media"
           securityContext:
             runAsUser: 0
             runAsGroup: 0

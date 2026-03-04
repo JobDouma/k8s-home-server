@@ -1,0 +1,28 @@
+# longhorn/recurringjob.yaml
+apiVersion: longhorn.io/v1beta2
+kind: RecurringJob
+metadata:
+  name: daily-backup
+  namespace: longhorn
+spec:
+  cron: "0 2 * * *"      # 02:00 — 1 hour before Velero at 03:00
+  task: backup
+  groups:
+    - default
+  retain: 10              # keep 10 backups
+  concurrency: 1
+  labels: {}
+---
+apiVersion: longhorn.io/v1beta2
+kind: RecurringJob
+metadata:
+  name: hourly-snapshot
+  namespace: longhorn
+spec:
+  cron: "0 * * * *"      # every hour
+  task: snapshot
+  groups:
+    - default
+  retain: 24              # keep 24 hourly snapshots
+  concurrency: 1
+  labels: {}
