@@ -31,7 +31,7 @@ spec:
 
   values:
     defaultSettings:
-      defaultReplicaCount: 1
+      defaultReplicaCount: 2
       createDefaultDiskLabeledNodes: true
       defaultDataPath: /var/lib/longhorn
       replicaAutoBalance: best-effort
@@ -43,7 +43,7 @@ spec:
 
     persistence:
       defaultClass: true
-      defaultClassReplicaCount: 1
+      defaultClassReplicaCount: 2
       reclaimPolicy: Retain
 
     csi:
