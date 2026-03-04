@@ -23,6 +23,6 @@ spec:
   task: snapshot
   groups:
     - default
-  retain: 24              # keep 24 hourly snapshots
+  retain: 10              # keep 10 hourly snapshots
   concurrency: 1
   labels: {}
