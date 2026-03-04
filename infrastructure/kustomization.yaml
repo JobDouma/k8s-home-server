@@ -35,6 +35,7 @@ resources:
   - longhorn/helmrelease.yaml
   - longhorn/servicemonitor.yaml
   - longhorn/ingressroute.yaml
+  - longhorn/recurringjob.yaml
 
   - authentik/namespace.yaml
   - authentik/helmrepository.yaml
