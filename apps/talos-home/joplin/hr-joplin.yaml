@@ -28,8 +28,6 @@ spec:
   values:
 
     defaultPodOptions:
-      annotations:
-        backup.velero.io/backup-volumes-excludes: "pm2,logs"
       securityContext:
         runAsUser: 0
         runAsGroup: 0

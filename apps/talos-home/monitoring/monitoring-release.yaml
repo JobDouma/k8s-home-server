@@ -31,6 +31,9 @@ spec:
 
   values:
     grafana:
+      deploymentStrategy:
+        type: Recreate
+
       additionalDataSources:
         - name: Loki
           type: loki
@@ -50,6 +53,14 @@ spec:
 
       tolerations:
         - operator: Exists
+        - key: "node.kubernetes.io/not-ready"
+          operator: "Exists"
+          effect: "NoExecute"
+          tolerationSeconds: 600
+        - key: "node.kubernetes.io/unreachable"
+          operator: "Exists"
+          effect: "NoExecute"
+          tolerationSeconds: 600
 
       admin:
         existingSecret: grafana-admin
@@ -65,6 +76,14 @@ spec:
       prometheusSpec:
         tolerations:
           - operator: Exists
+          - key: "node.kubernetes.io/not-ready"
+            operator: "Exists"
+            effect: "NoExecute"
+            tolerationSeconds: 600
+          - key: "node.kubernetes.io/unreachable"
+            operator: "Exists"
+            effect: "NoExecute"
+            tolerationSeconds: 600
         serviceMonitorSelectorNilUsesHelmValues: false
         serviceMonitorSelector: {}
         serviceMonitorNamespaceSelector: {}
@@ -86,6 +105,14 @@ spec:
       alertmanagerSpec:
         tolerations:
           - operator: Exists
+          - key: "node.kubernetes.io/not-ready"
+            operator: "Exists"
+            effect: "NoExecute"
+            tolerationSeconds: 600
+          - key: "node.kubernetes.io/unreachable"
+            operator: "Exists"
+            effect: "NoExecute"
+            tolerationSeconds: 600
         storage:
           volumeClaimTemplate:
             spec:

@@ -67,8 +67,6 @@ spec:
 
     singleBinary:
       replicas: 1
-      podAnnotations:
-        backup.velero.io/backup-volumes-excludes: "storage"
       tolerations:
         - operator: Exists
 

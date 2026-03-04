@@ -1,6 +1,5 @@
 # ============================================
 # longhorn/helmrelease.yaml
-# (Redeploy Longhorn safely via Flux; keeps data on /var/lib/longhorn)
 # ============================================
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
@@ -35,6 +34,12 @@ spec:
       createDefaultDiskLabeledNodes: true
       defaultDataPath: /var/lib/longhorn
       replicaAutoBalance: best-effort
+      # NFS backup target — points to TrueNAS
+      backupTarget: "nfs://192.168.2.5:/mnt/tank/configs/longhorn-backups"
+      backupTargetCredentialSecret: ""
+      # Auto-cleanup snapshots
+      snapshotDataIntegrity: fast-check
+      recurringJobMaxRetention: 10
 
     longhornManager:
       tolerations:
@@ -48,14 +53,14 @@ spec:
 
     csi:
       kubeletRootDir: /var/lib/kubelet
-    
+
     longhornDriver:
       tolerations:
         - operator: Exists
 
     longhornUI:
-      enabled: true               # <-- enable the UI
+      enabled: true
       service:
-        type: ClusterIP           # use ClusterIP, we’ll expose it via Traefik
+        type: ClusterIP
       tolerations:
         - operator: Exists
