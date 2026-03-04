@@ -54,5 +54,8 @@ spec:
         - operator: Exists
 
     longhornUI:
+      enabled: true               # <-- enable the UI
+      service:
+        type: ClusterIP           # use ClusterIP, we’ll expose it via Traefik
       tolerations:
         - operator: Exists
