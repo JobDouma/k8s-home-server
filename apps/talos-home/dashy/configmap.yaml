@@ -118,15 +118,10 @@ data:
             icon: fas fa-database
             url: http://truenas.lan
 
-          - title: Proxmox
-            description: Hypervisor
-            icon: fas fa-layer-group
-            url: https://proxmox.lan
-
-          - title: Portainer
-            description: Container Management
-            icon: fas fa-box
-            url: http://portainer.lan
+          - title: Longhorn
+            description: Storage UI
+            icon: fas fa-hdd
+            url: http://longhorn.lan
 
 
       - name: Networking
@@ -159,5 +154,5 @@ data:
 
           - title: Falco
             description: Runtime Security & Threat Detection
-            icon: fas fa-shield-halved
+            icon: fas fa-shield-alt
             url: http://falco.lan

@@ -34,6 +34,7 @@ resources:
   - longhorn/helmrepository.yaml
   - longhorn/helmrelease.yaml
   - longhorn/servicemonitor.yaml
+  - longhorn/ingressroute.yaml
 
   - authentik/namespace.yaml
   - authentik/helmrepository.yaml
