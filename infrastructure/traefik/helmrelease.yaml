@@ -25,14 +25,7 @@ spec:
   values:
     deployment:
       replicas: 3
-
-      # Tolerate ALL taints — covers both control-plane taints on the RPi:
-      #   node-role.kubernetes.io/control-plane:NoSchedule
-      #   node.kubernetes.io/role=controlplane:NoSchedule
-      tolerations:
-        - operator: Exists
-
-      # 1 replica per node — ingress survives any single node loss
+      # affinity goes here ✅
       affinity:
         podAntiAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
@@ -40,6 +33,10 @@ spec:
                 matchLabels:
                   app.kubernetes.io/name: traefik
               topologyKey: kubernetes.io/hostname
+
+    # tolerations go at TOP LEVEL, not under deployment ✅
+    tolerations:
+      - operator: Exists
 
     ingressClass:
       enabled: true
