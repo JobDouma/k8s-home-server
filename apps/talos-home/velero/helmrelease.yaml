@@ -26,7 +26,6 @@ spec:
             name: plugins
 
     configuration:
-      # Disable filesystem backup entirely
       defaultVolumesToFsBackup: false
       backupStorageLocation:
         - name: default
@@ -40,6 +39,7 @@ spec:
             s3Url: http://minio.velero.svc.cluster.local:9000
       maintenanceJobConfig:
         jobTTL: 1h0m0s
+        keepLatestMaintenanceJobs: 1   # ← only keep 1 completed job per repo
       volumeSnapshotLocation: []
 
     credentials:
