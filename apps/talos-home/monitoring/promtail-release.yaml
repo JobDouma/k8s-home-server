@@ -26,3 +26,26 @@ spec:
     config:
       clients:
         - url: http://loki-gateway.monitoring.svc.cluster.local/loki/api/v1/push
+
+    # Talos uses containerd, not Docker — /var/lib/docker/containers does not exist.
+    # Override the default Docker volume mount with the correct containerd path.
+    # /var/log/pods is the only path needed on Talos for container log tailing.
+    defaultVolumes:
+      - name: pods
+        hostPath:
+          path: /var/log/pods
+      - name: run
+        hostPath:
+          path: /run/promtail
+
+    defaultVolumeMounts:
+      - name: pods
+        mountPath: /var/log/pods
+        readOnly: true
+      - name: run
+        mountPath: /run/promtail
+
+    # Remove the Docker containers hostPath that doesn't exist on Talos
+    # (default chart includes /var/lib/docker/containers which causes errors)
+    extraVolumes: []
+    extraVolumeMounts: []
