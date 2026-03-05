@@ -31,15 +31,41 @@ spec:
 
   values:
     grafana:
+      # Fix for 82.9.0: chart now sets rollingUpdate by default which conflicts
+      # with Recreate strategy — must explicitly unset it
       deploymentStrategy:
         type: Recreate
+        rollingUpdate: null
 
-      additionalDataSources:
-        - name: Loki
-          type: loki
-          url: http://loki-gateway.monitoring.svc.cluster.local
-          access: proxy
-          isDefault: false
+      # Set explicit datasource UIDs so provisioned dashboards resolve correctly.
+      # Dashboards using ${DS_PROMETHEUS} or ${DS_LOKI} will match these UIDs
+      # automatically when loaded via the sidecar configmap provisioner.
+      grafana.ini:
+        unified_alerting:
+          enabled: true
+        alerting:
+          enabled: false
+
+      datasources:
+        datasources.yaml:
+          apiVersion: 1
+          datasources:
+            - name: Prometheus
+              type: prometheus
+              uid: prometheus
+              url: http://kube-prometheus-stack-prometheus.monitoring.svc.cluster.local:9090
+              access: proxy
+              isDefault: true
+              jsonData:
+                timeInterval: 30s
+            - name: Loki
+              type: loki
+              uid: loki
+              url: http://loki-gateway.monitoring.svc.cluster.local
+              access: proxy
+              isDefault: false
+              jsonData:
+                maxLines: 1000
 
       sidecar:
         dashboards:
