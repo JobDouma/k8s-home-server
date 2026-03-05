@@ -38,6 +38,7 @@ resources:
   - longhorn/recurringjob.yaml
 
   - authentik/namespace.yaml
+  - authentik/certificate.yaml
   - authentik/helmrepository.yaml
   - authentik/helmrelease.yaml
   - authentik/ingressroute.yaml
@@ -55,3 +56,6 @@ resources:
   - cert-manager/namespace.yaml
   - cert-manager/helmrepository.yaml
   - cert-manager/helmrelease.yaml
+  - cert-manager/ca-certificate.yaml
+  - cert-manager/clusterissuer-ca.yaml
+  - cert-manager/clusterissuer-selfsigned.yaml
