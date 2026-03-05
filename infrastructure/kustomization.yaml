@@ -51,3 +51,7 @@ resources:
   # ──────────────────────────────────────
   - metrics-server/helmrepository.yaml
   - metrics-server/helmrelease.yaml
+
+  - cert-manager/namespace.yaml
+  - cert-manager/helmrepository.yaml
+  - cert-manager/helmrelease.yaml
