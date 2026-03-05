@@ -26,10 +26,12 @@ spec:
   values:
     controllers:
       main:
-        replicas: 2
+        replicas: 3
 
         pod:
           dnsPolicy: Default
+
+          # 1 replica per node guaranteed — if a node dies, 2 DNS resolvers remain
           affinity:
             podAntiAffinity:
               requiredDuringSchedulingIgnoredDuringExecution:
@@ -37,6 +39,12 @@ spec:
                     matchLabels:
                       app.kubernetes.io/name: blocky
                   topologyKey: kubernetes.io/hostname
+
+          # Allow scheduling on the RPi control-plane node
+          tolerations:
+            - key: node-role.kubernetes.io/control-plane
+              operator: Exists
+              effect: NoSchedule
 
           annotations:
             configmap.reloader.stakater.com/reload: "blocky-config"
