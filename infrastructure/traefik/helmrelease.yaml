@@ -24,7 +24,22 @@ spec:
 
   values:
     deployment:
-      replicas: 2
+      replicas: 3
+
+      # Allow scheduling on the RPi control-plane node
+      tolerations:
+        - key: node-role.kubernetes.io/control-plane
+          operator: Exists
+          effect: NoSchedule
+
+      # 1 replica per node — losing 1 node keeps ingress fully alive
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchLabels:
+                  app.kubernetes.io/name: traefik
+              topologyKey: kubernetes.io/hostname
 
     ingressClass:
       enabled: true
@@ -60,7 +75,7 @@ spec:
         port: 9100
         protocol: TCP
         expose:
-          default: false  # internal only, no need to expose via LoadBalancer
+          default: false
 
     metrics:
       prometheus:
