@@ -26,13 +26,13 @@ spec:
     deployment:
       replicas: 3
 
-      # Allow scheduling on the RPi control-plane node
+      # Tolerate ALL taints — covers both control-plane taints on the RPi:
+      #   node-role.kubernetes.io/control-plane:NoSchedule
+      #   node.kubernetes.io/role=controlplane:NoSchedule
       tolerations:
-        - key: node-role.kubernetes.io/control-plane
-          operator: Exists
-          effect: NoSchedule
+        - operator: Exists
 
-      # 1 replica per node — losing 1 node keeps ingress fully alive
+      # 1 replica per node — ingress survives any single node loss
       affinity:
         podAntiAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
