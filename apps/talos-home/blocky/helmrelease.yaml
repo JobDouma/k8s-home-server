@@ -26,19 +26,21 @@ spec:
   values:
     controllers:
       main:
-        replicas: 3
+        replicas: 2
 
         pod:
-          dnsPolicy: Default
-
-          # Tolerate ALL taints — covers both control-plane taints on the RPi:
-          #   node-role.kubernetes.io/control-plane:NoSchedule
-          #   node.kubernetes.io/role=controlplane:NoSchedule
           tolerations:
             - operator: Exists
 
-          # 1 replica per node — guaranteed DNS on every node
           affinity:
+            nodeAffinity:
+              requiredDuringSchedulingIgnoredDuringExecution:
+                nodeSelectorTerms:
+                  - matchExpressions:
+                      - key: kubernetes.io/hostname
+                        operator: NotIn
+                        values:
+                          - talos-cp-3-rpi
             podAntiAffinity:
               requiredDuringSchedulingIgnoredDuringExecution:
                 - labelSelector:
