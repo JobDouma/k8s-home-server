@@ -31,17 +31,17 @@ spec:
     daemonset:
       tolerations:
         - operator: Exists
-      # Exclude RPi — Falco requires kernel extensions not present on this node.
-      # To enable: add falco extension via factory.talos.dev and reflash.
-      affinity:
-        nodeAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
-            nodeSelectorTerms:
-              - matchExpressions:
-                  - key: kubernetes.io/hostname
-                    operator: NotIn
-                    values:
-                      - talos-cp-3-rpi
+
+    # NOT under daemonset — top level
+    affinity:
+      nodeAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+          nodeSelectorTerms:
+            - matchExpressions:
+                - key: kubernetes.io/hostname
+                  operator: NotIn
+                  values:
+                    - talos-cp-3-rpi
     falcosidekick:
       enabled: true
       replicaCount: 1
