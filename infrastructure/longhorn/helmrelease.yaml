@@ -30,14 +30,12 @@ spec:
 
   values:
     defaultSettings:
-      defaultReplicaCount: 2
+      defaultReplicaCount: 3                  # ← was 2
       createDefaultDiskLabeledNodes: true
       defaultDataPath: /var/lib/longhorn
       replicaAutoBalance: best-effort
-      # NFS backup target — points to TrueNAS
       backupTarget: "nfs://192.168.2.5:/mnt/tank/configs/longhorn-backups"
       backupTargetCredentialSecret: ""
-      # Auto-cleanup snapshots
       snapshotDataIntegrity: fast-check
       recurringJobMaxRetention: 10
 
@@ -48,7 +46,7 @@ spec:
 
     persistence:
       defaultClass: true
-      defaultClassReplicaCount: 2
+      defaultClassReplicaCount: 3             # ← was 2
       reclaimPolicy: Retain
 
     csi:
