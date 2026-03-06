@@ -78,4 +78,4 @@ spec:
                 - key: kubernetes.io/hostname
                   operator: In
                   values:
-                    - talos-cp-2
+                    - talos-cp-3
