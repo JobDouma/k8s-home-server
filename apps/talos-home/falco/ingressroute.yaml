@@ -5,10 +5,12 @@ metadata:
   namespace: falco
 spec:
   entryPoints:
-    - web
+    - websecure
   routes:
     - match: Host(`falco.lan`)
       kind: Rule
       services:
         - name: falco-falcosidekick-ui
           port: 2802
+  tls:
+    secretName: falco-tls

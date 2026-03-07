@@ -5,10 +5,12 @@ metadata:
   namespace: freshrss
 spec:
   entryPoints:
-    - web
+    - websecure
   routes:
     - match: Host(`freshrss.lan`)
       kind: Rule
       services:
         - name: freshrss
           port: 80
+  tls:
+    secretName: freshrss-tls

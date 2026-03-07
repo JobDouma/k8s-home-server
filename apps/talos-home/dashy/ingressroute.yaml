@@ -5,10 +5,12 @@ metadata:
   namespace: media
 spec:
   entryPoints:
-    - web
+    - websecure
   routes:
     - match: Host(`dashy.lan`)
       kind: Rule
       services:
         - name: dashy
           port: 8080
+  tls:
+    secretName: dashy-tls

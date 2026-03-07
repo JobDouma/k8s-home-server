@@ -5,10 +5,12 @@ metadata:
   namespace: media
 spec:
   entryPoints:
-    - web
+    - websecure
   routes:
     - match: Host(`sonarr.lan`)
       kind: Rule
       services:
         - name: sonarr
           port: 8989
+  tls:
+    secretName: sonarr-tls

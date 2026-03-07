@@ -11,6 +11,7 @@ resources:
   - blocky/helmrelease.yaml
   - blocky/servicemonitor.yaml
   - blocky/ingressroute.yaml
+  - blocky/certificate.yaml
 
   # ──────────────────────────────────────
   # Jellyfin
@@ -26,19 +27,30 @@ resources:
   - qbittorrent/helmrelease.yaml
   - qbittorrent/secret.yaml
   - qbittorrent/ingressroute.yaml
+  - qbittorrent/certificate.yaml
 
   # ──────────────────────────────────────
   # monitoring / prometheus
   # ──────────────────────────────────────
-  - monitoring/namespace.yaml
-  - monitoring/monitoring-release.yaml
-  - monitoring/promtail-release.yaml
-  - monitoring/monitoring-repo.yaml
-  - monitoring/ingressroute.yaml
-  - monitoring/grafana-ingressroute.yaml
-  - monitoring/service.yaml
-  - monitoring/grafana-admin-secret.yaml
-  - monitoring/dashboards/
+  - prometheus/namespace.yaml
+  - prometheus/helmrepository.yaml
+  - prometheus/helmrelease.yaml
+  - prometheus/ingressroute.yaml
+  - prometheus/service.yaml
+  - prometheus/certificate.yaml
+
+  # ──────────────────────────────────────
+  # Grafana
+  # ──────────────────────────────────────
+  - grafana/ingressroute.yaml
+  - grafana/admin-secret.yaml
+  - grafana/certificate.yaml
+  - prometheus/dashboards/
+
+  # ──────────────────────────────────────
+  # Promtail
+  # ──────────────────────────────────────
+  - promtail/helmrelease.yaml
 
   # ──────────────────────────────────────
   # Loki
@@ -69,6 +81,7 @@ resources:
   - sonarr/pvc.yaml
   - sonarr/helmrelease.yaml
   - sonarr/ingressroute.yaml
+  - sonarr/certificate.yaml
 
   # ──────────────────────────────────────
   # Radarr
@@ -76,6 +89,7 @@ resources:
   - radarr/pvc.yaml
   - radarr/helmrelease.yaml
   - radarr/ingressroute.yaml
+  - radarr/certificate.yaml
 
   # ──────────────────────────────────────
   # PodDisruptionBudgets
@@ -97,6 +111,7 @@ resources:
   - dashy/configmap.yaml
   - dashy/helmrelease.yaml
   - dashy/ingressroute.yaml
+  - dashy/certificate.yaml
 
   # ──────────────────────────────────────
   # Prowlarr
@@ -104,6 +119,7 @@ resources:
   - prowlarr/pvc.yaml
   - prowlarr/helmrelease.yaml
   - prowlarr/ingressroute.yaml
+  - prowlarr/certificate.yaml
 
   # ──────────────────────────────────────
   # Reloader
@@ -161,6 +177,7 @@ resources:
   - freshrss/opml-configmap.yaml
   - freshrss/helmrelease.yaml
   - freshrss/ingressroute.yaml
+  - freshrss/certificate.yaml
 
 
   # ──────────────────────────────────────
@@ -171,6 +188,7 @@ resources:
   - falco/helmrelease.yaml
   - falco/ingressroute.yaml
   - falco/servicemonitor.yaml
+  - falco/certificate.yaml
 
   # ──────────────────────────────────────
   # Velero (K8s-backup)

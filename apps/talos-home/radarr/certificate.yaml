@@ -1,0 +1,15 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: radarr-tls
+  namespace: media
+spec:
+  secretName: jelradarrlyfin-tls
+  duration: 8760h
+  renewBefore: 720h
+  dnsNames:
+    - radarr.lan
+  issuerRef:
+    name: homelab-ca
+    kind: ClusterIssuer
+    group: cert-manager.io
