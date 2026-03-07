@@ -5,10 +5,12 @@ metadata:
   namespace: media
 spec:
   entryPoints:
-    - web
+    - websecure
   routes:
     - match: Host(`jellyfin.lan`)
       kind: Rule
       services:
         - name: jellyfin
           port: 8096
+  tls:
+    secretName: jellyfin-tls

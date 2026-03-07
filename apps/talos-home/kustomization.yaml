@@ -18,6 +18,7 @@ resources:
   - jellyfin/helmrepository.yaml
   - jellyfin/helmrelease.yaml
   - jellyfin/ingressroute.yaml
+  - jellyfin/certificate.yaml
 
   # ──────────────────────────────────────
   # qBittorrent
@@ -52,6 +53,7 @@ resources:
   - jellyseerr/helmrelease.yaml
   - jellyseerr/ingressroute.yaml
   - jellyseerr/pvc.yaml
+  - jellyseerr/certificate.yaml
 
   # ──────────────────────────────────────
   # Network Policies
@@ -131,6 +133,7 @@ resources:
   - joplin/hr-postgres.yaml
   - joplin/hr-joplin.yaml
   - joplin/ingressroute.yaml
+  - joplin/certificate.yaml
 
   # ──────────────────────────────────────
   # TrueNAS NFS dynamic provisioner

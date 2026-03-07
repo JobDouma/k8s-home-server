@@ -5,10 +5,12 @@ metadata:
   namespace: media
 spec:
   entryPoints:
-    - web
+    - websecure
   routes:
     - match: Host(`jellyseerr.lan`)
       kind: Rule
       services:
         - name: jellyseerr
           port: 5055
+  tls:
+    secretName: jellyseerr-tls

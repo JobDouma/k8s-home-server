@@ -1,0 +1,17 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: ntfy
+  namespace: ntfy
+spec:
+  chart:
+    spec:
+      chart: ntfy
+      sourceRef:
+        kind: HelmRepository
+        name: nicholaswilde
+  values:
+    config:
+      base-url: http://ntfy.lan
+      # Optional: restrict publishing to authenticated users
+      auth-default-access: deny-all
