@@ -158,13 +158,6 @@ resources:
   - truenas-nfs/helmrelease.yaml
 
   # ──────────────────────────────────────
-  # Proxmox
-  # ──────────────────────────────────────
-  # - proxmox/service.yaml
-  # - proxmox/ingressroute.yaml
-  # - proxmox/endpoints.yaml
-
-  # ──────────────────────────────────────
   # CoreDNS to Blocky
   # ──────────────────────────────────────
   - coredns/configmap.yaml
@@ -178,7 +171,6 @@ resources:
   - freshrss/helmrelease.yaml
   - freshrss/ingressroute.yaml
   - freshrss/certificate.yaml
-
 
   # ──────────────────────────────────────
   # Falco
