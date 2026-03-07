@@ -10,13 +10,13 @@ spec:
   duration: 87600h
   renewBefore: 720h
   privateKey:
-    algorithm: ECDSA
-    size: 256
+    algorithm: RSA
+    size: 4096
   subject:
     organizations:
       - homelab
   dnsNames:
-    - homelab-ca        # ← adds SAN to the CA itself
+    - homelab-ca
   issuerRef:
     name: selfsigned-bootstrap
     kind: ClusterIssuer
