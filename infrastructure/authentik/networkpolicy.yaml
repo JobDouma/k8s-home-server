@@ -28,8 +28,12 @@ spec:
             matchLabels:
               kubernetes.io/metadata.name: networking
       ports:
+        - port: 80      # ← add this
+          protocol: TCP
         - port: 9000
+          protocol: TCP
         - port: 9443
+          protocol: TCP
     # Prometheus scraping
     - from:
         - namespaceSelector:
