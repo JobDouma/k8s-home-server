@@ -32,6 +32,7 @@ resources:
   - headlamp/networkpolicy.yaml
   - headlamp/rbac.yaml
   - headlamp/certificate.yaml
+  - headlamp/clusterrolebinding.yaml
 
   - longhorn/namespace.yaml
   - longhorn/helmrepository.yaml
