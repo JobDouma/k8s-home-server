@@ -21,11 +21,9 @@ spec:
         kind: HelmRepository
         name: traefik
         namespace: flux-system
-
   values:
     deployment:
       replicas: 3
-      # affinity goes here ✅
       affinity:
         podAntiAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:
@@ -36,7 +34,6 @@ spec:
                     app.kubernetes.io/name: traefik
                 topologyKey: kubernetes.io/hostname
 
-    # tolerations go at TOP LEVEL, not under deployment ✅
     tolerations:
       - operator: Exists
 
@@ -85,10 +82,17 @@ spec:
       kubernetesIngress:
         enabled: true
         namespaces: []
-
       kubernetesCRD:
         enabled: true
         allowCrossNamespace: true
+        allowExternalNameServices: true
+        # This tells Traefik to watch all namespaces for secrets
+        namespaces: []
+
+    rbac:
+      enabled: true
+      # Grant cluster-wide secret read access
+      secretResourceNames: []
 
     additionalArguments:
       - "--providers.kubernetesingress.ingressclass=traefik"
@@ -104,6 +108,7 @@ spec:
       - "--entrypoints.web.http.redirections.entrypoint.to=websecure"
       - "--entrypoints.web.http.redirections.entrypoint.scheme=https"
       - "--entrypoints.web.http.redirections.entrypoint.permanent=true"
+      - "--providers.kubernetescrd.allowCrossNamespace=true"
 
     logs:
       general:
