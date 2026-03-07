@@ -46,7 +46,7 @@ spec:
           enabled: true
           name: headlamp-oidc-credentials
       extraArgs:
-        - -oidc-ca-cert=/etc/ssl/certs/homelab-ca.crt
+        - -oidc-ca-file=/etc/ssl/certs/homelab-ca.crt
 
     serviceAccount:
       create: false
