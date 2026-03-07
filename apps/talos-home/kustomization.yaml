@@ -45,7 +45,7 @@ resources:
   - grafana/ingressroute.yaml
   - grafana/admin-secret.yaml
   - grafana/certificate.yaml
-  - prometheus/dashboards/
+  - grafana/dashboards/
 
   # ──────────────────────────────────────
   # Promtail
