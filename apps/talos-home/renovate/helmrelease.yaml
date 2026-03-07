@@ -10,7 +10,7 @@ spec:
   chart:
     spec:
       chart: renovate
-      version: "46.53.1"
+      version: "46.56.2"
       sourceRef:
         kind: HelmRepository
         name: renovate
@@ -36,7 +36,7 @@ spec:
 
       image:
         repository: ghcr.io/renovatebot/renovate
-        tag: "43.56.1"
+        tag: "43.59.2"
 
       config: |
         {
