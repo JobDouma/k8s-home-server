@@ -16,6 +16,23 @@ spec:
   values:
     replicaCount: 1
 
+    volumes:
+      - name: homelab-ca
+        secret:
+          secretName: homelab-ca-secret
+          items:
+            - key: tls.crt
+              path: homelab-ca.crt
+
+    volumeMounts:
+      - name: homelab-ca
+        mountPath: /etc/ssl/certs/homelab-ca.crt
+        subPath: homelab-ca.crt
+
+    env:
+      - name: SSL_CERT_FILE
+        value: /etc/ssl/certs/homelab-ca.crt
+
     service:
       type: ClusterIP
       port: 80
