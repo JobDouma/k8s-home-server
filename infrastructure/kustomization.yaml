@@ -16,6 +16,7 @@ resources:
   - traefik/middlewares.yaml
   - traefik/servicemonitor.yaml
   - traefik/certificate.yaml
+  - traefik/Clusterrole.yaml
 
   - metallb/namespace.yaml
   - metallb/helmrelease.yaml
