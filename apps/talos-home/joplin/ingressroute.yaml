@@ -5,7 +5,7 @@ metadata:
   namespace: joplin
 spec:
   entryPoints:
-    - web
+    - websecure
 
   routes:
     - match: Host(`joplin.lan`)
@@ -13,3 +13,5 @@ spec:
       services:
         - name: joplin
           port: 22300
+  tls:
+    secretName: joplin-tls
