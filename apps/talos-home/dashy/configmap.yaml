@@ -31,37 +31,37 @@ data:
           - title: Jellyfin
             description: Media Server
             icon: fas fa-film
-            url: http://jellyfin.lan
+            url: https://jellyfin.lan
 
           - title: Jellyseerr
             description: Media Requests
             icon: fas fa-ticket-alt
-            url: http://jellyseerr.lan
+            url: https://jellyseerr.lan
 
           - title: Sonarr
             description: TV Automation
             icon: fas fa-tv
-            url: http://sonarr.lan
+            url: https://sonarr.lan
 
           - title: Radarr
             description: Movie Automation
             icon: fas fa-video
-            url: http://radarr.lan
+            url: https://radarr.lan
 
           - title: Prowlarr
             description: Indexer Management
             icon: fas fa-search
-            url: http://prowlarr.lan
+            url: https://prowlarr.lan
 
           - title: qBittorrent
             description: Torrent Client
             icon: fas fa-download
-            url: http://qbittorrent.lan
+            url: https://qbittorrent.lan
 
           - title: SABnzbd
             description: Usenet Client
             icon: fas fa-cloud-download-alt
-            url: http://sabnzbd.lan
+            url: https://sabnzbd.lan
 
 
       - name: Productivity
@@ -71,12 +71,12 @@ data:
           - title: Joplin
             description: Notes & Sync Server
             icon: fas fa-sticky-note
-            url: http://joplin.lan
+            url: https://joplin.lan
 
           - title: FreshRSS
             description: RSS Reader & News Aggregator
             icon: fas fa-rss
-            url: http://freshrss.lan
+            url: https://freshrss.lan
 
 
       - name: Monitoring
@@ -86,12 +86,12 @@ data:
           - title: Grafana
             description: Dashboards
             icon: fas fa-chart-area
-            url: http://grafana.lan
+            url: https://grafana.lan
 
           - title: Prometheus
             description: Metrics & Alerting
             icon: fas fa-fire
-            url: http://prometheus.lan
+            url: https://prometheus.lan
 
 
       - name: Kubernetes
@@ -101,12 +101,12 @@ data:
           - title: Headlamp
             description: Cluster Management
             icon: fas fa-cubes
-            url: http://headlamp.lan
+            url: https://headlamp.lan
 
           - title: Traefik
             description: Ingress Controller
             icon: fas fa-route
-            url: http://traefik.lan
+            url: https://traefik.lan
 
 
       - name: Infrastructure
@@ -116,12 +116,12 @@ data:
           - title: TrueNAS
             description: Storage System
             icon: fas fa-database
-            url: http://truenas.lan
+            url: https://truenas.lan
 
           - title: Longhorn
             description: Storage UI
             icon: fas fa-hdd
-            url: http://longhorn.lan
+            url: https://longhorn.lan
 
 
       - name: Networking
@@ -130,12 +130,12 @@ data:
           - title: Blocky
             description: DNS Ad Blocking & Resolver
             icon: fas fa-shield-virus
-            url: http://blocky.lan
+            url: https://blocky.lan
 
           - title: UniFi Controller
             description: Network Controller
             icon: fas fa-wifi
-            url: http://unifi.lan
+            url: https://unifi.lan
 
           - title: Router
             description: Gateway Management
@@ -150,9 +150,9 @@ data:
           - title: Authentik
             description: Identity Provider
             icon: fas fa-user-lock
-            url: http://auth.lan
+            url: https://auth.lan
 
           - title: Falco
             description: Runtime Security & Threat Detection
             icon: fas fa-shield-alt
-            url: http://falco.lan
+            url: https://falco.lan
