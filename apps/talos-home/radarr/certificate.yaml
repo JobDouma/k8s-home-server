@@ -4,7 +4,7 @@ metadata:
   name: radarr-tls
   namespace: media
 spec:
-  secretName: jelradarrlyfin-tls
+  secretName: radarr-tls
   duration: 8760h
   renewBefore: 720h
   dnsNames:
