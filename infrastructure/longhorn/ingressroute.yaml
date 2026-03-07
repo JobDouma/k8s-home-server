@@ -5,7 +5,7 @@ metadata:
   namespace: longhorn
 spec:
   entryPoints:
-    - web
+    - websecure
   routes:
     - match: Host(`longhorn.lan`)
       kind: Rule
@@ -15,3 +15,5 @@ spec:
       services:
         - name: longhorn-frontend
           port: 80
+  tls:
+    secretName: longhorn-tls

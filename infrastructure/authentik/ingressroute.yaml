@@ -7,8 +7,8 @@ spec:
   entryPoints:
     - websecure
   routes:
-    - match: Host(`auth.lan`)
-      kind: Rule
+    - kind: Rule
+      match: Host(`auth.lan`)
       services:
         - name: authentik-server
           port: 80

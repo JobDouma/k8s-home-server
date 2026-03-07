@@ -5,7 +5,7 @@ metadata:
   namespace: networking
 spec:
   entryPoints:
-    - web
+    - websecure
   routes:
     - match: Host(`traefik.lan`)
       kind: Rule
@@ -15,3 +15,5 @@ spec:
       services:
         - name: api@internal
           kind: TraefikService
+  tls:
+    secretName: traefik-tls  # ← needs a certificate

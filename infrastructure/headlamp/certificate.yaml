@@ -1,0 +1,15 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: headlamp-tls
+  namespace: networking
+spec:
+  secretName: headlamp-tls
+  duration: 8760h
+  renewBefore: 720h
+  dnsNames:
+    - headlamp.lan
+  issuerRef:
+    name: homelab-ca
+    kind: ClusterIssuer
+    group: cert-manager.io
