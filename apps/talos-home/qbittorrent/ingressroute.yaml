@@ -5,10 +5,12 @@ metadata:
   namespace: media
 spec:
   entryPoints:
-    - web
+    - websecure
   routes:
     - match: Host(`qbittorrent.lan`)
       kind: Rule
       services:
         - name: qbittorrent
           port: 8080
+  tls:
+    secretName: qbittorrent-tls

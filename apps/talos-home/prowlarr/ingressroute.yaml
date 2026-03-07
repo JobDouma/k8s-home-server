@@ -5,10 +5,12 @@ metadata:
   namespace: media
 spec:
   entryPoints:
-    - web
+    - websecure
   routes:
     - match: Host(`prowlarr.lan`)
       kind: Rule
       services:
         - name: prowlarr
           port: 9696
+  tls:
+    secretName: prowlarr-tls

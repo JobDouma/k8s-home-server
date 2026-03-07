@@ -5,10 +5,15 @@ metadata:
   namespace: dns
 spec:
   entryPoints:
-    - web
+    - websecure
   routes:
     - match: Host(`blocky.lan`)
       kind: Rule
+      middlewares:
+        - name: traefik-chain
+          namespace: networking
       services:
         - name: blocky
           port: 4000
+  tls:
+    secretName: blocky-tls

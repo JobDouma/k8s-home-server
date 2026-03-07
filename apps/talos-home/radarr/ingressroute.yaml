@@ -5,10 +5,12 @@ metadata:
   namespace: media
 spec:
   entryPoints:
-    - web
+    - websecure
   routes:
     - match: Host(`radarr.lan`)
       kind: Rule
       services:
         - name: radarr
           port: 7878
+  tls:
+    secretName: radarr-tls

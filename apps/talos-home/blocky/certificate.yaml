@@ -1,0 +1,15 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: blocky-tls
+  namespace: media
+spec:
+  secretName: blocky-tls
+  duration: 8760h
+  renewBefore: 720h
+  dnsNames:
+    - blocky.lan
+  issuerRef:
+    name: homelab-ca
+    kind: ClusterIssuer
+    group: cert-manager.io

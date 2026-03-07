@@ -5,10 +5,12 @@ metadata:
   namespace: monitoring
 spec:
   entryPoints:
-    - web
+    - websecure
   routes:
     - match: Host(`prometheus.lan`)
       kind: Rule
       services:
         - name: prometheus
           port: 9090
+  tls:
+    secretName: prometheus-tls

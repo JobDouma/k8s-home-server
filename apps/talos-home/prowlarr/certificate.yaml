@@ -1,0 +1,15 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: prowlarr-tls
+  namespace: media
+spec:
+  secretName: prowlarr-tls
+  duration: 8760h
+  renewBefore: 720h
+  dnsNames:
+    - prowlarr.lan
+  issuerRef:
+    name: homelab-ca
+    kind: ClusterIssuer
+    group: cert-manager.io
