@@ -2,7 +2,7 @@ apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
   name: falco-tls
-  namespace: media
+  namespace: falco
 spec:
   secretName: falco-tls
   duration: 8760h
