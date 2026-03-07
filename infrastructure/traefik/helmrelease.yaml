@@ -90,7 +90,7 @@ spec:
         namespaces: []
 
     rbac:
-      enabled: true
+      enabled: false
       # Grant cluster-wide secret read access
       secretResourceNames: []
 
