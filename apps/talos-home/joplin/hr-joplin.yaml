@@ -49,7 +49,7 @@ spec:
                 protocol: TCP
 
             env:
-              APP_BASE_URL: http://joplin.lan
+              APP_BASE_URL: https://joplin.lan
               APP_PORT: "22300"
               APP_LISTEN_ADDRESS: 0.0.0.0
 
