@@ -5,10 +5,12 @@ metadata:
   namespace: headlamp
 spec:
   entryPoints:
-    - web
+    - websecure
   routes:
     - match: Host(`headlamp.lan`)
       kind: Rule
       services:
         - name: headlamp
           port: 80
+  tls:
+    secretName: headlamp-tls

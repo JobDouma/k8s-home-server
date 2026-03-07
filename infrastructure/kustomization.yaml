@@ -15,6 +15,7 @@ resources:
   - traefik/ingressroute.yaml
   - traefik/middlewares.yaml
   - traefik/servicemonitor.yaml
+  - traefik/certificate.yaml
 
   - metallb/namespace.yaml
   - metallb/helmrelease.yaml
@@ -29,6 +30,7 @@ resources:
   - headlamp/oidc-secret.yaml
   - headlamp/networkpolicy.yaml
   - headlamp/rbac.yaml
+  - headlamp/certificate.yaml
 
   - longhorn/namespace.yaml
   - longhorn/helmrepository.yaml
@@ -36,6 +38,7 @@ resources:
   - longhorn/servicemonitor.yaml
   - longhorn/ingressroute.yaml
   - longhorn/recurringjob.yaml
+  - longhorn/certificate.yaml
 
   - authentik/namespace.yaml
   - authentik/certificate.yaml
