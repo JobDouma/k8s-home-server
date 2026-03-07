@@ -2,7 +2,7 @@ apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
   name: longhorn-tls
-  namespace: networking
+  namespace: longhorn
 spec:
   secretName: longhorn-tls
   duration: 8760h

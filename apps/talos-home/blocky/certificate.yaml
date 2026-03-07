@@ -2,7 +2,7 @@ apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
   name: blocky-tls
-  namespace: media
+  namespace: dns
 spec:
   secretName: blocky-tls
   duration: 8760h
