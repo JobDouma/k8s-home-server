@@ -12,6 +12,7 @@ data:
           - https://dns.google/dns-query
           - 1.1.1.1
           - 8.8.8.8
+      timeout: 2s 
 
     blocking:
       blackLists:
@@ -21,9 +22,22 @@ data:
           - https://adguardteam.github.io/AdGuardSDNSFilter/Filters/filter.txt
           - https://raw.githubusercontent.com/hoshsadiq/adblock-nocoin-list/master/hosts.txt
           - https://raw.githubusercontent.com/EnergizedProtection/block/master/EnergizedBlu.hosts
+          - https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts          # StevenBlack consolidated
+          - https://big.oisd.nl                                                        # oisd big (more aggressive)
         malware:
           - https://urlhaus.abuse.ch/downloads/hostfile/
           - https://raw.githubusercontent.com/nicehash/NiceHash-blocklist/master/blocklist.txt
+          - https://phishing.army/download/phishing_army_blocklist_extended.txt        # phishing domains
+          - https://raw.githubusercontent.com/DandelionSprout/adfilt/master/Alternate%20versions%20Anti-Malware%20List/AntiMalwareHosts.txt
+
+      whiteLists:
+        ads:
+          - |
+            # Common false positives
+            clients4.google.com
+            clients2.google.com
+            s.youtube.com
+            time.windows.com
 
       clientGroupsBlock:
         default:
@@ -37,12 +51,19 @@ data:
 
     caching:
       minTime: 5m
-      maxTime: 30m
+      maxTime: 1h     # was 30m — fine to increase
+      prefetching: true          # proactively refresh popular domains before TTL expires
+      prefetchExpires: 2h
+      prefetchThreshold: 5
 
     ports:
       dns: 53
       http: 4000
 
+    queryLog:
+      type: console
+      logRetentionDays: 7
+    
     log:
       level: info
 
@@ -75,3 +96,4 @@ data:
         # external infra
         truenas.lan: 192.168.2.5
         router.lan: 192.168.2.254
+        omni.lan: 192.168.2.12
