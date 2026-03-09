@@ -108,6 +108,11 @@ data:
             icon: fas fa-route
             url: https://traefik.lan
 
+          - title: Omni
+            description: Talos Machine Management
+            icon: fas fa-server
+            url: https://omni.lan
+
 
       - name: Infrastructure
         icon: fas fa-server
