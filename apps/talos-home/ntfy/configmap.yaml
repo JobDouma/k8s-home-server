@@ -1,0 +1,26 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ntfy-config
+  namespace: ntfy
+data:
+  server.yml: |
+    base-url: https://ntfy.lan
+    listen-http: ":80"
+
+    # Auth — deny unauthenticated access
+    auth-default-access: deny-all
+    auth-file: /var/cache/ntfy/user.db
+
+    # Cache — persist messages across restarts
+    cache-file: /var/cache/ntfy/cache.db
+    cache-duration: 12h
+
+    # Attachments
+    attachment-cache-dir: /var/cache/ntfy/attachments
+    attachment-total-size-limit: 5G
+    attachment-file-size-limit: 15M
+    attachment-expiry-duration: 3h
+
+    # Logging
+    log-level: info
