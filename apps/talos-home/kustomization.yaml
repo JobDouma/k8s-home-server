@@ -194,3 +194,11 @@ resources:
   - velero/servicemonitor.yaml
   - velero/networkpolicy.yaml
 
+  # ──────────────────────────────────────
+  # Ntfy
+  # ──────────────────────────────────────
+  - ntfy/namespace.yaml
+  - ntfy/helmrepository.yaml
+  - ntfy/helmrelease.yaml
+  - ntfy/certificate.yaml
+  - ntfy/ingressroute.yaml

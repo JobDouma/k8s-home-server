@@ -92,6 +92,7 @@ data:
         auth.lan: 192.168.2.100
         falco.lan: 192.168.2.100
         longhorn.lan: 192.168.2.100
+        ntfy.lan: 192.168.2.100
 
         # external infra
         truenas.lan: 192.168.2.5
