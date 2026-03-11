@@ -34,22 +34,10 @@ spec:
               tag: v2.11.0
             command:
               - /bin/sh
-              - /etc/ntfy/bootstrap.sh
+              - /scripts/bootstrap.sh
             envFrom:
               - secretRef:
                   name: ntfy-secret
-            # needs access to both the config (bootstrap.sh) and the cache (user.db)
-            volumeMounts:
-              - name: config
-                mountPath: /etc/ntfy/server.yml
-                subPath: server.yml
-                readOnly: true
-              - name: bootstrap
-                mountPath: /etc/ntfy/bootstrap.sh
-                subPath: bootstrap.sh
-                readOnly: true
-              - name: cache
-                mountPath: /var/cache/ntfy
 
         containers:
           app:
@@ -58,9 +46,6 @@ spec:
               tag: v2.11.0
             args:
               - serve
-            envFrom:
-              - secretRef:
-                  name: ntfy-secret
             env:
               TZ: Europe/Amsterdam
             resources:
@@ -80,30 +65,39 @@ spec:
             targetPort: 80
 
     persistence:
+      # server.yml config for the main container
       config:
-        enabled: true
         type: configMap
         name: ntfy-config
-        globalMounts:
-          - path: /etc/ntfy/server.yml
-            subPath: server.yml
-            readOnly: true
+        advancedMounts:
+          ntfy:
+            app:
+              - path: /etc/ntfy/server.yml
+                subPath: server.yml
+                readOnly: true
 
-      bootstrap:
-        enabled: true
+      # bootstrap.sh mounted into the init container only
+      scripts:
         type: configMap
         name: ntfy-config
         defaultMode: 0755
-        globalMounts:
-          - path: /etc/ntfy/bootstrap.sh
-            subPath: bootstrap.sh
-            readOnly: true
+        advancedMounts:
+          ntfy:
+            bootstrap:
+              - path: /scripts/bootstrap.sh
+                subPath: bootstrap.sh
+                readOnly: true
 
+      # shared cache volume — both init container and main container need it
+      # init container writes user.db, main container reads/writes cache.db
       cache:
-        enabled: true
         type: persistentVolumeClaim
         storageClass: longhorn
         accessMode: ReadWriteOnce
         size: 2Gi
-        globalMounts:
-          - path: /var/cache/ntfy
+        advancedMounts:
+          ntfy:
+            bootstrap:
+              - path: /var/cache/ntfy
+            app:
+              - path: /var/cache/ntfy

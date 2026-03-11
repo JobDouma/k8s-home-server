@@ -39,32 +39,30 @@ data:
 
     echo "Bootstrapping ntfy users and ACLs..."
 
-    # ── Users ────────────────────────────────────────────────
-    # Admin user — full access
-    ntfy user add --role=admin "$NTFY_ADMIN_USER" <<EOF
-    $NTFY_ADMIN_PASSWORD
-    $NTFY_ADMIN_PASSWORD
-    EOF
+    # ntfy reads auth-file from server.yml — pass it explicitly here too
+    CONF="--config /etc/ntfy/server.yml"
 
-    # Publisher user — used by apps to POST notifications
-    ntfy user add "$NTFY_PUBLISHER_USER" <<EOF
-    $NTFY_PUBLISHER_PASSWORD
-    $NTFY_PUBLISHER_PASSWORD
-    EOF
+    # ── Users ────────────────────────────────────────────────
+    # Admin user — full cluster access
+    ntfy $CONF user add --role=admin --password="$NTFY_ADMIN_PASSWORD" "$NTFY_ADMIN_USER"
+
+    # Publisher user — used by apps (Alertmanager, Velero, Renovate) to POST
+    ntfy $CONF user add --password="$NTFY_PUBLISHER_PASSWORD" "$NTFY_PUBLISHER_USER"
 
     # ── ACLs ─────────────────────────────────────────────────
-    # Publisher: write-only to each topic
-    ntfy access "$NTFY_PUBLISHER_USER" homelab-alerts rw
-    ntfy access "$NTFY_PUBLISHER_USER" longhorn        rw
-    ntfy access "$NTFY_PUBLISHER_USER" velero          rw
-    ntfy access "$NTFY_PUBLISHER_USER" renovate        rw
-    ntfy access "$NTFY_PUBLISHER_USER" flux            rw
+    # Publisher: write access to each topic
+    ntfy $CONF access "$NTFY_PUBLISHER_USER" homelab-alerts  write-only
+    ntfy $CONF access "$NTFY_PUBLISHER_USER" longhorn        write-only
+    ntfy $CONF access "$NTFY_PUBLISHER_USER" velero          write-only
+    ntfy $CONF access "$NTFY_PUBLISHER_USER" renovate        write-only
+    ntfy $CONF access "$NTFY_PUBLISHER_USER" flux            write-only
 
-    # Admin: read access to all topics (admin role covers write already)
-    ntfy access "$NTFY_ADMIN_USER" homelab-alerts ro
-    ntfy access "$NTFY_ADMIN_USER" longhorn        ro
-    ntfy access "$NTFY_ADMIN_USER" velero          ro
-    ntfy access "$NTFY_ADMIN_USER" renovate        ro
-    ntfy access "$NTFY_ADMIN_USER" flux            ro
+    # Admin: read access to all topics (admin role covers everything already,
+    # but explicit grants make it visible in the ACL table)
+    ntfy $CONF access "$NTFY_ADMIN_USER" homelab-alerts  read-write
+    ntfy $CONF access "$NTFY_ADMIN_USER" longhorn        read-write
+    ntfy $CONF access "$NTFY_ADMIN_USER" velero          read-write
+    ntfy $CONF access "$NTFY_ADMIN_USER" renovate        read-write
+    ntfy $CONF access "$NTFY_ADMIN_USER" flux            read-write
 
     echo "Bootstrap complete."
