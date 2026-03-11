@@ -27,6 +27,30 @@ spec:
   values:
     controllers:
       ntfy:
+        initContainers:
+          bootstrap:
+            image:
+              repository: binwiederhier/ntfy
+              tag: v2.11.0
+            command:
+              - /bin/sh
+              - /etc/ntfy/bootstrap.sh
+            envFrom:
+              - secretRef:
+                  name: ntfy-secret
+            # needs access to both the config (bootstrap.sh) and the cache (user.db)
+            volumeMounts:
+              - name: config
+                mountPath: /etc/ntfy/server.yml
+                subPath: server.yml
+                readOnly: true
+              - name: bootstrap
+                mountPath: /etc/ntfy/bootstrap.sh
+                subPath: bootstrap.sh
+                readOnly: true
+              - name: cache
+                mountPath: /var/cache/ntfy
+
         containers:
           app:
             image:
@@ -34,6 +58,9 @@ spec:
               tag: v2.11.0
             args:
               - serve
+            envFrom:
+              - secretRef:
+                  name: ntfy-secret
             env:
               TZ: Europe/Amsterdam
             resources:
@@ -60,6 +87,16 @@ spec:
         globalMounts:
           - path: /etc/ntfy/server.yml
             subPath: server.yml
+            readOnly: true
+
+      bootstrap:
+        enabled: true
+        type: configMap
+        name: ntfy-config
+        defaultMode: 0755
+        globalMounts:
+          - path: /etc/ntfy/bootstrap.sh
+            subPath: bootstrap.sh
             readOnly: true
 
       cache:
