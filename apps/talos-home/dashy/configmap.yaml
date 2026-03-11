@@ -78,6 +78,11 @@ data:
             icon: fas fa-rss
             url: https://freshrss.lan
 
+          - title: Ntfy
+            description: Push Notifications
+            icon: fas fa-bell
+            url: https://ntfy.lan
+
 
       - name: Monitoring
         icon: fas fa-chart-line

@@ -4,14 +4,44 @@ metadata:
   name: ntfy
   namespace: ntfy
 spec:
+  interval: 15m
+  timeout: 10m
+
+  install:
+    remediation:
+      retries: 3
+
+  upgrade:
+    remediation:
+      retries: 3
+
   chart:
     spec:
       chart: ntfy
+      version: "*"
       sourceRef:
         kind: HelmRepository
         name: nicholaswilde
+        namespace: flux-system
+
   values:
     config:
-      base-url: http://ntfy.lan
-      # Optional: restrict publishing to authenticated users
+      base-url: https://ntfy.lan
       auth-default-access: deny-all
+
+    service:
+      type: ClusterIP
+      port: 80
+
+    persistence:
+      enabled: true
+      storageClass: longhorn
+      accessMode: ReadWriteOnce
+      size: 2Gi
+
+    resources:
+      requests:
+        cpu: 50m
+        memory: 64Mi
+      limits:
+        memory: 256Mi
