@@ -36,6 +36,7 @@ spec:
     daemonset:
       tolerations:
         - operator: Exists
+      podAnnotations: {}
 
     affinity:
       nodeAffinity:
