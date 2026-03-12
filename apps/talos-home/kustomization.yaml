@@ -181,6 +181,7 @@ resources:
   - falco/ingressroute.yaml
   - falco/servicemonitor.yaml
   - falco/certificate.yaml
+  - falco/configmap.yaml
 
   # ──────────────────────────────────────
   # Velero (K8s-backup)
