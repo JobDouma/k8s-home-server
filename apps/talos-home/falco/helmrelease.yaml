@@ -25,14 +25,18 @@ spec:
   values:
     driver:
       kind: modern_ebpf
+
     falco:
       jsonOutput: true
       logLevel: info
+      existingRulesConfigMaps:
+        - falco-rules
+        - falco-custom-rules
+
     daemonset:
       tolerations:
         - operator: Exists
 
-    # NOT under daemonset — top level
     affinity:
       nodeAffinity:
         requiredDuringSchedulingIgnoredDuringExecution:
@@ -42,23 +46,30 @@ spec:
                   operator: NotIn
                   values:
                     - talos-cp-3-rpi
+
     falcosidekick:
       enabled: true
       replicaCount: 1
+      tolerations:
+        - operator: Exists
+      podAnnotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "2801"
       webui:
         enabled: true
         replicaCount: 1
       config:
         loki:
-          hostport: http://loki-gateway.monitoring.svc.cluster.local
-          minimumpriority: warning
+          hostport: "http://loki-gateway.monitoring.svc.cluster.local"
+          minimumpriority: "warning"
           customHeaders: "X-Scope-OrgID: 1"
-        prometheus:
-          hostport: ""
-          minimumpriority: ""
-      podAnnotations:
-        prometheus.io/scrape: "true"
-        prometheus.io/port: "2801"
+        ntfy:
+          hostport: "http://ntfy.ntfy.svc.cluster.local"
+          topic: "homelab-alerts"
+          token: ""
+          minimumpriority: "warning"
+          checkcert: false
+
     resources:
       limits:
         memory: 512Mi

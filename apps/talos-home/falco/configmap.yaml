@@ -1,0 +1,76 @@
+# falco/custom-rules.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: falco-custom-rules
+  namespace: falco
+data:
+  custom-rules.yaml: |
+    # ── Silence expected noisy rules ──────────────────────────────
+
+    # linuxserver.io images run as root by design — suppress container drift alerts
+    - rule: Launch Privileged Container
+      condition: and not (container.image.repository in (
+        "ghcr.io/linuxserver/sonarr",
+        "ghcr.io/linuxserver/radarr",
+        "ghcr.io/linuxserver/prowlarr",
+        "ghcr.io/linuxserver/sabnzbd"
+      ))
+      override:
+        condition: append
+
+    # Jellyfin reads media files — suppress read-sensitive-file for media paths
+    - macro: allowed_media_readers
+      condition: >
+        container.image.repository = "jellyfin/jellyfin" and
+        fd.name startswith "/media"
+    
+    # qBittorrent legitimately opens many network connections
+    - macro: qbittorrent_container
+      condition: container.image.repository = "ghcr.io/onedr0p/qbittorrent"
+
+    # ── Custom rules for YOUR environment ─────────────────────────
+
+    # Alert if anything in the cluster tries to read Kubernetes secrets from the API
+    - rule: Unexpected K8s Secret Access
+      desc: A process accessed Kubernetes secrets via the API server
+      condition: >
+        ka.verb in (get, list, watch) and
+        ka.target.resource = secrets and
+        not ka.user.name in (
+          "system:serviceaccount:velero:velero",
+          "system:serviceaccount:monitoring:kube-prometheus-stack-prometheus",
+          "system:serviceaccount:flux-system:kube-apiserver-health-check"
+        )
+      output: >
+        Unexpected secret access (user=%ka.user.name verb=%ka.verb
+        resource=%ka.target.resource ns=%ka.target.namespace)
+      priority: WARNING
+      source: k8s_audit
+
+    # Alert on any shell in a media container (Jellyfin, qBittorrent etc. should never shell)
+    - rule: Shell in Media Container
+      desc: Shell spawned inside a media namespace container
+      condition: >
+        spawned_process and
+        shell_procs and
+        container and
+        k8s.ns.name = "media"
+      output: >
+        Shell in media container (pod=%k8s.pod.name image=%container.image.repository
+        shell=%proc.name)
+      priority: WARNING
+      tags: [media, shell]
+
+    # Alert on any new listening port in the cluster
+    - rule: Unexpected Listening Port
+      desc: A container started listening on an unexpected port
+      condition: >
+        evt.type = listen and
+        container and
+        not proc.name in (nginx, traefik, node, python3, java) and
+        not fd.sport in (80, 443, 8080, 8096, 8989, 7878, 9696, 5055, 22300, 53)
+      output: >
+        Unexpected listen port (pod=%k8s.pod.name port=%fd.sport image=%container.image.repository)
+      priority: NOTICE
+      tags: [network]
