@@ -7,22 +7,14 @@ data:
   server.yml: |
     base-url: https://ntfy.lan
     listen-http: ":80"
-
-    # Auth — deny unauthenticated access
     auth-default-access: deny-all
     auth-file: /var/cache/ntfy/user.db
-
-    # Cache — persist messages across restarts
     cache-file: /var/cache/ntfy/cache.db
     cache-duration: 12h
-
-    # Attachments
     attachment-cache-dir: /var/cache/ntfy/attachments
     attachment-total-size-limit: 5G
     attachment-file-size-limit: 15M
     attachment-expiry-duration: 3h
-
-    # Logging
     log-level: info
 
   bootstrap.sh: |
@@ -31,7 +23,6 @@ data:
 
     DB="/var/cache/ntfy/user.db"
 
-    # Only bootstrap on first run — if db already exists, skip entirely.
     if [ -f "$DB" ]; then
       echo "Auth DB already exists, skipping bootstrap."
       exit 0
@@ -39,27 +30,23 @@ data:
 
     echo "Bootstrapping ntfy users and ACLs..."
 
-    # ntfy user/access commands read auth-file from server.yml.
-    # NTFY_PASSWORD env var is read automatically by ntfy user add.
+    # Admin user
+    ntfy user add --role=admin --password="$NTFY_ADMIN_PASSWORD" "$NTFY_ADMIN_USER"
 
-    # ── Admin user ───────────────────────────────────────────
-    NTFY_PASSWORD="$NTFY_ADMIN_PASSWORD" ntfy user add --role=admin "$NTFY_ADMIN_USER"
+    # Publisher user
+    ntfy user add --password="$NTFY_PUBLISHER_PASSWORD" "$NTFY_PUBLISHER_USER"
 
-    # ── Publisher user ───────────────────────────────────────
-    NTFY_PASSWORD="$NTFY_PUBLISHER_PASSWORD" ntfy user add "$NTFY_PUBLISHER_USER"
+    # ACLs — note: correct command is `ntfy user access`, NOT `ntfy access`
+    ntfy user access "$NTFY_PUBLISHER_USER" homelab-alerts  write-only
+    ntfy user access "$NTFY_PUBLISHER_USER" longhorn        write-only
+    ntfy user access "$NTFY_PUBLISHER_USER" velero          write-only
+    ntfy user access "$NTFY_PUBLISHER_USER" renovate        write-only
+    ntfy user access "$NTFY_PUBLISHER_USER" flux            write-only
 
-    # ── ACLs — publisher write-only per topic ────────────────
-    ntfy access "$NTFY_PUBLISHER_USER" homelab-alerts  write-only
-    ntfy access "$NTFY_PUBLISHER_USER" longhorn        write-only
-    ntfy access "$NTFY_PUBLISHER_USER" velero          write-only
-    ntfy access "$NTFY_PUBLISHER_USER" renovate        write-only
-    ntfy access "$NTFY_PUBLISHER_USER" flux            write-only
-
-    # ── ACLs — admin read-write per topic ────────────────────
-    ntfy access "$NTFY_ADMIN_USER" homelab-alerts  read-write
-    ntfy access "$NTFY_ADMIN_USER" longhorn        read-write
-    ntfy access "$NTFY_ADMIN_USER" velero          read-write
-    ntfy access "$NTFY_ADMIN_USER" renovate        read-write
-    ntfy access "$NTFY_ADMIN_USER" flux            read-write
+    ntfy user access "$NTFY_ADMIN_USER" homelab-alerts  read-write
+    ntfy user access "$NTFY_ADMIN_USER" longhorn        read-write
+    ntfy user access "$NTFY_ADMIN_USER" velero          read-write
+    ntfy user access "$NTFY_ADMIN_USER" renovate        read-write
+    ntfy user access "$NTFY_ADMIN_USER" flux            read-write
 
     echo "Bootstrap complete."
