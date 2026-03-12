@@ -6,15 +6,12 @@ metadata:
 spec:
   interval: 15m
   timeout: 10m
-
   install:
     remediation:
       retries: 3
-
   upgrade:
     remediation:
       retries: 3
-
   chart:
     spec:
       chart: app-template
@@ -23,22 +20,9 @@ spec:
         kind: HelmRepository
         name: bjw-s
         namespace: flux-system
-
   values:
     controllers:
       ntfy:
-        initContainers:
-          bootstrap:
-            image:
-              repository: binwiederhier/ntfy
-              tag: v2.18.0
-            command:
-              - /bin/sh
-              - /scripts/bootstrap.sh
-            envFrom:
-              - secretRef:
-                  name: ntfy-secret
-
         containers:
           app:
             image:
@@ -65,43 +49,17 @@ spec:
             targetPort: 80
 
     persistence:
-      # server.yml mounted into BOTH init and app containers
-      # ntfy user/access commands require auth-file defined in server.yml
       config:
-        type: configMap
-        name: ntfy-config
-        advancedMounts:
-          ntfy:
-            bootstrap:
-              - path: /etc/ntfy/server.yml
-                subPath: server.yml
-                readOnly: true
-            app:
-              - path: /etc/ntfy/server.yml
-                subPath: server.yml
-                readOnly: true
-
-      # bootstrap.sh mounted into init container only
-      scripts:
-        type: configMap
-        name: ntfy-config
-        defaultMode: 0755
-        advancedMounts:
-          ntfy:
-            bootstrap:
-              - path: /scripts/bootstrap.sh
-                subPath: bootstrap.sh
-                readOnly: true
-
-      # cache PVC shared between init container (writes user.db) and app (reads/writes it)
+        type: secret
+        name: ntfy-secret
+        globalMounts:
+          - path: /etc/ntfy/server.yml
+            subPath: server.yml
+            readOnly: true
       cache:
         type: persistentVolumeClaim
         storageClass: longhorn
         accessMode: ReadWriteOnce
         size: 2Gi
-        advancedMounts:
-          ntfy:
-            bootstrap:
-              - path: /var/cache/ntfy
-            app:
-              - path: /var/cache/ntfy
+        globalMounts:
+          - path: /var/cache/ntfy

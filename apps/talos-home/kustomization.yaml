@@ -200,7 +200,6 @@ resources:
   # ──────────────────────────────────────
   - ntfy/namespace.yaml
   - ntfy/secret.yaml
-  - ntfy/configmap.yaml
   - ntfy/helmrelease.yaml
   - ntfy/certificate.yaml
   - ntfy/ingressroute.yaml
