@@ -34,20 +34,25 @@ spec:
       prometheus.io/scrape: "true"
       prometheus.io/port: "2801"
 
+    extraEnv:
+      - name: NTFY_HOSTPORT
+        value: "http://ntfy.ntfy.svc.cluster.local"
+      - name: NTFY_TOPIC
+        value: "homelab-alerts"
+      - name: NTFY_MINIMUMPRIORITY
+        value: "warning"
+      - name: NTFY_CHECKCERT
+        value: "false"
+
     config:
       loki:
         hostport: "http://loki-gateway.monitoring.svc.cluster.local"
         minimumpriority: "warning"
         customHeaders: "X-Scope-OrgID: 1"
-      ntfy:
-        hostport: "http://ntfy.ntfy.svc.cluster.local"
-        topic: "homelab-alerts"
-        minimumpriority: "warning"
-        checkcert: false
 
     webui:
       enabled: true
       replicaCount: 1
 
     serviceMonitor:
-      enabled: false  # using your existing ServiceMonitor manifest
+      enabled: false
