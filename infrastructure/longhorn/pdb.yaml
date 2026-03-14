@@ -1,0 +1,10 @@
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: pdb-longhorn-manager
+  namespace: longhorn
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: longhorn-manager

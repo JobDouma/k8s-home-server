@@ -17,6 +17,7 @@ resources:
   - traefik/servicemonitor.yaml
   - traefik/certificate.yaml
   - traefik/clusterrole.yaml
+  - traefik/pdb.yaml
 
   - metallb/namespace.yaml
   - metallb/helmrelease.yaml
@@ -41,6 +42,7 @@ resources:
   - longhorn/ingressroute.yaml
   - longhorn/recurringjob.yaml
   - longhorn/certificate.yaml
+  - longhorn/pdb.yaml
 
   - authentik/namespace.yaml
   - authentik/certificate.yaml
@@ -51,6 +53,7 @@ resources:
   - authentik/postgresql-secret.yaml
   - authentik/servicemonitor.yaml
   - authentik/networkpolicy.yaml
+  - authentik/pdb.yaml
 
   # ──────────────────────────────────────
   # Kube Metrics Server
