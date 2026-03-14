@@ -31,15 +31,12 @@ spec:
 
   values:
     grafana:
-      # Fix for 82.9.0: chart now sets rollingUpdate by default which conflicts
-      # with Recreate strategy — must explicitly unset it
-      deploymentStrategy:
+      # Remove deploymentStrategy block entirely — it maps to the wrong chart key
+      # and causes rollingUpdate to be injected even when set to null.
+      # Use grafana.deploymentStrategy instead (subchart's own values key).
+      grafana.deploymentStrategy:
         type: Recreate
-        rollingUpdate: null
 
-      # Set explicit datasource UIDs so provisioned dashboards resolve correctly.
-      # Dashboards using ${DS_PROMETHEUS} or ${DS_LOKI} will match these UIDs
-      # automatically when loaded via the sidecar configmap provisioner.
       grafana.ini:
         unified_alerting:
           enabled: true
