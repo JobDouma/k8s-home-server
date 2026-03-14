@@ -19,6 +19,8 @@ spec:
     browserXssFilter: true
     contentTypeNosniff: true
     forceSTSHeader: false
+    customRequestHeaders:
+      X-Forwarded-Proto: "https"
 ---
 apiVersion: traefik.io/v1alpha1
 kind: Middleware
