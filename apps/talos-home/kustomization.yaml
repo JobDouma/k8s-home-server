@@ -95,12 +95,6 @@ resources:
   - radarr/certificate.yaml
 
   # ──────────────────────────────────────
-  # PodDisruptionBudgets
-  # ──────────────────────────────────────
-  - policies/pdb-traefik.yaml
-  - policies/pdb-blocky.yaml
-
-  # ──────────────────────────────────────
   # Renovate
   # ──────────────────────────────────────
   - renovate/namespace.yaml

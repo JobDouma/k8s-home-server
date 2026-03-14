@@ -31,11 +31,9 @@ spec:
 
   values:
     grafana:
-      # Remove deploymentStrategy block entirely — it maps to the wrong chart key
-      # and causes rollingUpdate to be injected even when set to null.
-      # Use grafana.deploymentStrategy instead (subchart's own values key).
-      grafana.deploymentStrategy:
+      deploymentStrategy:
         type: Recreate
+        # rollingUpdate must be completely absent — not null, not empty
 
       grafana.ini:
         unified_alerting:
