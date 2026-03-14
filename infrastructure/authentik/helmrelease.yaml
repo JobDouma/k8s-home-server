@@ -69,7 +69,7 @@ spec:
       livenessProbe: {}
 
     worker:
-      replicas: 2
+      replicas: 1
       # Workers are stateless — RollingUpdate is safe
       strategy:
         type: RollingUpdate

@@ -23,10 +23,10 @@ spec:
         namespace: flux-system
   values:
     deployment:
-      replicas: 3
+      replicas: 2
       affinity:
         podAntiAffinity:
-          preferredDuringSchedulingIgnoredDuringExecution:
+          requiredDuringSchedulingIgnoredDuringExecution:
             - weight: 100
               podAffinityTerm:
                 labelSelector:

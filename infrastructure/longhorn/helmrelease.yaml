@@ -30,7 +30,7 @@ spec:
 
   values:
     defaultSettings:
-      defaultReplicaCount: 3                  # ← was 2
+      defaultReplicaCount: 2
       createDefaultDiskLabeledNodes: true
       defaultDataPath: /var/lib/longhorn
       replicaAutoBalance: best-effort
@@ -39,6 +39,32 @@ spec:
       snapshotDataIntegrity: fast-check
       recurringJobMaxRetention: 10
 
+      # ── Node shutdown resilience ──────────────────────────
+      # Don't wait for the default 5-min Kubernetes timeout before
+      # cleaning up pods on a node that's gone. Combined with your
+      # drain script this is belt-and-suspenders: drain evacuates
+      # cleanly, this handles the unclean case.
+      nodeDownPodDeletionPolicy: delete-both-statefulset-and-deployment-pod
+
+      # Allow replicas to share a node if no better option exists.
+      # Without this, a 2-replica volume on a 2-node cluster would
+      # refuse to rebuild after cp-3 comes back (no "new" node to
+      # place the replica on without violating hard anti-affinity).
+      replicaSoftAntiAffinity: true
+
+      # Don't auto-evict replicas from a cordoned node.
+      # Your drain script gracefully migrates workloads; Longhorn
+      # replicas should stay put on cp-3 so they're immediately
+      # available when the node comes back — no rebuild needed.
+      replicaZoneSoftAntiAffinity: true
+      disableReplicaRebuildOnNodeDrainingAndVolumeMigrating: false
+      replicaReplenishmentWaitInterval: 600
+
+      # Detach volumes from the node before it goes down so they
+      # don't stay in an attached-but-inaccessible state.
+      autoCleanupSystemGeneratedSnapshot: true
+      autoDeletePodWhenVolumeDetachedUnexpectedly: true
+
     longhornManager:
       tolerations:
         - operator: Exists
@@ -46,7 +72,7 @@ spec:
 
     persistence:
       defaultClass: true
-      defaultClassReplicaCount: 3             # ← was 2
+      defaultClassReplicaCount: 2
       reclaimPolicy: Retain
 
     csi:
