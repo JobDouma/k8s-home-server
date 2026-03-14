@@ -12,6 +12,7 @@ resources:
   - blocky/servicemonitor.yaml
   - blocky/ingressroute.yaml
   - blocky/certificate.yaml
+  - blocky/pdb.yaml
 
   # ──────────────────────────────────────
   # Jellyfin
@@ -38,6 +39,7 @@ resources:
   - prometheus/ingressroute.yaml
   - prometheus/service.yaml
   - prometheus/certificate.yaml
+  - prometheus/pdb.yaml
 
   # ──────────────────────────────────────
   # Grafana
@@ -58,6 +60,7 @@ resources:
   - loki/helmrepository.yaml
   - loki/helmrelease.yaml
   - loki/servicemonitor.yaml
+  - loki/pdb.yaml
 
   # ──────────────────────────────────────
   # Jellyseerr
