@@ -21,6 +21,7 @@ stringData:
           mode: forward_single
           external_host: https://traefik.lan
           authorization_flow: !Find [authentik_flows.flow, [slug, default-provider-authorization-implicit-consent]]
+          invalidation_flow: !Find [authentik_flows.flow, [slug, default-invalidation-flow]]
 
       - model: authentik_providers_proxy.proxyprovider
         state: present
@@ -31,6 +32,7 @@ stringData:
           mode: forward_single
           external_host: https://longhorn.lan
           authorization_flow: !Find [authentik_flows.flow, [slug, default-provider-authorization-implicit-consent]]
+          invalidation_flow: !Find [authentik_flows.flow, [slug, default-invalidation-flow]]
 
       - model: authentik_providers_proxy.proxyprovider
         state: present
@@ -41,6 +43,7 @@ stringData:
           mode: forward_single
           external_host: https://blocky.lan
           authorization_flow: !Find [authentik_flows.flow, [slug, default-provider-authorization-implicit-consent]]
+          invalidation_flow: !Find [authentik_flows.flow, [slug, default-invalidation-flow]]
 
       - model: authentik_providers_proxy.proxyprovider
         state: present
@@ -51,6 +54,7 @@ stringData:
           mode: forward_single
           external_host: https://prometheus.lan
           authorization_flow: !Find [authentik_flows.flow, [slug, default-provider-authorization-implicit-consent]]
+          invalidation_flow: !Find [authentik_flows.flow, [slug, default-invalidation-flow]]
 
       - model: authentik_providers_proxy.proxyprovider
         state: present
@@ -61,6 +65,7 @@ stringData:
           mode: forward_single
           external_host: https://dashy.lan
           authorization_flow: !Find [authentik_flows.flow, [slug, default-provider-authorization-implicit-consent]]
+          invalidation_flow: !Find [authentik_flows.flow, [slug, default-invalidation-flow]]
 
       - model: authentik_providers_proxy.proxyprovider
         state: present
@@ -71,6 +76,7 @@ stringData:
           mode: forward_single
           external_host: https://radarr.lan
           authorization_flow: !Find [authentik_flows.flow, [slug, default-provider-authorization-implicit-consent]]
+          invalidation_flow: !Find [authentik_flows.flow, [slug, default-invalidation-flow]]
 
       - model: authentik_providers_proxy.proxyprovider
         state: present
@@ -81,6 +87,7 @@ stringData:
           mode: forward_single
           external_host: https://sonarr.lan
           authorization_flow: !Find [authentik_flows.flow, [slug, default-provider-authorization-implicit-consent]]
+          invalidation_flow: !Find [authentik_flows.flow, [slug, default-invalidation-flow]]
 
       - model: authentik_providers_proxy.proxyprovider
         state: present
@@ -91,6 +98,7 @@ stringData:
           mode: forward_single
           external_host: https://prowlarr.lan
           authorization_flow: !Find [authentik_flows.flow, [slug, default-provider-authorization-implicit-consent]]
+          invalidation_flow: !Find [authentik_flows.flow, [slug, default-invalidation-flow]]
 
       - model: authentik_providers_proxy.proxyprovider
         state: present
@@ -101,6 +109,7 @@ stringData:
           mode: forward_single
           external_host: https://qbittorrent.lan
           authorization_flow: !Find [authentik_flows.flow, [slug, default-provider-authorization-implicit-consent]]
+          invalidation_flow: !Find [authentik_flows.flow, [slug, default-invalidation-flow]]
 
       - model: authentik_providers_proxy.proxyprovider
         state: present
@@ -111,6 +120,7 @@ stringData:
           mode: forward_single
           external_host: https://sabnzbd.lan
           authorization_flow: !Find [authentik_flows.flow, [slug, default-provider-authorization-implicit-consent]]
+          invalidation_flow: !Find [authentik_flows.flow, [slug, default-invalidation-flow]]
 
       - model: authentik_providers_proxy.proxyprovider
         state: present
@@ -121,6 +131,7 @@ stringData:
           mode: forward_single
           external_host: https://falco.lan
           authorization_flow: !Find [authentik_flows.flow, [slug, default-provider-authorization-implicit-consent]]
+          invalidation_flow: !Find [authentik_flows.flow, [slug, default-invalidation-flow]]
 
       - model: authentik_core.application
         state: present
