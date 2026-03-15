@@ -29,12 +29,13 @@ spec:
       secrets:
         - authentik-blueprints
     prometheus:
+      rules:
+        create: false
+    metrics:
       serviceMonitor:
         create: true
         interval: 30s
         scrapeTimeout: 10s
-      rules:
-        create: false
 
     authentik:
       existingSecret:
