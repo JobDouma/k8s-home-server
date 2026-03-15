@@ -13,115 +13,137 @@ stringData:
       labels:
         blueprints.goauthentik.io/instantiate: "true"
 
-    context:
-      auth_flow: !Find [authentik_flows.flow, [slug, default-provider-authorization-implicit-consent]]
-
     entries:
-      # -----------------------
+
+      ############################
       # Proxy Providers
-      # -----------------------
+      ############################
+
       - model: authentik_providers_proxy.proxyprovider
         state: present
         identifiers: {name: traefik-proxy}
         attrs:
           name: traefik-proxy
-          external_host: https://traefik.lan
           mode: forward_single
-          authorization_flow: !Context auth_flow
+          external_host: https://traefik.lan
+          authorization_flow: !Find
+            - authentik_flows.flow
+            - [slug, default-provider-authorization-implicit-consent]
 
       - model: authentik_providers_proxy.proxyprovider
         state: present
         identifiers: {name: longhorn-proxy}
         attrs:
           name: longhorn-proxy
-          external_host: https://longhorn.lan
           mode: forward_single
-          authorization_flow: !Context auth_flow
+          external_host: https://longhorn.lan
+          authorization_flow: !Find
+            - authentik_flows.flow
+            - [slug, default-provider-authorization-implicit-consent]
 
       - model: authentik_providers_proxy.proxyprovider
         state: present
         identifiers: {name: blocky-proxy}
         attrs:
           name: blocky-proxy
-          external_host: https://blocky.lan
           mode: forward_single
-          authorization_flow: !Context auth_flow
+          external_host: https://blocky.lan
+          authorization_flow: !Find
+            - authentik_flows.flow
+            - [slug, default-provider-authorization-implicit-consent]
 
       - model: authentik_providers_proxy.proxyprovider
         state: present
         identifiers: {name: prometheus-proxy}
         attrs:
           name: prometheus-proxy
-          external_host: https://prometheus.lan
           mode: forward_single
-          authorization_flow: !Context auth_flow
+          external_host: https://prometheus.lan
+          authorization_flow: !Find
+            - authentik_flows.flow
+            - [slug, default-provider-authorization-implicit-consent]
 
       - model: authentik_providers_proxy.proxyprovider
         state: present
         identifiers: {name: dashy-proxy}
         attrs:
           name: dashy-proxy
-          external_host: https://dashy.lan
           mode: forward_single
-          authorization_flow: !Context auth_flow
+          external_host: https://dashy.lan
+          authorization_flow: !Find
+            - authentik_flows.flow
+            - [slug, default-provider-authorization-implicit-consent]
 
       - model: authentik_providers_proxy.proxyprovider
         state: present
         identifiers: {name: radarr-proxy}
         attrs:
           name: radarr-proxy
-          external_host: https://radarr.lan
           mode: forward_single
-          authorization_flow: !Context auth_flow
+          external_host: https://radarr.lan
+          authorization_flow: !Find
+            - authentik_flows.flow
+            - [slug, default-provider-authorization-implicit-consent]
 
       - model: authentik_providers_proxy.proxyprovider
         state: present
         identifiers: {name: sonarr-proxy}
         attrs:
           name: sonarr-proxy
-          external_host: https://sonarr.lan
           mode: forward_single
-          authorization_flow: !Context auth_flow
+          external_host: https://sonarr.lan
+          authorization_flow: !Find
+            - authentik_flows.flow
+            - [slug, default-provider-authorization-implicit-consent]
 
       - model: authentik_providers_proxy.proxyprovider
         state: present
         identifiers: {name: prowlarr-proxy}
         attrs:
           name: prowlarr-proxy
-          external_host: https://prowlarr.lan
           mode: forward_single
-          authorization_flow: !Context auth_flow
+          external_host: https://prowlarr.lan
+          authorization_flow: !Find
+            - authentik_flows.flow
+            - [slug, default-provider-authorization-implicit-consent]
 
       - model: authentik_providers_proxy.proxyprovider
         state: present
         identifiers: {name: qbittorrent-proxy}
         attrs:
           name: qbittorrent-proxy
-          external_host: https://qbittorrent.lan
           mode: forward_single
-          authorization_flow: !Context auth_flow
+          external_host: https://qbittorrent.lan
+          authorization_flow: !Find
+            - authentik_flows.flow
+            - [slug, default-provider-authorization-implicit-consent]
 
       - model: authentik_providers_proxy.proxyprovider
         state: present
         identifiers: {name: sabnzbd-proxy}
         attrs:
           name: sabnzbd-proxy
-          external_host: https://sabnzbd.lan
           mode: forward_single
-          authorization_flow: !Context auth_flow
+          external_host: https://sabnzbd.lan
+          authorization_flow: !Find
+            - authentik_flows.flow
+            - [slug, default-provider-authorization-implicit-consent]
 
       - model: authentik_providers_proxy.proxyprovider
         state: present
         identifiers: {name: falco-proxy}
         attrs:
           name: falco-proxy
-          external_host: https://falco.lan
           mode: forward_single
-          authorization_flow: !Context auth_flow
+          external_host: https://falco.lan
+          authorization_flow: !Find
+            - authentik_flows.flow
+            - [slug, default-provider-authorization-implicit-consent]
 
-      # -----------------------
+      ############################
       # Applications
-      # -----------------------
+      ############################
+
       - model: authentik_core.application
         state: present
         identifiers: {slug: traefik}
@@ -221,13 +243,14 @@ stringData:
           provider: !Find [authentik_providers_proxy.proxyprovider, [name, falco-proxy]]
           meta_launch_url: https://falco.lan
 
-      # -----------------------
-      # Attach Providers to Embedded Outpost
-      # -----------------------
+      ############################
+      # Attach providers to outpost
+      ############################
+
       - model: authentik_outposts.outpost
         state: present
         identifiers:
-          pk: !Find [authentik_outposts.outpost, [name, "authentik Embedded Outpost"]]
+          pk: !Find [authentik_outposts.outpost, [name, authentik Embedded Outpost]]
         attrs:
           providers:
             - !Find [authentik_providers_proxy.proxyprovider, [name, traefik-proxy]]
