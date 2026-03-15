@@ -26,7 +26,7 @@ spec:
 
   values:
     blueprints:
-      configMaps:
+      secrets:
         - authentik-blueprints
     prometheus:
       serviceMonitor:
