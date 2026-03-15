@@ -10,7 +10,7 @@ spec:
     - match: Host(`prometheus.lan`)
       kind: Rule
       middlewares:
-        - name: traefik-chain-noauth
+        - name: traefik-chain
           namespace: networking
       services:
         - name: prometheus
