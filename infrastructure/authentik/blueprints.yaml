@@ -1,9 +1,10 @@
 apiVersion: v1
-kind: ConfigMap
+kind: Secret
 metadata:
   name: authentik-blueprints
   namespace: authentik
-data:
+type: Opaque
+stringData:
   homelab-proxy-providers.yaml: |
     version: 1
     metadata:
