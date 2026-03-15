@@ -9,6 +9,18 @@ spec:
       - name: lan-headers
       - name: authentik-forwardauth
 ---
+# Use this for services that handle their own auth
+# (Headlamp with OIDC, Jellyfin, Prometheus, Grafana)
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: traefik-chain-noauth
+  namespace: networking
+spec:
+  chain:
+    middlewares:
+      - name: lan-headers
+---
 apiVersion: traefik.io/v1alpha1
 kind: Middleware
 metadata:
