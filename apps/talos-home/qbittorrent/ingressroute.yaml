@@ -9,6 +9,9 @@ spec:
   routes:
     - match: Host(`qbittorrent.lan`)
       kind: Rule
+      middlewares:
+        - name: traefik-chain
+          namespace: networking
       services:
         - name: qbittorrent
           port: 8080

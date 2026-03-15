@@ -9,6 +9,9 @@ spec:
   routes:
     - match: Host(`sabnzbd.lan`)
       kind: Rule
+      middlewares:
+        - name: traefik-chain
+          namespace: networking
       services:
         - name: sabnzbd
           port: 8080
