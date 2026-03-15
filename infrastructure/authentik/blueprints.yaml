@@ -231,3 +231,23 @@ stringData:
           slug: falco
           provider: !Find [authentik_providers_proxy.proxyprovider, [name, falco-proxy]]
           meta_launch_url: https://falco.lan
+      
+      - model: authentik_outposts.outpost
+        state: present
+        identifiers:
+          name: "authentik Embedded Outpost"
+        attrs:
+          name: "authentik Embedded Outpost"
+          type: proxy
+          providers_obj:
+            - !Find [authentik_providers_proxy.proxyprovider, [name, traefik-proxy]]
+            - !Find [authentik_providers_proxy.proxyprovider, [name, longhorn-proxy]]
+            - !Find [authentik_providers_proxy.proxyprovider, [name, blocky-proxy]]
+            - !Find [authentik_providers_proxy.proxyprovider, [name, prometheus-proxy]]
+            - !Find [authentik_providers_proxy.proxyprovider, [name, dashy-proxy]]
+            - !Find [authentik_providers_proxy.proxyprovider, [name, radarr-proxy]]
+            - !Find [authentik_providers_proxy.proxyprovider, [name, sonarr-proxy]]
+            - !Find [authentik_providers_proxy.proxyprovider, [name, prowlarr-proxy]]
+            - !Find [authentik_providers_proxy.proxyprovider, [name, qbittorrent-proxy]]
+            - !Find [authentik_providers_proxy.proxyprovider, [name, sabnzbd-proxy]]
+            - !Find [authentik_providers_proxy.proxyprovider, [name, falco-proxy]]
