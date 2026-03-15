@@ -25,7 +25,14 @@ spec:
         namespace: flux-system
 
   values:
-
+    prometheus:
+      serviceMonitor:
+        create: true
+        interval: 30s
+        scrapeTimeout: 10s
+      rules:
+        create: false
+        
     authentik:
       existingSecret:
         secretName: authentik-secret
