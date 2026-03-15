@@ -6,126 +6,125 @@ metadata:
 type: Opaque
 stringData:
   homelab-proxy-providers.yaml: |
+    ---
     version: 1
     metadata:
       name: Homelab Proxy Providers
       labels:
         blueprints.goauthentik.io/instantiate: "true"
+
+    context:
+      auth_flow: !Find [authentik_flows.flow, [slug, default-provider-authorization-implicit-consent]]
+
     entries:
+      # -----------------------
+      # Proxy Providers
+      # -----------------------
       - model: authentik_providers_proxy.proxyprovider
         state: present
-        identifiers:
-          name: traefik-proxy
+        identifiers: {name: traefik-proxy}
         attrs:
           name: traefik-proxy
-          authorization_flow: !Find [authentik_flows.flow, [slug, default-provider-authorization-implicit-consent]]
           external_host: https://traefik.lan
           mode: forward_single
+          authorization_flow: !Context auth_flow
 
       - model: authentik_providers_proxy.proxyprovider
         state: present
-        identifiers:
-          name: longhorn-proxy
+        identifiers: {name: longhorn-proxy}
         attrs:
           name: longhorn-proxy
-          authorization_flow: !Find [authentik_flows.flow, [slug, default-provider-authorization-implicit-consent]]
           external_host: https://longhorn.lan
           mode: forward_single
+          authorization_flow: !Context auth_flow
 
       - model: authentik_providers_proxy.proxyprovider
         state: present
-        identifiers:
-          name: blocky-proxy
+        identifiers: {name: blocky-proxy}
         attrs:
           name: blocky-proxy
-          authorization_flow: !Find [authentik_flows.flow, [slug, default-provider-authorization-implicit-consent]]
           external_host: https://blocky.lan
           mode: forward_single
+          authorization_flow: !Context auth_flow
 
       - model: authentik_providers_proxy.proxyprovider
         state: present
-        identifiers:
-          name: prometheus-proxy
+        identifiers: {name: prometheus-proxy}
         attrs:
           name: prometheus-proxy
-          authorization_flow: !Find [authentik_flows.flow, [slug, default-provider-authorization-implicit-consent]]
           external_host: https://prometheus.lan
           mode: forward_single
+          authorization_flow: !Context auth_flow
 
       - model: authentik_providers_proxy.proxyprovider
         state: present
-        identifiers:
-          name: dashy-proxy
+        identifiers: {name: dashy-proxy}
         attrs:
           name: dashy-proxy
-          authorization_flow: !Find [authentik_flows.flow, [slug, default-provider-authorization-implicit-consent]]
           external_host: https://dashy.lan
           mode: forward_single
+          authorization_flow: !Context auth_flow
 
       - model: authentik_providers_proxy.proxyprovider
         state: present
-        identifiers:
-          name: radarr-proxy
+        identifiers: {name: radarr-proxy}
         attrs:
           name: radarr-proxy
-          authorization_flow: !Find [authentik_flows.flow, [slug, default-provider-authorization-implicit-consent]]
           external_host: https://radarr.lan
           mode: forward_single
+          authorization_flow: !Context auth_flow
 
       - model: authentik_providers_proxy.proxyprovider
         state: present
-        identifiers:
-          name: sonarr-proxy
+        identifiers: {name: sonarr-proxy}
         attrs:
           name: sonarr-proxy
-          authorization_flow: !Find [authentik_flows.flow, [slug, default-provider-authorization-implicit-consent]]
           external_host: https://sonarr.lan
           mode: forward_single
+          authorization_flow: !Context auth_flow
 
       - model: authentik_providers_proxy.proxyprovider
         state: present
-        identifiers:
-          name: prowlarr-proxy
+        identifiers: {name: prowlarr-proxy}
         attrs:
           name: prowlarr-proxy
-          authorization_flow: !Find [authentik_flows.flow, [slug, default-provider-authorization-implicit-consent]]
           external_host: https://prowlarr.lan
           mode: forward_single
+          authorization_flow: !Context auth_flow
 
       - model: authentik_providers_proxy.proxyprovider
         state: present
-        identifiers:
-          name: qbittorrent-proxy
+        identifiers: {name: qbittorrent-proxy}
         attrs:
           name: qbittorrent-proxy
-          authorization_flow: !Find [authentik_flows.flow, [slug, default-provider-authorization-implicit-consent]]
           external_host: https://qbittorrent.lan
           mode: forward_single
+          authorization_flow: !Context auth_flow
 
       - model: authentik_providers_proxy.proxyprovider
         state: present
-        identifiers:
-          name: sabnzbd-proxy
+        identifiers: {name: sabnzbd-proxy}
         attrs:
           name: sabnzbd-proxy
-          authorization_flow: !Find [authentik_flows.flow, [slug, default-provider-authorization-implicit-consent]]
           external_host: https://sabnzbd.lan
           mode: forward_single
+          authorization_flow: !Context auth_flow
 
       - model: authentik_providers_proxy.proxyprovider
         state: present
-        identifiers:
-          name: falco-proxy
+        identifiers: {name: falco-proxy}
         attrs:
           name: falco-proxy
-          authorization_flow: !Find [authentik_flows.flow, [slug, default-provider-authorization-implicit-consent]]
           external_host: https://falco.lan
           mode: forward_single
+          authorization_flow: !Context auth_flow
 
+      # -----------------------
+      # Applications
+      # -----------------------
       - model: authentik_core.application
         state: present
-        identifiers:
-          slug: traefik
+        identifiers: {slug: traefik}
         attrs:
           name: Traefik
           slug: traefik
@@ -134,8 +133,7 @@ stringData:
 
       - model: authentik_core.application
         state: present
-        identifiers:
-          slug: longhorn
+        identifiers: {slug: longhorn}
         attrs:
           name: Longhorn
           slug: longhorn
@@ -144,8 +142,7 @@ stringData:
 
       - model: authentik_core.application
         state: present
-        identifiers:
-          slug: blocky
+        identifiers: {slug: blocky}
         attrs:
           name: Blocky
           slug: blocky
@@ -154,8 +151,7 @@ stringData:
 
       - model: authentik_core.application
         state: present
-        identifiers:
-          slug: prometheus
+        identifiers: {slug: prometheus}
         attrs:
           name: Prometheus
           slug: prometheus
@@ -164,8 +160,7 @@ stringData:
 
       - model: authentik_core.application
         state: present
-        identifiers:
-          slug: dashy
+        identifiers: {slug: dashy}
         attrs:
           name: Dashy
           slug: dashy
@@ -174,8 +169,7 @@ stringData:
 
       - model: authentik_core.application
         state: present
-        identifiers:
-          slug: radarr
+        identifiers: {slug: radarr}
         attrs:
           name: Radarr
           slug: radarr
@@ -184,8 +178,7 @@ stringData:
 
       - model: authentik_core.application
         state: present
-        identifiers:
-          slug: sonarr
+        identifiers: {slug: sonarr}
         attrs:
           name: Sonarr
           slug: sonarr
@@ -194,8 +187,7 @@ stringData:
 
       - model: authentik_core.application
         state: present
-        identifiers:
-          slug: prowlarr
+        identifiers: {slug: prowlarr}
         attrs:
           name: Prowlarr
           slug: prowlarr
@@ -204,8 +196,7 @@ stringData:
 
       - model: authentik_core.application
         state: present
-        identifiers:
-          slug: qbittorrent
+        identifiers: {slug: qbittorrent}
         attrs:
           name: qBittorrent
           slug: qbittorrent
@@ -214,8 +205,7 @@ stringData:
 
       - model: authentik_core.application
         state: present
-        identifiers:
-          slug: sabnzbd
+        identifiers: {slug: sabnzbd}
         attrs:
           name: SABnzbd
           slug: sabnzbd
@@ -224,14 +214,16 @@ stringData:
 
       - model: authentik_core.application
         state: present
-        identifiers:
-          slug: falco
+        identifiers: {slug: falco}
         attrs:
           name: Falco
           slug: falco
           provider: !Find [authentik_providers_proxy.proxyprovider, [name, falco-proxy]]
           meta_launch_url: https://falco.lan
-      
+
+      # -----------------------
+      # Attach Providers to Embedded Outpost
+      # -----------------------
       - model: authentik_outposts.outpost
         state: present
         identifiers:

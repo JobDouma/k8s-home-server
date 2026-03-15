@@ -26,6 +26,7 @@ spec:
 
   values:
     blueprints:
+      enabled: true
       secrets:
         - authentik-blueprints
     prometheus:
