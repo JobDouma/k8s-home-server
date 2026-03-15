@@ -9,6 +9,9 @@ spec:
   routes:
     - match: Host(`headlamp.lan`)
       kind: Rule
+      middlewares:
+        - name: traefik-chain-noauth
+          namespace: networking
       services:
         - name: headlamp
           port: 80

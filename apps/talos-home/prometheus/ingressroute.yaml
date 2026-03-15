@@ -9,6 +9,9 @@ spec:
   routes:
     - match: Host(`prometheus.lan`)
       kind: Rule
+      middlewares:
+        - name: traefik-chain-noauth
+          namespace: networking
       services:
         - name: prometheus
           port: 9090
