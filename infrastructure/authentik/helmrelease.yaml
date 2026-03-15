@@ -25,6 +25,9 @@ spec:
         namespace: flux-system
 
   values:
+    blueprints:
+      configMaps:
+        - authentik-blueprints
     prometheus:
       serviceMonitor:
         create: true
@@ -88,15 +91,7 @@ spec:
         - key: node-role.kubernetes.io/control-plane
           operator: Exists
           effect: NoSchedule
-      
-      volumes:
-        - name: blueprints
-          configMap:
-            name: authentik-blueprints
-      volumeMounts:
-        - name: blueprints
-          mountPath: /blueprints/custom
-          
+
       affinity:
         podAntiAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:
