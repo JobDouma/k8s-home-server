@@ -14,5 +14,5 @@ spec:
       app.kubernetes.io/name: authentik
   endpoints:
     - port: http
-      path: /metrics
+      path: /application/metrics/
       interval: 30s

@@ -78,7 +78,7 @@ spec:
         port: 9100
         protocol: TCP
         expose:
-          default: false
+          default: true
 
     metrics:
       prometheus:
