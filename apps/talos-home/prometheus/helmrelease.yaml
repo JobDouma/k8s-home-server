@@ -71,6 +71,8 @@ spec:
           folderAnnotation: grafana_folder
           provider:
             foldersFromFilesStructure: true
+        datasources:          # add this block
+          enabled: false
 
       tolerations:
         - operator: Exists
