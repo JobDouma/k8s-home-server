@@ -235,11 +235,9 @@ stringData:
       - model: authentik_outposts.outpost
         state: present
         identifiers:
-          name: "authentik Embedded Outpost"
+          pk: !Find [authentik_outposts.outpost, [name, "authentik Embedded Outpost"]]
         attrs:
-          name: "authentik Embedded Outpost"
-          type: proxy
-          providers_obj:
+          providers:
             - !Find [authentik_providers_proxy.proxyprovider, [name, traefik-proxy]]
             - !Find [authentik_providers_proxy.proxyprovider, [name, longhorn-proxy]]
             - !Find [authentik_providers_proxy.proxyprovider, [name, blocky-proxy]]
