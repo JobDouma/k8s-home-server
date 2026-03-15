@@ -5,29 +5,18 @@ metadata:
   namespace: authentik
 type: Opaque
 stringData:
-  homelab-proxy-providers.yaml: |
-    ---
+  01-homelab-providers.yaml: |
     version: 1
     metadata:
       name: Homelab Proxy Providers
       labels:
         blueprints.goauthentik.io/instantiate: "true"
-
     entries:
-
-      ############################
-      # Authorization flow (shared reference)
-      ############################
-
       - model: authentik_flows.flow
-        state: present
+        state: created
         id: authorization-flow
         identifiers:
           slug: default-provider-authorization-implicit-consent
-
-      ############################
-      # Proxy Providers
-      ############################
 
       - model: authentik_providers_proxy.proxyprovider
         state: present
@@ -139,10 +128,6 @@ stringData:
           external_host: https://falco.lan
           authorization_flow: !KeyOf authorization-flow
 
-      ############################
-      # Applications
-      ############################
-
       - model: authentik_core.application
         state: present
         identifiers: {slug: traefik}
@@ -242,10 +227,13 @@ stringData:
           provider: !KeyOf falco-proxy
           meta_launch_url: https://falco.lan
 
-      ############################
-      # Outpost assignment
-      ############################
-
+  02-homelab-outpost.yaml: |
+    version: 1
+    metadata:
+      name: Homelab Outpost Assignment
+      labels:
+        blueprints.goauthentik.io/instantiate: "true"
+    entries:
       - model: authentik_outposts.outpost
         state: present
         identifiers:
@@ -254,14 +242,14 @@ stringData:
           name: "authentik Embedded Outpost"
           type: proxy
           providers:
-            - !KeyOf traefik-proxy
-            - !KeyOf longhorn-proxy
-            - !KeyOf blocky-proxy
-            - !KeyOf prometheus-proxy
-            - !KeyOf dashy-proxy
-            - !KeyOf radarr-proxy
-            - !KeyOf sonarr-proxy
-            - !KeyOf prowlarr-proxy
-            - !KeyOf qbittorrent-proxy
-            - !KeyOf sabnzbd-proxy
-            - !KeyOf falco-proxy
+            - !Find [authentik_providers_proxy.proxyprovider, [name, traefik-proxy]]
+            - !Find [authentik_providers_proxy.proxyprovider, [name, longhorn-proxy]]
+            - !Find [authentik_providers_proxy.proxyprovider, [name, blocky-proxy]]
+            - !Find [authentik_providers_proxy.proxyprovider, [name, prometheus-proxy]]
+            - !Find [authentik_providers_proxy.proxyprovider, [name, dashy-proxy]]
+            - !Find [authentik_providers_proxy.proxyprovider, [name, radarr-proxy]]
+            - !Find [authentik_providers_proxy.proxyprovider, [name, sonarr-proxy]]
+            - !Find [authentik_providers_proxy.proxyprovider, [name, prowlarr-proxy]]
+            - !Find [authentik_providers_proxy.proxyprovider, [name, qbittorrent-proxy]]
+            - !Find [authentik_providers_proxy.proxyprovider, [name, sabnzbd-proxy]]
+            - !Find [authentik_providers_proxy.proxyprovider, [name, falco-proxy]]
