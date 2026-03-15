@@ -32,6 +32,14 @@ spec:
       existingRulesConfigMaps:
         - falco-rules
         - falco-custom-rules
+      grpc:
+        enabled: false          # not needed for http output
+      grpcOutput:
+        enabled: false
+      # ADD THIS — point Falco's HTTP output at Falcosidekick
+      httpOutput:
+        enabled: true
+        url: "http://falcosidekick.falco.svc.cluster.local:2801"
 
     daemonset:
       tolerations:
