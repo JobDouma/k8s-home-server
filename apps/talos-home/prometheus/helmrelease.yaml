@@ -61,6 +61,12 @@ spec:
               isDefault: false
               jsonData:
                 maxLines: 1000
+            - name: Tempo
+              type: tempo
+              uid: tempo
+              url: http://tempo.monitoring.svc.cluster.local:3100
+              access: proxy
+              isDefault: false
 
       sidecar:
         dashboards:

@@ -201,3 +201,8 @@ resources:
   - ntfy/helmrelease.yaml
   - ntfy/certificate.yaml
   - ntfy/ingressroute.yaml
+
+  # ──────────────────────────────────────
+  # Tempo
+  # ──────────────────────────────────────
+  - tempo/helmrelease.yaml
