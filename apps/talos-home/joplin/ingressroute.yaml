@@ -6,10 +6,12 @@ metadata:
 spec:
   entryPoints:
     - websecure
-
   routes:
     - match: Host(`joplin.lan`)
       kind: Rule
+      middlewares:
+        - name: traefik-chain-noauth
+          namespace: networking
       services:
         - name: joplin
           port: 22300

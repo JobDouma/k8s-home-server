@@ -6,6 +6,7 @@ resources:
   - node-exporter.yaml
   - longhorn.yaml
   - traefik.yaml
+  - traefik-traces.yaml
   - falco.yaml
   - blocky.yaml
   - kubernetes-cluster.yaml
