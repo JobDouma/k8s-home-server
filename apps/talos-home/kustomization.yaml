@@ -176,6 +176,7 @@ resources:
   - falco/helmrepository.yaml
   - falco/helmrelease.yaml
   - falco/falcosidekick-helmrelease.yaml
+  - falco/falcosidekick-secret.yaml
   - falco/ingressroute.yaml
   - falco/servicemonitor.yaml
   - falco/certificate.yaml
