@@ -34,27 +34,16 @@ spec:
       prometheus.io/scrape: "true"
       prometheus.io/port: "2801"
 
-    # Inject ntfy credentials directly as env vars from a SOPS-encrypted secret
-    # The falcosidekick chart reads all env vars from its own secret via envFrom,
-    # but extraEnv adds to the container directly — overriding blanks in the chart secret
-    extraEnv:
-      - name: NTFY_USER
-        valueFrom:
-          secretKeyRef:
-            name: falcosidekick-ntfy-secret
-            key: ntfy-user
-      - name: NTFY_PASSWORD
-        valueFrom:
-          secretKeyRef:
-            name: falcosidekick-ntfy-secret
-            key: ntfy-password
-
     config:
-      ntfy:
-        hostport: "http://ntfy.ntfy.svc.cluster.local"
-        topic: "homelab-alerts"
+      # Falcosidekick's native ntfy integration requires NTFY_TOKEN at init time
+      # but the chart secret overrides it with an empty string — broken by design.
+      # Use the generic webhook output instead: ntfy accepts plain HTTP POST natively
+      # and the Authorization header is all that's needed for auth.
+      webhook:
+        address: "http://ntfy.ntfy.svc.cluster.local/homelab-alerts"
         minimumpriority: "warning"
         checkcert: false
+        customHeaders: "Authorization:Bearer tk_ziuf1kf6mwr78xysvczcr57gs90hv"
 
       loki:
         hostport: "http://loki-gateway.monitoring.svc.cluster.local"
