@@ -6,7 +6,6 @@ metadata:
 spec:
   interval: 30m
   timeout: 30m
-
   chart:
     spec:
       chart: loki
@@ -15,27 +14,21 @@ spec:
         kind: HelmRepository
         name: grafana
         namespace: flux-system
-
   values:
     deploymentMode: SingleBinary
-
     backend:
       replicas: 0
     read:
       replicas: 0
     write:
       replicas: 0
-
     loki:
       auth_enabled: false
-
       commonConfig:
         replication_factor: 1
-        path_prefix: /var/loki
-        storage:
-          filesystem:
-            directory: /var/loki
-
+      # path_prefix and storage do NOT belong under commonConfig — moved here
+      storage:
+        type: filesystem
       schemaConfig:
         configs:
           - from: "2024-01-01"
@@ -45,38 +38,28 @@ spec:
             index:
               prefix: index_
               period: 24h
-
-      storage:
-        type: filesystem
-        bucketNames:
-          chunks: chunks
-          ruler: ruler
-          admin: admin
-
       storage_config:
+        tsdb_shipper:
+          active_index_directory: /var/loki/tsdb-index
+          cache_location: /var/loki/tsdb-cache
         filesystem:
           directory: /var/loki/chunks
-
       compactor:
         retention_enabled: true
         working_directory: /var/loki/compactor
         delete_request_store: filesystem
-
       limits_config:
         retention_period: 168h
-
     singleBinary:
       replicas: 1
       tolerations:
         - operator: Exists
-
       persistence:
         enabled: true
         storageClass: longhorn
         accessModes:
           - ReadWriteOnce
         size: 10Gi
-
     gateway:
       enabled: true
       replicas: 1

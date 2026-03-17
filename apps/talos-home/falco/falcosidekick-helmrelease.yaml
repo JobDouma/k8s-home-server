@@ -44,7 +44,9 @@ spec:
       loki:
         hostport: "http://loki-gateway.monitoring.svc.cluster.local"
         minimumpriority: "warning"
-        customHeaders: "X-Scope-OrgID: 1"
+        # Removed customHeaders: "X-Scope-OrgID: 1"
+        # With auth_enabled: false, Loki uses tenant "fake" and ignores this header,
+        # causing data to be written under one tenant but queried under another.
 
     webui:
       enabled: true
