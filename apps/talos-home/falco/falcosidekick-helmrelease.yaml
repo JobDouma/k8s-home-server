@@ -24,6 +24,12 @@ spec:
   upgrade:
     remediation:
       retries: 3
+  valuesFrom:
+    - kind: Secret
+      name: falcosidekick-ntfy-secret
+      valuesKey: ntfy-password
+      targetPath: config.ntfy.password
+
   values:
     replicaCount: 1
 
@@ -40,6 +46,9 @@ spec:
         topic: "homelab-alerts"
         minimumpriority: "warning"
         checkcert: false
+        # publisher has write-only access to homelab-alerts per ntfy server.yml
+        user: "publisher"
+        # password injected via valuesFrom → falcosidekick-ntfy-secret
 
       loki:
         hostport: "http://loki-gateway.monitoring.svc.cluster.local"
