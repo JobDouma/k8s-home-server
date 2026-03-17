@@ -27,17 +27,17 @@ spec:
       kind: modern_ebpf
 
     falco:
-      jsonOutput: true
-      logLevel: info
+      # Use snake_case — the chart dumps camelCase as raw passthrough keys that Falco ignores
+      json_output: true
+      log_level: info
       existingRulesConfigMaps:
         - falco-rules
         - falco-custom-rules
       grpc:
-        enabled: false          # not needed for http output
-      grpcOutput:
         enabled: false
-      # ADD THIS — point Falco's HTTP output at Falcosidekick
-      httpOutput:
+      grpc_output:
+        enabled: false
+      http_output:
         enabled: true
         url: "http://falcosidekick.falco.svc.cluster.local:2801"
 
