@@ -1,0 +1,68 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: falcosidekick
+  namespace: falco
+spec:
+  interval: 15m
+  dependsOn:
+    - name: falco
+      namespace: falco
+    - name: loki
+      namespace: monitoring
+  chart:
+    spec:
+      chart: falcosidekick
+      version: "0.13.0"
+      sourceRef:
+        kind: HelmRepository
+        name: falcosecurity
+        namespace: flux-system
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    remediation:
+      retries: 3
+  values:
+    replicaCount: 1
+
+    tolerations:
+      - operator: Exists
+
+    podAnnotations:
+      prometheus.io/scrape: "true"
+      prometheus.io/port: "2801"
+
+    # Inject ntfy credentials directly as env vars from a SOPS-encrypted secret
+    # The falcosidekick chart reads all env vars from its own secret via envFrom,
+    # but extraEnv adds to the container directly — overriding blanks in the chart secret
+    extraEnv:
+      - name: NTFY_USER
+        valueFrom:
+          secretKeyRef:
+            name: falcosidekick-ntfy-secret
+            key: ntfy-user
+      - name: NTFY_PASSWORD
+        valueFrom:
+          secretKeyRef:
+            name: falcosidekick-ntfy-secret
+            key: ntfy-password
+
+    config:
+      ntfy:
+        hostport: "http://ntfy.ntfy.svc.cluster.local"
+        topic: "homelab-alerts"
+        minimumpriority: "warning"
+        checkcert: false
+
+      loki:
+        hostport: "http://loki-gateway.monitoring.svc.cluster.local"
+        minimumpriority: "warning"
+
+    webui:
+      enabled: true
+      replicaCount: 1
+
+    serviceMonitor:
+      enabled: true
