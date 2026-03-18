@@ -28,9 +28,10 @@ kubectl drain "$K8S_NODE" \
   --grace-period=60 \
   --timeout=5m \
   --skip-wait-for-delete-timeout=30 \
+
   || log "Drain exited non-zero (may be fine — checking stuck pods next)."
 log "Drain complete."
-# ── Step 3: Force-delete stuck non-daemonset pods on this node ─
+# ── Step 3a: Force-delete stuck non-daemonset pods on this node ─
 # DaemonSet pods are intentionally left by --ignore-daemonsets above.
 # Force-deleting them causes ContainerStatusUnknown: the daemonset controller
 # immediately recreates them into a node that is mid-shutdown.
@@ -60,6 +61,23 @@ else
   done <<< "$STUCK_PODS"
 fi
 log "Cleanup complete."
+
+# ── Step 3b: Clean ContainerStatusUnknown pods cluster-wide ──
+log "Cleaning any pre-existing ContainerStatusUnknown pods cluster-wide..."
+kubectl get pods -A -o json | \
+  jq -r '
+    .items[] |
+    select(
+      (.status.containerStatuses // [] + (.status.initContainerStatuses // [])) |
+      any(.state.terminated.reason? == "ContainerStatusUnknown")
+    ) |
+    .metadata.namespace + " " + .metadata.name
+  ' | while read -r NS POD; do
+    [[ -z "$NS" ]] && continue
+    log "  Deleting ContainerStatusUnknown pod: $NS/$POD"
+    kubectl delete pod -n "$NS" "$POD" --force --grace-period=0 2>/dev/null || true
+  done
+  
 # ── Step 4: Talos graceful shutdown ──────────────────────────
 log "Sending graceful shutdown to Talos node $TALOS_NODE_IP..."
 talosctl shutdown \
