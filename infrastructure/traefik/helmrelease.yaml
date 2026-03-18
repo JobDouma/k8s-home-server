@@ -24,9 +24,10 @@ spec:
   values:
     deployment:
       replicas: 2
+      revisionHistoryLimit: 2
       affinity:
         podAntiAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
+          preferredDuringSchedulingIgnoredDuringExecution:
             - weight: 100
               podAffinityTerm:
                 labelSelector:
@@ -43,6 +44,14 @@ spec:
 
     tolerations:
       - operator: Exists
+      - key: "node.kubernetes.io/not-ready"
+        operator: "Exists"
+        effect: "NoExecute"
+        tolerationSeconds: 60
+      - key: "node.kubernetes.io/unreachable"
+        operator: "Exists"
+        effect: "NoExecute"
+        tolerationSeconds: 60
 
     ingressClass:
       enabled: true
