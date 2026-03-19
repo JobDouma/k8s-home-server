@@ -207,3 +207,10 @@ resources:
   # Tempo
   # ──────────────────────────────────────
   - tempo/helmrelease.yaml
+
+  - tailscale/namespace.yaml
+  - tailscale/helmrepository.yaml
+  - tailscale/helmrelease.yaml
+  - tailscale/connector.yaml
+  - tailscale/servicemonitor.yaml
+  - tailscale/secret.yaml
