@@ -1,0 +1,50 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: tailscale-operator
+  namespace: tailscale
+spec:
+  interval: 15m
+  timeout: 10m
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    remediation:
+      strategy: uninstall
+      retries: 3
+
+  chart:
+    spec:
+      chart: tailscale-operator
+      # renovate: registryUrl=https://pkgs.tailscale.com/helmcharts
+      version: ">=1.0.0"
+      sourceRef:
+        kind: HelmRepository
+        name: tailscale
+        namespace: flux-system
+
+  values:
+    operatorConfig:
+      hostname: talos-home-operator
+
+    oauth:
+      # Reference the secret created separately (keep credentials out of git)
+      clientId:
+        secretKeyRef:
+          name: tailscale-oauth
+          key: client_id
+      clientSecret:
+        secretKeyRef:
+          name: tailscale-oauth
+          key: client_secret
+
+    # Enable the API server proxy so you can kubectl over Tailscale
+    apiServerProxyConfig:
+      mode: "true"
+
+    # Emit Prometheus metrics for the operator pod itself
+    podAnnotations:
+      prometheus.io/scrape: "true"
+      prometheus.io/port: "9090"
+      prometheus.io/path: "/metrics"

@@ -1,0 +1,30 @@
+# Connector: subnet router
+# Advertises your home LAN (192.168.2.0/24) to your tailnet so that
+# any Tailscale device can reach your homelab services by their LAN IP.
+#
+# Prerequisites:
+#   1. In your tailnet ACL policy, add tag:k8s to tagOwners owned by tag:k8s-operator
+#   2. Enable subnet route auto-approval in the admin console, or approve manually at:
+#      https://login.tailscale.com/admin/machines
+#
+# You can add additional CIDRs (e.g. pod/service CIDRs) to advertiseRoutes
+# if you want full in-cluster connectivity over Tailscale.
+apiVersion: tailscale.com/v1alpha1
+kind: Connector
+metadata:
+  name: homelab-subnet-router
+  namespace: tailscale
+spec:
+  # hostname as it appears in the Tailscale admin console
+  hostnamePrefix: talos-home-subnet
+
+  # Tag the connector device; operator must own this tag in your ACL policy
+  tags:
+    - tag:k8s
+
+  subnetRouter:
+    advertiseRoutes:
+      - "192.168.2.0/24"   # your home LAN — adjust if different
+      # Uncomment to also expose Kubernetes pod/service networks:
+      # - "10.96.0.0/12"   # default Kubernetes service CIDR (check your cluster)
+      # - "10.244.0.0/16"  # default pod CIDR (check your CNI config)
