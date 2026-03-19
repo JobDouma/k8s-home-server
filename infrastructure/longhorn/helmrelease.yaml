@@ -38,6 +38,12 @@ spec:
       backupTargetCredentialSecret: ""
       snapshotDataIntegrity: fast-check
       recurringJobMaxRetention: 10
+      guaranteedEngineManagerCPU: 0
+      guaranteedReplicaManagerCPU: 0
+      replicaFileSyncHTTPClientTimeout: 30
+      disableRevisionCounter: true
+      concurrentReplicaRebuildPerNodeLimit: 1
+      engineReplicaTimeout: 8
 
       # ── Node shutdown resilience ──────────────────────────
       # Don't wait for the default 5-min Kubernetes timeout before
