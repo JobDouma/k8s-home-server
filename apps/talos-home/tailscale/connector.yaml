@@ -1,30 +1,40 @@
 # Connector: subnet router
+#
 # Advertises your home LAN (192.168.2.0/24) to your tailnet so that
-# any Tailscale device can reach your homelab services by their LAN IP.
+# any Tailscale device can reach:
+#   - your Traefik ingress at 192.168.2.100  (all *.lan services)
+#   - TrueNAS at 192.168.2.5
+#   - router at 192.168.2.254
+#   - blocky DNS at 192.168.2.53
+#   - any other host on your LAN
 #
-# Prerequisites:
-#   1. In your tailnet ACL policy, add tag:k8s to tagOwners owned by tag:k8s-operator
-#   2. Enable subnet route auto-approval in the admin console, or approve manually at:
-#      https://login.tailscale.com/admin/machines
+# Required ACL policy in the Tailscale admin console
+# (https://login.tailscale.com/admin/acls):
 #
-# You can add additional CIDRs (e.g. pod/service CIDRs) to advertiseRoutes
-# if you want full in-cluster connectivity over Tailscale.
+#   "tagOwners": {
+#     "tag:k8s-operator": [],                   // admins own this
+#     "tag:k8s":          ["tag:k8s-operator"],  // operator owns this
+#   },
+#   "autoApprovers": {
+#     "routes": {
+#       "192.168.2.0/24": ["tag:k8s"],           // auto-approve the subnet route
+#     },
+#   },
+#
+# Without autoApprovers you must manually approve the route at:
+#   https://login.tailscale.com/admin/machines
 apiVersion: tailscale.com/v1alpha1
 kind: Connector
 metadata:
   name: homelab-subnet-router
   namespace: tailscale
 spec:
-  # hostname as it appears in the Tailscale admin console
   hostnamePrefix: talos-home-subnet
 
-  # Tag the connector device; operator must own this tag in your ACL policy
+  # tag:k8s is owned by the operator (tag:k8s-operator) — do NOT use tag:k8s-operator here
   tags:
     - tag:k8s
 
   subnetRouter:
     advertiseRoutes:
-      - "192.168.2.0/24"   # your home LAN — adjust if different
-      # Uncomment to also expose Kubernetes pod/service networks:
-      # - "10.96.0.0/12"   # default Kubernetes service CIDR (check your cluster)
-      # - "10.244.0.0/16"  # default pod CIDR (check your CNI config)
+      - "192.168.2.0/24"
