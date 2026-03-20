@@ -48,7 +48,7 @@ spec:
                   failureThreshold: 3
             image:
               repository: binwiederhier/ntfy
-              tag: v2.19.1
+              tag: v2.19.2
             args:
               - serve
             env:
