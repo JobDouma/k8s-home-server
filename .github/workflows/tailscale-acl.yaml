@@ -9,15 +9,28 @@ on:
     branches: [main]
     paths:
       - apps/talos-home/tailscale/acl.json
+  workflow_dispatch: # allows manual trigger from GitHub Actions UI
 
 jobs:
   acl:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write # required for OAuth JWT
+
     steps:
       - uses: actions/checkout@v4
 
-      - name: Deploy ACL to Tailscale
-        if: github.event_name == 'push'
+      - name: Fetch version-cache.json
+        uses: actions/cache@v4
+        with:
+          path: ./version-cache.json
+          key: version-cache.json-${{ github.run_id }}
+          restore-keys: |
+            version-cache.json-
+
+      - name: Deploy ACL
+        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
         uses: tailscale/gitops-acl-action@v1
         with:
           oauth-client-id: ${{ secrets.TS_OAUTH_CLIENT_ID }}
@@ -26,7 +39,7 @@ jobs:
           policy-file: apps/talos-home/tailscale/acl.json
           action: apply
 
-      - name: Validate ACL (dry-run on PRs)
+      - name: Test ACL (dry-run on PRs)
         if: github.event_name == 'pull_request'
         uses: tailscale/gitops-acl-action@v1
         with:
