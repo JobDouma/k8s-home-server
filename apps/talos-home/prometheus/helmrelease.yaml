@@ -32,15 +32,17 @@ spec:
   values:
     grafana:
       revisionHistoryLimit: 2
+      grafana:
       tolerations:
+        - operator: Exists
         - key: "node.kubernetes.io/not-ready"
           operator: "Exists"
           effect: "NoExecute"
-          tolerationSeconds: 60
+          tolerationSeconds: 600
         - key: "node.kubernetes.io/unreachable"
           operator: "Exists"
           effect: "NoExecute"
-          tolerationSeconds: 60
+          tolerationSeconds: 600
       deploymentStrategy:
         type: Recreate
         # rollingUpdate must be completely absent — not null, not empty
@@ -89,17 +91,6 @@ spec:
             foldersFromFilesStructure: true
         datasources:          # add this block
           enabled: false
-
-      tolerations:
-        - operator: Exists
-        - key: "node.kubernetes.io/not-ready"
-          operator: "Exists"
-          effect: "NoExecute"
-          tolerationSeconds: 600
-        - key: "node.kubernetes.io/unreachable"
-          operator: "Exists"
-          effect: "NoExecute"
-          tolerationSeconds: 600
 
       admin:
         existingSecret: grafana-admin
