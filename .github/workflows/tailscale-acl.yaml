@@ -24,6 +24,7 @@ jobs:
           oauth-secret: ${{ secrets.TS_OAUTH_SECRET }}
           tailnet: ${{ secrets.TS_TAILNET }}
           policy-file: apps/talos-home/tailscale/acl.json
+          action: apply
 
       - name: Validate ACL (dry-run on PRs)
         if: github.event_name == 'pull_request'
