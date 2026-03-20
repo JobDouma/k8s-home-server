@@ -1,4 +1,4 @@
-// ACLs for talos-home homelab
+// ACLs for talos-home homelab — v2
 {
 	"groups": {"group:admin": ["jobdouma@gmail.com"]},
 
