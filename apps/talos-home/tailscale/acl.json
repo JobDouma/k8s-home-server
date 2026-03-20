@@ -1,0 +1,59 @@
+// ACLs for talos-home homelab
+{
+	"groups": {"group:admin": ["jobdouma@gmail.com"]},
+
+	"tagOwners": {
+		"tag:k8s-operator": [],                  // owned by admins
+		"tag:k8s-readers":  [],                  // owned by admins
+		"tag:k8s":          ["tag:k8s-operator"], // owned by the operator — used by Connector/subnet router
+	},
+
+	// Auto-approve the subnet route advertised by the Connector (tag:k8s).
+	// Without this you'd have to manually approve it in the machines list every restart.
+	"autoApprovers": {
+		"routes": {
+			"192.168.2.0/24": ["tag:k8s"],
+		},
+	},
+
+	"grants": [
+		// k8s-readers can reach the operator on 443
+		{
+			"src": ["tag:k8s-readers"],
+			"dst": ["tag:k8s-operator"],
+			"ip":  ["tcp:443"],
+		},
+		// group:admin can kubectl via the API server proxy as cluster-admin
+		{
+			"src": ["group:admin"],
+			"dst": ["tag:k8s-operator"],
+			"app": {
+				"tailscale.com/cap/kubernetes": [{"impersonate": {"groups": ["system:masters"]}}],
+			},
+		},
+	],
+
+	"ssh": [
+		{
+			"action": "check",
+			"src":    ["autogroup:member"],
+			"dst":    ["autogroup:self"],
+			"users":  ["autogroup:nonroot", "root"],
+		},
+	],
+
+	"acls": [
+		// Allow the operator to reach the kube-apiserver
+		{
+			"action": "accept",
+			"src":    ["tag:k8s-operator"],
+			"dst":    ["tag:k8s-operator:6443"],
+		},
+		// Allow group:admin to reach all homelab devices (subnet router + operator)
+		{
+			"action": "accept",
+			"src":    ["group:admin"],
+			"dst":    ["tag:k8s:*", "tag:k8s-operator:*"],
+		},
+	],
+}
