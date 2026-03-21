@@ -24,17 +24,22 @@ spec:
       successfulJobsHistoryLimit: 0
       failedJobsHistoryLimit: 1
       ttlSecondsAfterFinished: 36000
-      postCommand: |
-        if [ $? -eq 0 ]; then
-          STATUS="✅ Renovate finished successfully"
-          PRIORITY=3
-        else
-          STATUS="❌ Renovate failed"
-          PRIORITY=8
-        fi
-        curl -s -X POST "http://gotify.gotify.svc.cluster.local/message?token=${RENOVATE_GOTIFY_TOKEN}" \
-          -H "Content-Type: application/json" \
-          -d "{\"title\": \"Renovate\", \"message\": \"${STATUS}\", \"priority\": ${PRIORITY}}"
+      commandOverride:
+        - /bin/bash
+        - -c
+        - |
+          renovate; EXIT=$?
+          if [ $EXIT -eq 0 ]; then
+            STATUS="✅ Renovate finished successfully"
+            PRIORITY=3
+          else
+            STATUS="❌ Renovate failed (exit: $EXIT)"
+            PRIORITY=8
+          fi
+          curl -s -X POST "http://gotify.gotify.svc.cluster.local/message?token=${RENOVATE_GOTIFY_TOKEN}" \
+            -H "Content-Type: application/json" \
+            -d "{\"title\": \"Renovate\", \"message\": \"${STATUS}\", \"priority\": ${PRIORITY}}"
+          exit $EXIT
 
     envFrom:
       - secretRef:
