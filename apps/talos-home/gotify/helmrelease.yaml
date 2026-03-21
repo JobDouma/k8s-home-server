@@ -28,7 +28,7 @@ spec:
           app:
             image:
               repository: gotify/server
-              tag: "2.6.3"
+              tag: "2.9.1"
             env:
               TZ: Europe/Amsterdam
               GOTIFY_DEFAULTUSER_NAME:
