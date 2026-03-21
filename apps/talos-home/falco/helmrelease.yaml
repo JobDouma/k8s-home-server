@@ -8,6 +8,8 @@ spec:
   dependsOn:
     - name: loki
       namespace: monitoring
+    - name: falcosidekick
+      namespace: falco
   chart:
     spec:
       chart: falco
