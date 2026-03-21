@@ -31,6 +31,11 @@ spec:
 
     env:
       LOG_LEVEL: info
+      RENOVATE_GOTIFY_TOKEN:
+        valueFrom:
+          secretKeyRef:
+            name: renovate-secret
+            key: RENOVATE_GOTIFY_TOKEN
 
     renovate:
 
@@ -51,6 +56,15 @@ spec:
 
           "dependencyDashboard": true,
           "baseBranchPatterns": ["main"],
+
+          "notificationServices": {
+            "gotify": {
+              "endpoint": "http://gotify.gotify.svc.cluster.local",
+              "token": "{{ env.RENOVATE_GOTIFY_TOKEN }}"
+            }
+          },
+
+          "notifications": ["gotify"],
 
           "enabledManagers": [
             "flux",
