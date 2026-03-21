@@ -17,7 +17,7 @@ spec:
   chart:
     spec:
       chart: jellyfin
-      version: "*"
+      version: "2.7.0"
       sourceRef:
         kind: HelmRepository
         name: jellyfin

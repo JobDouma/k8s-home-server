@@ -18,7 +18,7 @@ spec:
     spec:
       chart: tailscale-operator
       # renovate: registryUrl=https://pkgs.tailscale.com/helmcharts
-      version: ">=1.0.0"
+      version: "1.94.2"
       sourceRef:
         kind: HelmRepository
         name: tailscale
