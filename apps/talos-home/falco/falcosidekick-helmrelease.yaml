@@ -5,6 +5,7 @@ metadata:
   namespace: falco
 spec:
   interval: 15m
+  maxHistory: 2
   dependsOn:
     - name: loki
       namespace: monitoring
@@ -26,7 +27,6 @@ spec:
     - kind: Secret
       name: falcosidekick-values
       valuesKey: values.yaml
-
   values:
     replicaCount: 1
     tolerations:
@@ -45,13 +45,6 @@ spec:
       prometheus.io/port: "2801"
 
     config:
-      ntfy:
-        hostport: "http://ntfy.ntfy.svc.cluster.local"
-        topic: "homelab-alerts"
-        minimumpriority: "warning"
-        checkcert: false
-        # token injected via valuesFrom secret
-
       loki:
         hostport: "http://loki-gateway.monitoring.svc.cluster.local"
         minimumpriority: "warning"
