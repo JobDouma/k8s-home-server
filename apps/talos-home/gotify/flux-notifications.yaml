@@ -17,7 +17,7 @@ metadata:
 spec:
   providerRef:
     name: gotify
-  eventSeverity: info
+  eventSeverity: warn
   eventSources:
     - kind: Kustomization
       name: "*"
