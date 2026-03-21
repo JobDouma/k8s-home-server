@@ -5,7 +5,6 @@ metadata:
   namespace: flux-system
 spec:
   type: generic
-  address: http://gotify.gotify.svc.cluster.local/message
   secretRef:
     name: gotify-flux-token
 ---
@@ -17,10 +16,11 @@ metadata:
 spec:
   providerRef:
     name: gotify
-  eventSeverity: info
+  eventSeverity: error
   eventSources:
     - kind: Kustomization
       name: "*"
     - kind: HelmRelease
       name: "*"
-  summary: "Flux reconciliation failed"
+  eventMetadata:
+    summary: "Flux reconciliation failed"
