@@ -6,8 +6,6 @@ metadata:
 spec:
   interval: 15m
   dependsOn:
-    - name: falco
-      namespace: falco
     - name: loki
       namespace: monitoring
   chart:
@@ -50,12 +48,18 @@ spec:
         address: "http://ntfy.ntfy.svc.cluster.local/homelab-alerts"
         minimumpriority: "warning"
         checkcert: false
-        customHeaders: "Authorization:Bearer tk_ziuf1kf6mwr78xysvczcr57gs90hv"
+        customHeaders: "Authorization:Bearer ${NTFY_TOKEN}"
 
       loki:
         hostport: "http://loki-gateway.monitoring.svc.cluster.local"
         minimumpriority: "warning"
-
+    
+    extraEnv:
+      - name: NTFY_TOKEN
+        valueFrom:
+          secretKeyRef:
+            name: falcosidekick-ntfy-secret
+            key: ntfy-token
     webui:
       enabled: true
       replicaCount: 1
