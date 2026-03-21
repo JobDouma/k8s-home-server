@@ -203,6 +203,8 @@ resources:
   - gotify/certificate.yaml
   - gotify/ingressroute.yaml
   - gotify/networkpolicy.yaml
+  - gotify/flux-notifications.yaml
+  - gotify/flux-token-secret.yaml
 
   # ──────────────────────────────────────
   # Tempo
