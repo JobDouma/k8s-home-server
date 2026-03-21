@@ -43,16 +43,13 @@ spec:
           "$schema": "https://docs.renovatebot.com/renovate-schema.json",
 
           "platform": "github",
-
           "repositories": ["jobdouma/k8s-home-server"],
 
           "autodiscover": false,
-
           "onboarding": false,
           "requireConfig": "optional",
 
           "dependencyDashboard": true,
-
           "baseBranchPatterns": ["main"],
 
           "enabledManagers": [
@@ -96,11 +93,14 @@ spec:
               "groupName": "all non-major updates",
               "groupSlug": "all-non-major",
               "automerge": true,
-              "automergeType": "pr"
+              "automergeType": "pr",
+              "platformAutomerge": true,
+              "labels": ["automerge"]
             },
             {
               "matchUpdateTypes": ["major"],
-              "automerge": false
+              "automerge": false,
+              "labels": ["major-update"]
             }
           ]
         }

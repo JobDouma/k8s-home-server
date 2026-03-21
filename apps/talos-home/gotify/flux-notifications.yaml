@@ -1,0 +1,26 @@
+apiVersion: notification.toolkit.fluxcd.io/v1beta3
+kind: Provider
+metadata:
+  name: gotify
+  namespace: flux-system
+spec:
+  type: gotify
+  address: http://gotify.gotify.svc.cluster.local
+  secretRef:
+    name: gotify-flux-token
+---
+apiVersion: notification.toolkit.fluxcd.io/v1beta3
+kind: Alert
+metadata:
+  name: gotify-flux-alerts
+  namespace: flux-system
+spec:
+  providerRef:
+    name: gotify
+  eventSeverity: error
+  eventSources:
+    - kind: Kustomization
+      name: "*"
+    - kind: HelmRelease
+      name: "*"
+  summary: "Flux reconciliation failed"
