@@ -103,7 +103,7 @@ resources:
   - renovate/helmrelease.yaml
 
   # ──────────────────────────────────────
-  # Renovate
+  # Dashy
   # ──────────────────────────────────────
   - dashy/configmap.yaml
   - dashy/helmrelease.yaml
@@ -185,14 +185,14 @@ resources:
   # ──────────────────────────────────────
   # Velero (K8s-backup)
   # ──────────────────────────────────────
-  - velero/namespace.yaml
-  - velero/pvc.yaml
-  - velero/minio-secret.yaml
-  - velero/minio.yaml
-  - velero/helmrepository.yaml
-  - velero/helmrelease.yaml
-  - velero/servicemonitor.yaml
-  - velero/networkpolicy.yaml
+  # - velero/namespace.yaml
+  # - velero/pvc.yaml
+  # - velero/minio-secret.yaml
+  # - velero/minio.yaml
+  # - velero/helmrepository.yaml
+  # - velero/helmrelease.yaml
+  # - velero/servicemonitor.yaml
+  # - velero/networkpolicy.yaml
 
   # ──────────────────────────────────────
   # Ntfy
