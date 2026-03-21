@@ -5,6 +5,7 @@ metadata:
   namespace: flux-system
 spec:
   type: generic
+  address: ""   # leave empty — address comes from the secret
   secretRef:
     name: gotify-flux-token
 ---
