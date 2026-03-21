@@ -4,8 +4,8 @@ metadata:
   name: gotify
   namespace: flux-system
 spec:
-  type: gotify
-  address: http://gotify.gotify.svc.cluster.local
+  type: generic
+  address: http://gotify.gotify.svc.cluster.local/message
   secretRef:
     name: gotify-flux-token
 ---
