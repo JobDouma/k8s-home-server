@@ -47,11 +47,6 @@ spec:
 
     env:
       LOG_LEVEL: info
-      RENOVATE_GOTIFY_TOKEN:
-        valueFrom:
-          secretKeyRef:
-            name: renovate-secret
-            key: RENOVATE_GOTIFY_TOKEN
 
     renovate:
 
