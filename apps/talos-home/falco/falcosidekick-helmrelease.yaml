@@ -22,6 +22,11 @@ spec:
   upgrade:
     remediation:
       retries: 3
+  valuesFrom:
+    - kind: Secret
+      name: falcosidekick-values
+      valuesKey: values.yaml
+
   values:
     replicaCount: 1
     tolerations:
@@ -40,26 +45,17 @@ spec:
       prometheus.io/port: "2801"
 
     config:
-      # Falcosidekick's native ntfy integration requires NTFY_TOKEN at init time
-      # but the chart secret overrides it with an empty string — broken by design.
-      # Use the generic webhook output instead: ntfy accepts plain HTTP POST natively
-      # and the Authorization header is all that's needed for auth.
-      webhook:
-        address: "http://ntfy.ntfy.svc.cluster.local/homelab-alerts"
+      ntfy:
+        hostport: "http://ntfy.ntfy.svc.cluster.local"
+        topic: "homelab-alerts"
         minimumpriority: "warning"
         checkcert: false
-        customHeaders: "Authorization:Bearer ${NTFY_TOKEN}"
+        # token injected via valuesFrom secret
 
       loki:
         hostport: "http://loki-gateway.monitoring.svc.cluster.local"
         minimumpriority: "warning"
-    
-    extraEnv:
-      - name: NTFY_TOKEN
-        valueFrom:
-          secretKeyRef:
-            name: falcosidekick-ntfy-secret
-            key: ntfy-token
+
     webui:
       enabled: true
       replicaCount: 1
