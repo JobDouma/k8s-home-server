@@ -195,13 +195,13 @@ resources:
   # - velero/networkpolicy.yaml
 
   # ──────────────────────────────────────
-  # Ntfy
+  # gotify
   # ──────────────────────────────────────
-  - ntfy/namespace.yaml
-  - ntfy/secret.yaml
-  - ntfy/helmrelease.yaml
-  - ntfy/certificate.yaml
-  - ntfy/ingressroute.yaml
+  - gotify/namespace.yaml
+  - gotify/secret.yaml
+  - gotify/helmrelease.yaml
+  - gotify/certificate.yaml
+  - gotify/ingressroute.yaml
 
   # ──────────────────────────────────────
   # Tempo
