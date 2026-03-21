@@ -24,6 +24,17 @@ spec:
       successfulJobsHistoryLimit: 0
       failedJobsHistoryLimit: 1
       ttlSecondsAfterFinished: 36000
+      postCommand: |
+        if [ $? -eq 0 ]; then
+          STATUS="✅ Renovate finished successfully"
+          PRIORITY=3
+        else
+          STATUS="❌ Renovate failed"
+          PRIORITY=8
+        fi
+        curl -s -X POST "http://gotify.gotify.svc.cluster.local/message?token=${RENOVATE_GOTIFY_TOKEN}" \
+          -H "Content-Type: application/json" \
+          -d "{\"title\": \"Renovate\", \"message\": \"${STATUS}\", \"priority\": ${PRIORITY}}"
 
     envFrom:
       - secretRef:
@@ -42,24 +53,6 @@ spec:
       image:
         repository: ghcr.io/renovatebot/renovate
         tag: "43.84.2"
-
-      command:
-        - /bin/sh
-        - -c
-        - |
-          renovate
-          EXIT_CODE=$?
-          if [ $EXIT_CODE -eq 0 ]; then
-            STATUS="✅ Renovate finished successfully"
-            PRIORITY=3
-          else
-            STATUS="❌ Renovate failed (exit code: $EXIT_CODE)"
-            PRIORITY=8
-          fi
-          curl -s -X POST "http://gotify.gotify.svc.cluster.local/message?token=${RENOVATE_GOTIFY_TOKEN}" \
-            -H "Content-Type: application/json" \
-            -d "{\"title\": \"Renovate\", \"message\": \"${STATUS}\", \"priority\": ${PRIORITY}}"
-          exit $EXIT_CODE
 
       config: |
         {
