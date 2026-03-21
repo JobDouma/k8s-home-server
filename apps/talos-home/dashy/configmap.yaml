@@ -78,10 +78,10 @@ data:
             icon: fas fa-rss
             url: https://freshrss.lan
 
-          - title: Ntfy
+          - title: Gotify
             description: Push Notifications
             icon: fas fa-bell
-            url: https://ntfy.lan
+            url: https://gotify.lan
 
 
       - name: Monitoring
