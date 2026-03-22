@@ -2,66 +2,66 @@ apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
   name: headlamp
-    namespace: headlamp
+  namespace: headlamp
+spec:
+  interval: 30m
+  chart:
     spec:
-      interval: 30m
-        chart:
-            spec:
-                  chart: headlamp
-                        version: "0.40.1"
-                              sourceRef:
-                                      kind: HelmRepository
-                                              name: headlamp
-                                                      namespace: flux-system
-                                                        values:
-                                                            replicaCount: 1
-                                                                nodeSelector: {}
-                                                                    affinity: {}
+      chart: headlamp
+      version: "0.40.1"
+      sourceRef:
+        kind: HelmRepository
+        name: headlamp
+        namespace: flux-system
+  values:
+    replicaCount: 1
+    nodeSelector: {}
+    affinity: {}
 
-                                                                        volumes:
-                                                                              - name: homelab-ca
-                                                                                      secret:`
-                                                                                                secretName: homelab-ca-secret
-                                                                                                          items:
-                                                                                                                      - key: tls.crt
-                                                                                                                                    path: homelab-ca.crt
+    volumes:
+      - name: homelab-ca
+        secret:
+          secretName: homelab-ca-secret
+          items:
+            - key: tls.crt
+              path: homelab-ca.crt
 
-                                                                                                                                        volumeMounts:
-                                                                                                                                              - name: homelab-ca
-                                                                                                                                                      mountPath: /etc/ssl/certs/homelab-ca.crt
-                                                                                                                                                              subPath: homelab-ca.crt
+    volumeMounts:
+      - name: homelab-ca
+        mountPath: /etc/ssl/certs/homelab-ca.crt
+        subPath: homelab-ca.crt
 
-                                                                                                                                                                  env:
-                                                                                                                                                                        - name: SSL_CERT_FILE
-                                                                                                                                                                                value: /etc/ssl/certs/homelab-ca.crt
+    env:
+      - name: SSL_CERT_FILE
+        value: /etc/ssl/certs/homelab-ca.crt
 
-                                                                                                                                                                                    service:
-                                                                                                                                                                                          type: ClusterIP
-                                                                                                                                                                                                port: 80
-                                                                                                                                                                                                      sessionAffinity: ClientIP
+    service:
+      type: ClusterIP
+      port: 80
+      sessionAffinity: ClientIP
 
-                                                                                                                                                                                                          config:
-                                                                                                                                                                                                                oidc:
-                                                                                                                                                                                                                        secret:
-                                                                                                                                                                                                                                  create: false
-                                                                                                                                                                                                                                          externalSecret:
-                                                                                                                                                                                                                                                    enabled: true
-                                                                                                                                                                                                                                                              name: headlamp-oidc-credentials
-                                                                                                                                                                                                                                                                    extraArgs:
-                                                                                                                                                                                                                                                                            - --oidc-ca-file=/etc/ssl/certs/homelab-ca.crt
-                                                                                                                                                                                                                                                                                  sessionTTL: null
+    config:
+      oidc:
+        secret:
+          create: false
+        externalSecret:
+          enabled: true
+          name: headlamp-oidc-credentials
+      extraArgs:
+        - --oidc-ca-file=/etc/ssl/certs/homelab-ca.crt
+      sessionTTL: null
 
-                                                                                                                                                                                                                                                                                      serviceAccount:
-                                                                                                                                                                                                                                                                                            create: false
-                                                                                                                                                                                                                                                                                                  name: headlamp
+    serviceAccount:
+      create: false
+      name: headlamp
 
-                                                                                                                                                                                                                                                                                                      clusterRoleBinding:
-                                                                                                                                                                                                                                                                                                            create: false
+    clusterRoleBinding:
+      create: false
 
-                                                                                                                                                                                                                                                                                                                resources:
-                                                                                                                                                                                                                                                                                                                      requests:
-                                                                                                                                                                                                                                                                                                                              cpu: 50m
-                                                                                                                                                                                                                                                                                                                                      memory: 64Mi
-                                                                                                                                                                                                                                                                                                                                            limits:
-                                                                                                                                                                                                                                                                                                                                                    cpu: 500m
-                                                                                                                                                                                                                                                                                                                                                            memory: 512Mi
+    resources:
+      requests:
+        cpu: 50m
+        memory: 64Mi
+      limits:
+        cpu: 500m
+        memory: 512Mi
