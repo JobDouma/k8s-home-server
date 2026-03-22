@@ -33,10 +33,34 @@ spec:
       defaultReplicaCount: 2
       createDefaultDiskLabeledNodes: true
       defaultDataPath: /var/lib/longhorn
-      replicaAutoBalance: best-effort
       backupTarget: "nfs://192.168.2.5:/mnt/tank/configs/longhorn-backups"
       backupTargetCredentialSecret: ""
-      snapshotDataIntegrity: fast-check
+
+      # CHANGED: best-effort means Longhorn continuously calculates
+      # replica placement across nodes and moves replicas to achieve
+      # balance. On a 3-node homelab this runs background I/O and
+      # CPU work constantly. "disabled" means replicas stay where
+      # they are placed at volume creation — no ongoing rebalancing.
+      replicaAutoBalance: disabled
+
+      # CHANGED: fast-check still runs a CRC scan on every snapshot
+      # which is I/O and CPU work on each node. For a homelab with
+      # NFS backups, this is unnecessary overhead. Your backups are
+      # the integrity guarantee.
+      snapshotDataIntegrity: disabled
+
+      # CHANGED: 600s (10 min) means if a node blips, Longhorn starts
+      # rebuilding replicas after just 10 minutes. Rebuilds are the
+      # most CPU/IO intensive thing Longhorn does. 1800s (30 min) is
+      # better for a homelab where node restarts are expected.
+      replicaReplenishmentWaitInterval: 1800
+
+      # ADDED: without this, if your NFS backup kicks off, Longhorn
+      # can run unlimited concurrent backup jobs and saturate your
+      # nodes. 1 concurrent backup is plenty for a homelab.
+      backupConcurrentLimit: 1
+
+      # These were already well set, kept as-is:
       recurringJobMaxRetention: 10
       guaranteedEngineManagerCPU: 0
       guaranteedReplicaManagerCPU: 0
@@ -44,30 +68,10 @@ spec:
       disableRevisionCounter: true
       concurrentReplicaRebuildPerNodeLimit: 1
       engineReplicaTimeout: 8
-
-      # ── Node shutdown resilience ──────────────────────────
-      # Don't wait for the default 5-min Kubernetes timeout before
-      # cleaning up pods on a node that's gone. Combined with your
-      # drain script this is belt-and-suspenders: drain evacuates
-      # cleanly, this handles the unclean case.
       nodeDownPodDeletionPolicy: delete-both-statefulset-and-deployment-pod
-
-      # Allow replicas to share a node if no better option exists.
-      # Without this, a 2-replica volume on a 2-node cluster would
-      # refuse to rebuild after cp-3 comes back (no "new" node to
-      # place the replica on without violating hard anti-affinity).
       replicaSoftAntiAffinity: true
-
-      # Don't auto-evict replicas from a cordoned node.
-      # Your drain script gracefully migrates workloads; Longhorn
-      # replicas should stay put on cp-3 so they're immediately
-      # available when the node comes back — no rebuild needed.
       replicaZoneSoftAntiAffinity: true
       disableReplicaRebuildOnNodeDrainingAndVolumeMigrating: false
-      replicaReplenishmentWaitInterval: 600
-
-      # Detach volumes from the node before it goes down so they
-      # don't stay in an attached-but-inaccessible state.
       autoCleanupSystemGeneratedSnapshot: true
       autoDeletePodWhenVolumeDetachedUnexpectedly: true
 

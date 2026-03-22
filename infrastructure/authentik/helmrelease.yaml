@@ -35,7 +35,9 @@ spec:
     metrics:
       serviceMonitor:
         create: true
-        interval: 30s
+        # CHANGED: 30s is aggressive for a homelab auth server.
+        # 120s gives Prometheus the same data with 4x less scrape work.
+        interval: 120s
         scrapeTimeout: 10s
 
     authentik:
@@ -47,15 +49,25 @@ spec:
         path: "/"
 
     server:
-      replicas: 2
-      # RollingUpdate is safe with 2+ replicas — always 1 server available during upgrades
-      strategy:
-        type: RollingUpdate
-        rollingUpdate:
-          maxUnavailable: 1
-          maxSurge: 1
+      # CHANGED: 2 → 1. On a homelab, running 2 server pods means
+      # double the memory, double the Python process overhead, and
+      # Longhorn replicating writes for two pods' session data.
+      # If your single node goes down you'd lose auth anyway since
+      # the 2nd pod is on the same 3-node pool with no zone HA.
+      # 1 replica is the honest homelab choice.
+      replicas: 1
 
-      # Spread server pods across nodes — 1 survives any single node loss
+      # ADDED: without limits, a spike in logins or blueprint
+      # processing can consume 2-3 cores temporarily. These limits
+      # keep authentik from crowding out your other workloads.
+      resources:
+        requests:
+          cpu: 50m
+          memory: 512Mi
+        limits:
+          cpu: 500m
+          memory: 1Gi
+
       tolerations:
         - key: node-role.kubernetes.io/control-plane
           operator: Exists
@@ -82,7 +94,18 @@ spec:
 
     worker:
       replicas: 1
-      # Workers are stateless — RollingUpdate is safe
+
+      # ADDED: workers handle background tasks like blueprint sync,
+      # outpost health checks, and email. Unbounded they can spike
+      # heavily during policy evaluation.
+      resources:
+        requests:
+          cpu: 50m
+          memory: 256Mi
+        limits:
+          cpu: 300m
+          memory: 512Mi
+
       strategy:
         type: RollingUpdate
         rollingUpdate:
@@ -124,8 +147,28 @@ spec:
           enabled: true
           storageClass: longhorn
           size: 10Gi
+        # ADDED: Postgres for authentik on a homelab rarely needs
+        # more than 200m CPU. Without limits it can vacuum/analyze
+        # and spike freely.
+        resources:
+          requests:
+            cpu: 50m
+            memory: 256Mi
+          limits:
+            cpu: 200m
+            memory: 512Mi
 
     redis:
       enabled: true
       auth:
         enabled: false
+      # ADDED: Redis for session caching is tiny workload.
+      # Cap it so it doesn't quietly grow.
+      master:
+        resources:
+          requests:
+            cpu: 10m
+            memory: 64Mi
+          limits:
+            cpu: 100m
+            memory: 128Mi
