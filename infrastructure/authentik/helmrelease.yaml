@@ -32,14 +32,7 @@ spec:
     prometheus:
       rules:
         create: false
-    metrics:
-      enabled: true
-      serviceMonitor:
-        create: true
-        # CHANGED: 30s is aggressive for a homelab auth server.
-        # 120s gives Prometheus the same data with 4x less scrape work.
-        interval: 120s
-        scrapeTimeout: 10s
+    
 
     authentik:
       existingSecret:
@@ -50,6 +43,14 @@ spec:
         path: "/"
 
     server:
+      metrics:
+        enabled: true
+        serviceMonitor:
+          create: true
+          # CHANGED: 30s is aggressive for a homelab auth server.
+          # 120s gives Prometheus the same data with 4x less scrape work.
+          interval: 120s
+          scrapeTimeout: 10s
       # CHANGED: 2 → 1. On a homelab, running 2 server pods means
       # double the memory, double the Python process overhead, and
       # Longhorn replicating writes for two pods' session data.
