@@ -33,6 +33,7 @@ spec:
       rules:
         create: false
     metrics:
+      enabled: true
       serviceMonitor:
         create: true
         # CHANGED: 30s is aggressive for a homelab auth server.
