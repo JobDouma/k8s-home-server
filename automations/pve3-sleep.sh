@@ -28,7 +28,6 @@ kubectl drain "$K8S_NODE" \
   --grace-period=60 \
   --timeout=5m \
   --skip-wait-for-delete-timeout=30 \
-
   || log "Drain exited non-zero (may be fine — checking stuck pods next)."
 log "Drain complete."
 # ── Step 3a: Force-delete stuck non-daemonset pods on this node ─
@@ -42,7 +41,7 @@ STUCK_PODS=$(kubectl get pods -A \
   -o json 2>/dev/null | \
   jq -r '
     .items[] |
-    select(
+    select(git s
       (.metadata.ownerReferences // []) |
       map(.kind) |
       contains(["DaemonSet"]) | not
