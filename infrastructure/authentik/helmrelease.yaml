@@ -46,7 +46,7 @@ spec:
       metrics:
         enabled: true
         serviceMonitor:
-          create: true
+          enabled: true
           # CHANGED: 30s is aggressive for a homelab auth server.
           # 120s gives Prometheus the same data with 4x less scrape work.
           interval: 120s
