@@ -65,7 +65,7 @@ spec:
       annotations:
         metallb.universe.tf/address-pool: traefik-pool
       spec:
-        externalTrafficPolicy: Local
+        externalTrafficPolicy: Cluster
         allocateLoadBalancerNodePorts: false
 
     ports:
