@@ -35,6 +35,17 @@ data:
         loadbalance
     }
 
+# For in-cluster DNS — it handles DNS for pods inside Kubernetes. 
+# This is completely separate from what Tailscale does.
+
+# Inside cluster (pods):
+# Pod DNS query → CoreDNS → Blocky → upstream
+
+# Your phone on 4G via Tailscale:
+# Phone DNS query → Tailscale → Blocky (192.168.2.53) → upstream
+# Your phone on WiFi with Override local DNS:
+# Phone DNS query → Tailscale → Blocky (192.168.2.53) → upstream
+
 # Query → Blocky
 #       ↓ (if fails)
 #       → 1.1.1.1
