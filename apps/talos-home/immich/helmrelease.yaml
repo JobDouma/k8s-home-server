@@ -173,6 +173,9 @@ spec:
             image:
               repository: docker.io/valkey/valkey
               tag: "9-alpine"
+            args:
+              - --save ""
+              - --appendonly no
             resources:
               requests:
                 cpu: 10m
