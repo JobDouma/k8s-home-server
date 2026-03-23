@@ -58,10 +58,10 @@ data:
             icon: fas fa-download
             url: https://qbittorrent.lan
 
-          - title: SABnzbd
-            description: Usenet Client
-            icon: fas fa-cloud-download-alt
-            url: https://sabnzbd.lan
+          - title: Immich
+            description: Photo & Video Backup
+            icon: fas fa-images
+            url: https://immich.lan
 
 
       - name: Productivity

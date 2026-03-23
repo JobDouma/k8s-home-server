@@ -206,14 +206,24 @@ resources:
   - gotify/flux-notifications.yaml
   - gotify/flux-token-secret.yaml
 
-  # ──────────────────────────────────────
-  # Tempo
-  # ──────────────────────────────────────
-  # - tempo/helmrelease.yaml
 
+  # ──────────────────────────────────────
+  # Tailscale
+  # ──────────────────────────────────────
   - tailscale/namespace.yaml
   - tailscale/helmrepository.yaml
   - tailscale/helmrelease.yaml
   - tailscale/connector.yaml
   - tailscale/servicemonitor.yaml
   - tailscale/secret.yaml
+
+  # ──────────────────────────────────────
+  # Immich
+  # ──────────────────────────────────────
+  - immich/namespace.yaml
+  - immich/secret.yaml
+  - immich/certificate.yaml
+  - immich/helmrelease.yaml
+  - immich/ingressroute.yaml
+  - immich/networkpolicy.yaml
+  - immich/servicemonitor.yaml
