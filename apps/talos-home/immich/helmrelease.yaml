@@ -45,9 +45,9 @@ spec:
             env:
               TZ: Europe/Amsterdam
               IMMICH_PORT: "3001"
-              DB_HOSTNAME: immich-postgres
+              DB_HOSTNAME: immich-immich-postgres
               DB_PORT: "5432"
-              REDIS_HOSTNAME: immich-redis
+              REDIS_HOSTNAME: immich-immich-redis
               REDIS_PORT: "6379"
             envFrom:
               - secretRef:
