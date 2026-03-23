@@ -1,0 +1,252 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: immich
+  namespace: immich
+spec:
+  interval: 15m
+  timeout: 10m
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    remediation:
+      retries: 3
+
+  chart:
+    spec:
+      chart: app-template
+      version: "4.6.2"
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s
+        namespace: flux-system
+
+  values:
+
+    defaultPodOptions:
+      securityContext:
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+        fsGroupChangePolicy: OnRootMismatch
+        seccompProfile:
+          type: RuntimeDefault
+
+    controllers:
+      immich-server:
+        annotations:
+          reloader.stakater.com/auto: "true"
+        containers:
+          app:
+            image:
+              repository: ghcr.io/immich-app/immich-server
+              tag: v1.130.3
+            env:
+              TZ: Europe/Amsterdam
+              IMMICH_PORT: "3001"
+              DB_HOSTNAME: immich-postgres
+              DB_PORT: "5432"
+              REDIS_HOSTNAME: immich-redis
+              REDIS_PORT: "6379"
+            envFrom:
+              - secretRef:
+                  name: immich-secret
+            ports:
+              - name: http
+                containerPort: 3001
+            resources:
+              requests:
+                cpu: 100m
+                memory: 512Mi
+              limits:
+                cpu: 1000m
+                memory: 2Gi
+            probes:
+              readiness:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /api/server/ping
+                    port: 3001
+                  initialDelaySeconds: 10
+                  periodSeconds: 10
+                  failureThreshold: 6
+              liveness:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /api/server/ping
+                    port: 3001
+                  initialDelaySeconds: 30
+                  periodSeconds: 30
+                  failureThreshold: 3
+
+      immich-machine-learning:
+        annotations:
+          reloader.stakater.com/auto: "true"
+        containers:
+          app:
+            image:
+              repository: ghcr.io/immich-app/immich-machine-learning
+              tag: v1.130.3
+            env:
+              TZ: Europe/Amsterdam
+              MACHINE_LEARNING_CACHE_FOLDER: /cache
+            envFrom:
+              - secretRef:
+                  name: immich-secret
+            ports:
+              - name: http
+                containerPort: 3003
+            resources:
+              requests:
+                cpu: 50m
+                memory: 512Mi
+              limits:
+                cpu: 2000m        # ML spikes during photo processing
+                memory: 4Gi
+
+      immich-postgres:
+        strategy: Recreate
+        containers:
+          app:
+            image:
+              repository: ghcr.io/immich-app/postgres
+              tag: 14-vectorchord0.3.0-pgvectors0.2.0
+            env:
+              POSTGRES_DB:
+                valueFrom:
+                  secretKeyRef:
+                    name: immich-secret
+                    key: DB_DATABASE_NAME
+              POSTGRES_USER:
+                valueFrom:
+                  secretKeyRef:
+                    name: immich-secret
+                    key: DB_USERNAME
+              POSTGRES_PASSWORD:
+                valueFrom:
+                  secretKeyRef:
+                    name: immich-secret
+                    key: DB_PASSWORD
+              POSTGRES_INITDB_ARGS: "--data-checksums"
+              PGDATA: /var/lib/postgresql/data/pgdata
+            resources:
+              requests:
+                cpu: 50m
+                memory: 256Mi
+              limits:
+                cpu: 500m
+                memory: 1Gi
+            probes:
+              startup:
+                enabled: true
+                spec:
+                  exec:
+                    command: [sh, -c, "pg_isready -U $POSTGRES_USER"]
+                  failureThreshold: 30
+                  periodSeconds: 5
+              readiness:
+                enabled: true
+                spec:
+                  exec:
+                    command: [sh, -c, "pg_isready -U $POSTGRES_USER"]
+              liveness:
+                enabled: true
+                spec:
+                  exec:
+                    command: [sh, -c, "pg_isready -U $POSTGRES_USER"]
+
+      immich-redis:
+        containers:
+          app:
+            image:
+              repository: docker.io/redis
+              tag: 7.4.3-alpine
+            resources:
+              requests:
+                cpu: 10m
+                memory: 32Mi
+              limits:
+                cpu: 100m
+                memory: 128Mi
+            probes:
+              readiness:
+                enabled: true
+                custom: true
+                spec:
+                  exec:
+                    command: [redis-cli, ping]
+                  initialDelaySeconds: 5
+                  periodSeconds: 5
+              liveness:
+                enabled: true
+                custom: true
+                spec:
+                  exec:
+                    command: [redis-cli, ping]
+                  initialDelaySeconds: 10
+                  periodSeconds: 10
+
+    service:
+      immich-server:
+        controller: immich-server
+        type: ClusterIP
+        ports:
+          http:
+            port: 3001
+      immich-machine-learning:
+        controller: immich-machine-learning
+        type: ClusterIP
+        ports:
+          http:
+            port: 3003
+      immich-postgres:
+        controller: immich-postgres
+        type: ClusterIP
+        ports:
+          db:
+            port: 5432
+      immich-redis:
+        controller: immich-redis
+        type: ClusterIP
+        ports:
+          redis:
+            port: 6379
+
+    persistence:
+      library:
+        enabled: true
+        type: persistentVolumeClaim
+        storageClass: truenas-nfs
+        accessMode: ReadWriteMany
+        size: 500Gi
+        advancedMounts:
+          immich-server:
+            app:
+              - path: /usr/src/app/upload
+
+      ml-cache:
+        enabled: true
+        type: persistentVolumeClaim
+        storageClass: longhorn
+        accessMode: ReadWriteOnce
+        size: 10Gi
+        advancedMounts:
+          immich-machine-learning:
+            app:
+              - path: /cache
+
+      postgres-data:
+        enabled: true
+        type: persistentVolumeClaim
+        storageClass: longhorn
+        accessMode: ReadWriteOnce
+        size: 10Gi
+        advancedMounts:
+          immich-postgres:
+            app:
+              - path: /var/lib/postgresql/data
