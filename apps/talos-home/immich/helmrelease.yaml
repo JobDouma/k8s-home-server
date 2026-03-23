@@ -118,11 +118,6 @@ spec:
             fsGroup: 999
             runAsNonRoot: true
             fsGroupChangePolicy: OnRootMismatch
-          volumes:
-            - name: dshm
-              emptyDir:
-                medium: Memory
-                sizeLimit: 128Mi
         containers:
           app:
             image:
@@ -146,9 +141,6 @@ spec:
                     key: DB_PASSWORD
               POSTGRES_INITDB_ARGS: "--data-checksums"
               PGDATA: /var/lib/postgresql/data/pgdata
-            volumeMounts:
-              - name: dshm
-                mountPath: /dev/shm
             resources:
               requests:
                 cpu: 50m
@@ -265,3 +257,13 @@ spec:
           immich-postgres:
             app:
               - path: /var/lib/postgresql/data
+
+      postgres-shm:
+        enabled: true
+        type: emptyDir
+        medium: Memory
+        sizeLimit: 128Mi
+        advancedMounts:
+          immich-postgres:
+            app:
+              - path: /dev/shm
