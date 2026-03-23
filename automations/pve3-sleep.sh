@@ -41,7 +41,7 @@ STUCK_PODS=$(kubectl get pods -A \
   -o json 2>/dev/null | \
   jq -r '
     .items[] |
-    select(git s
+    select(
       (.metadata.ownerReferences // []) |
       map(.kind) |
       contains(["DaemonSet"]) | not
