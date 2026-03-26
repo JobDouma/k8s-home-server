@@ -160,6 +160,7 @@ resources:
   # ──────────────────────────────────────
   - freshrss/namespace.yaml
   - freshrss/opml-configmap.yaml
+  - freshrss/init-configmap.yaml
   - freshrss/helmrelease.yaml
   - freshrss/ingressroute.yaml
   - freshrss/certificate.yaml
