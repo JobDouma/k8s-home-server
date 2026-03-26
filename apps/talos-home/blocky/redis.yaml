@@ -1,0 +1,56 @@
+# A small Redis deployment to share cache between the two Blocky replicas
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: redis-blocky
+  namespace: dns
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: redis-blocky
+  template:
+    metadata:
+      labels:
+        app: redis-blocky
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 999
+        runAsGroup: 999
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: redis
+          image: redis:7-alpine
+          args:
+            - redis-server
+            - --save ""           # disable persistence — cache only, no disk writes
+            - --maxmemory 64mb
+            - --maxmemory-policy allkeys-lru
+          ports:
+            - containerPort: 6379
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+          resources:
+            requests:
+              cpu: 10m
+              memory: 80Mi
+            limits:
+              memory: 96Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis-blocky
+  namespace: dns
+spec:
+  selector:
+    app: redis-blocky
+  ports:
+    - port: 6379
+      targetPort: 6379
