@@ -5,6 +5,3 @@ resources:
   - gotk-sync.yaml
 patches:
   - path: patch-resources.yaml
-    target:
-      kind: Deployment
-      namespace: flux-system
