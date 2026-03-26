@@ -52,8 +52,9 @@ spec:
       enabled: false
 
     resources:
-      limits:
-        memory: 512Mi
       requests:
-        cpu: 100m
+        cpu: 30m
         memory: 256Mi
+      limits:
+        cpu: 500m
+        memory: 512Mi
