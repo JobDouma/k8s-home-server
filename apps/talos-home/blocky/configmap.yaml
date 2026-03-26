@@ -12,7 +12,7 @@ data:
           - https://dns.google/dns-query          # Google DoH
           - https://dns.quad9.net/dns-query       # Quad9 DoH (malware filtering at resolver level too)
       timeout: 2s
-      strategy: parallelBest   # query all upstreams, return fastest — reduces latency
+      strategy: parallel_best   # query all upstreams, return fastest — reduces latency
 
     # Prevent .lan queries leaking to upstream resolvers
     conditional:
