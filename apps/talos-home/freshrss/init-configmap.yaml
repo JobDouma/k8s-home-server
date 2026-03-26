@@ -13,20 +13,21 @@ data:
 
     OPML_SOURCE="/config/bootstrap/feeds.opml"
     OPML_STAMP="/config/bootstrap/.opml-imported"
-    FRESHRSS_CLI="/var/www/FreshRSS/cli"
+    FRESHRSS_CLI="/app/www/cli"
+    FRESHRSS_DATA="/config/www/freshrss/data"
     FRESHRSS_USER="${FRESHRSS_DEFAULT_USER:-admin}"
 
     log() { echo "[opml-import] $*"; }
 
     # Wait for FreshRSS data directory to be ready (Longhorn PVC may take a moment)
     for i in $(seq 1 30); do
-      [ -d "/config/data" ] && break
-      log "Waiting for /config/data to be available... (${i}/30)"
+      [ -d "${FRESHRSS_DATA}" ] && break
+      log "Waiting for ${FRESHRSS_DATA} to be available... (${i}/30)"
       sleep 2
     done
 
-    if [ ! -d "/config/data" ]; then
-      log "ERROR: /config/data not available after 60s, skipping OPML import."
+    if [ ! -d "${FRESHRSS_DATA}" ]; then
+      log "ERROR: ${FRESHRSS_DATA} not available after 60s, skipping OPML import."
       exit 0
     fi
 
@@ -42,18 +43,18 @@ data:
 
     # Wait for FreshRSS to finish its own install/init before we import
     for i in $(seq 1 30); do
-      [ -f "/config/data/users/${FRESHRSS_USER}/config.php" ] && break
+      [ -f "${FRESHRSS_DATA}/users/${FRESHRSS_USER}/config.php" ] && break
       log "Waiting for FreshRSS user config... (${i}/30)"
       sleep 3
     done
 
-    if [ ! -f "/config/data/users/${FRESHRSS_USER}/config.php" ]; then
+    if [ ! -f "${FRESHRSS_DATA}/users/${FRESHRSS_USER}/config.php" ]; then
       log "FreshRSS user config not found — FreshRSS may not be installed yet. Skipping."
       exit 0
     fi
 
     log "Importing OPML for user '${FRESHRSS_USER}'..."
-    php "${FRESHRSS_CLI}/import-opml.php" \
+    php "${FRESHRSS_CLI}/import-for-user.php" \
       --user "${FRESHRSS_USER}" \
       --filename "${OPML_SOURCE}" \
       && touch "${OPML_STAMP}" \
