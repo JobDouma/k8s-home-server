@@ -70,7 +70,7 @@ spec:
               access: proxy
               isDefault: true
               jsonData:
-                timeInterval: 30s
+                timeInterval: 60s    # match new scrape interval
             - name: Loki
               type: loki
               uid: loki
@@ -127,13 +127,29 @@ spec:
         podMonitorSelector: {}
         podMonitorNamespaceSelector: {}
 
+        # Scrape every 60s instead of 15s — single biggest CPU reduction
+        # Homelab metrics don't need sub-minute resolution
+        scrapeInterval: 60s
+        evaluationInterval: 60s
+
+        # Keep 5 days — enough for trend analysis without bloating TSDB
+        retention: 5d
+        retentionSize: 15GB   # hard cap so it can't exceed your 20Gi PVC
+
+        # Compress WAL — reduces memory and disk usage
+        walCompression: true
+
+        # Limit TSDB in-memory chunks
+        tsdb:
+          outOfOrderTimeWindow: 0s  # disable out-of-order ingestion — not needed for homelab
+
         resources:
           requests:
-            cpu: 100m
-            memory: 512Mi
+            cpu: 50m        # down from 100m — 60s interval does 4x less work
+            memory: 400Mi   # down from 512Mi
           limits:
             cpu: 500m
-            memory: 2Gi
+            memory: 1Gi     # down from 2Gi — 5d retention needs far less
 
         storageSpec:
           volumeClaimTemplate:

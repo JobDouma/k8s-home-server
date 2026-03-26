@@ -127,12 +127,6 @@ resources:
   - stakater-reloader/servicemonitor.yaml
 
   # ──────────────────────────────────────
-  # Sabnzbd
-  # ──────────────────────────────────────
-  # - sabnzbd/helmrelease.yaml
-  # - sabnzbd/ingressroute.yaml
-
-  # ──────────────────────────────────────
   # Recyclarr
   # ──────────────────────────────────────
   - recyclarr/configmap.yaml
@@ -182,18 +176,6 @@ resources:
   - falco/servicemonitor.yaml
   - falco/certificate.yaml
   - falco/configmap.yaml
-
-  # ──────────────────────────────────────
-  # Velero (K8s-backup)
-  # ──────────────────────────────────────
-  # - velero/namespace.yaml
-  # - velero/pvc.yaml
-  # - velero/minio-secret.yaml
-  # - velero/minio.yaml
-  # - velero/helmrepository.yaml
-  # - velero/helmrelease.yaml
-  # - velero/servicemonitor.yaml
-  # - velero/networkpolicy.yaml
 
   # ──────────────────────────────────────
   # gotify
