@@ -13,6 +13,7 @@ resources:
   - blocky/ingressroute.yaml
   - blocky/certificate.yaml
   - blocky/pdb.yaml
+  - blocky/redis.yaml
 
   # ──────────────────────────────────────
   # Jellyfin
