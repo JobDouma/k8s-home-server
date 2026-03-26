@@ -1,0 +1,61 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: freshrss-init
+  namespace: freshrss
+data:
+  # This script is executed by the linuxserver s6 init system on every container start.
+  # It uses the FreshRSS CLI to import the OPML only if feeds have not already been imported,
+  # making it fully idempotent — safe to run on every restart.
+  01-import-opml.sh: |
+    #!/usr/bin/with-contenv bash
+    set -euo pipefail
+
+    OPML_SOURCE="/config/bootstrap/feeds.opml"
+    OPML_STAMP="/config/bootstrap/.opml-imported"
+    FRESHRSS_CLI="/var/www/FreshRSS/cli"
+    FRESHRSS_USER="${FRESHRSS_DEFAULT_USER:-admin}"
+
+    log() { echo "[opml-import] $*"; }
+
+    # Wait for FreshRSS data directory to be ready (Longhorn PVC may take a moment)
+    for i in $(seq 1 30); do
+      [ -d "/config/data" ] && break
+      log "Waiting for /config/data to be available... (${i}/30)"
+      sleep 2
+    done
+
+    if [ ! -d "/config/data" ]; then
+      log "ERROR: /config/data not available after 60s, skipping OPML import."
+      exit 0
+    fi
+
+    if [ ! -f "${OPML_SOURCE}" ]; then
+      log "No OPML file found at ${OPML_SOURCE}, skipping."
+      exit 0
+    fi
+
+    if [ -f "${OPML_STAMP}" ]; then
+      log "OPML already imported (stamp file present). Skipping."
+      exit 0
+    fi
+
+    # Wait for FreshRSS to finish its own install/init before we import
+    for i in $(seq 1 30); do
+      [ -f "/config/data/users/${FRESHRSS_USER}/config.php" ] && break
+      log "Waiting for FreshRSS user config... (${i}/30)"
+      sleep 3
+    done
+
+    if [ ! -f "/config/data/users/${FRESHRSS_USER}/config.php" ]; then
+      log "FreshRSS user config not found — FreshRSS may not be installed yet. Skipping."
+      exit 0
+    fi
+
+    log "Importing OPML for user '${FRESHRSS_USER}'..."
+    php "${FRESHRSS_CLI}/import-opml.php" \
+      --user "${FRESHRSS_USER}" \
+      --filename "${OPML_SOURCE}" \
+      && touch "${OPML_STAMP}" \
+      && log "OPML import complete. Stamp written to ${OPML_STAMP}." \
+      || log "WARNING: OPML import failed. Will retry on next container start."
