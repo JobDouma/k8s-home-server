@@ -79,8 +79,7 @@ data:
           timeout: 60s
           attempts: 5
           cooldown: 10s
-        startStrategy: failOnError   # refuse to start with no lists — avoids starting "open" after a crash
-
+        
     caching:
       minTime: 5m
       maxTime: 12h          # raised — respect long TTLs from CDNs etc.
