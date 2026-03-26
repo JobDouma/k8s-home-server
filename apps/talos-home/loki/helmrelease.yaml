@@ -26,7 +26,6 @@ spec:
       auth_enabled: false
       commonConfig:
         replication_factor: 1
-      # path_prefix and storage do NOT belong under commonConfig — moved here
       storage:
         type: filesystem
       schemaConfig:
@@ -50,6 +49,7 @@ spec:
         delete_request_store: filesystem
       limits_config:
         retention_period: 168h
+
     singleBinary:
       replicas: 1
       tolerations:
@@ -60,8 +60,44 @@ spec:
         accessModes:
           - ReadWriteOnce
         size: 10Gi
+      resources:
+        requests:
+          cpu: 50m
+          memory: 256Mi
+        limits:
+          cpu: 500m
+          memory: 1Gi
+
     gateway:
       enabled: true
       replicas: 1
       tolerations:
         - operator: Exists
+      resources:
+        requests:
+          cpu: 20m
+          memory: 32Mi
+        limits:
+          cpu: 100m
+          memory: 128Mi
+
+    # This is where your ~11Gi was being reserved
+    chunksCache:
+      enabled: true
+      resources:
+        requests:
+          cpu: 50m
+          memory: 256Mi
+        limits:
+          cpu: 100m
+          memory: 512Mi
+
+    resultsCache:
+      enabled: true
+      resources:
+        requests:
+          cpu: 25m
+          memory: 128Mi
+        limits:
+          cpu: 100m
+          memory: 256Mi
