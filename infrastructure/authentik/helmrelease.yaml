@@ -67,7 +67,7 @@ spec:
           cpu: 50m
           memory: 512Mi
         limits:
-          cpu: 500m
+          cpu: 750m
           memory: 1Gi
 
       tolerations:
@@ -167,10 +167,17 @@ spec:
       # ADDED: Redis for session caching is tiny workload.
       # Cap it so it doesn't quietly grow.
       master:
+        persistence:
+          enabled: true
+          storageClass: longhorn
+          size: 1Gi
         resources:
           requests:
             cpu: 10m
             memory: 64Mi
           limits:
             cpu: 100m
-            memory: 128Mi
+            memory: 256Mi   # was 128Mi
+        args:
+          - --appendonly yes
+          - --appendfsync everysec
