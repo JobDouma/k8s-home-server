@@ -51,7 +51,8 @@ resources:
   - authentik/secret.yaml
   - authentik/postgresql-secret.yaml
   - authentik/networkpolicy.yaml
-  - authentik/pdb.yaml
+  - authentik/pdb-server.yaml
+  - authentik/pdb-worker.yaml
   - authentik/blueprints.yaml
 
   # ──────────────────────────────────────
