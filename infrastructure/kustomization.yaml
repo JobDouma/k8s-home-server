@@ -35,6 +35,7 @@ resources:
   - headlamp/certificate.yaml
 
   - longhorn/namespace.yaml
+  
   - longhorn/helmrepository.yaml
   - longhorn/helmrelease.yaml
   - longhorn/servicemonitor.yaml
