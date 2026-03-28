@@ -1,0 +1,266 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: victoria-metrics-k8s-stack
+  namespace: monitoring
+spec:
+  interval: 30m
+  timeout: 60m
+  dependsOn:
+    - name: loki
+      namespace: monitoring
+
+  chart:
+    spec:
+      chart: victoria-metrics-k8s-stack
+      # renovate: registryUrl=https://victoriametrics.github.io/helm-charts
+      version: "0.48.1"
+      sourceRef:
+        kind: HelmRepository
+        name: victoriametrics
+        namespace: flux-system
+
+  install:
+    crds: CreateReplace
+    remediation:
+      retries: 3
+
+  upgrade:
+    crds: CreateReplace
+    remediation:
+      retries: 3
+
+  values:
+    # ── Operator ────────────────────────────────────────────────────────────
+    # The VM operator converts prometheus-operator CRDs (ServiceMonitor,
+    # PodMonitor, PrometheusRule) into VM equivalents automatically.
+    # This means your existing Tailscale ServiceMonitor keeps working
+    # with zero changes.
+    victoria-metrics-operator:
+      enabled: true
+      crds:
+        plain: true
+      operator:
+        # Convert existing prometheus-operator objects (ServiceMonitor etc.)
+        # into VictoriaMetrics equivalents automatically
+        disable_prometheus_converter: false
+
+    # ── VMSingle — replaces Prometheus ──────────────────────────────────────
+    # VMSingle is a single-process replacement for Prometheus.
+    # Same PromQL, same Grafana datasource type, ~5-10x less RAM/CPU.
+    # retentionPeriod uses: h(ours), d(ays), w(eeks), y(ears), or months (no unit)
+    vmsingle:
+      enabled: true
+      spec:
+        retentionPeriod: "5d"         # matches your previous 5d retention
+
+        # Hard size cap so it can't exceed the PVC
+        extraArgs:
+          retentionFilters: ""
+          storage.maxDiskUsageBytes: "15GB"
+
+        resources:
+          requests:
+            cpu: 50m
+            memory: 128Mi           # down from 400Mi — VM is far more efficient
+          limits:
+            cpu: 500m
+            memory: 512Mi           # down from 1Gi
+
+        storage:
+          accessModes:
+            - ReadWriteOnce
+          resources:
+            requests:
+              storage: 20Gi
+          storageClassName: longhorn
+
+        tolerations:
+          - operator: Exists
+          - key: "node.kubernetes.io/not-ready"
+            operator: "Exists"
+            effect: "NoExecute"
+            tolerationSeconds: 600
+          - key: "node.kubernetes.io/unreachable"
+            operator: "Exists"
+            effect: "NoExecute"
+            tolerationSeconds: 600
+
+    # ── VMAgent — replaces the Prometheus scrape engine ──────────────────────
+    # VMAgent is a lightweight scraper that sends data to VMSingle.
+    # It uses less memory than Prometheus because it doesn't store data itself.
+    vmagent:
+      enabled: true
+      spec:
+        scrapeInterval: 60s           # matches your previous 60s interval
+        selectAllByDefault: true      # auto-discover all ServiceMonitors/PodMonitors
+
+        resources:
+          requests:
+            cpu: 10m
+            memory: 64Mi
+          limits:
+            cpu: 200m
+            memory: 256Mi
+
+        tolerations:
+          - operator: Exists
+
+        extraArgs:
+          # Reduces vmagent memory — trades off debugging detail for efficiency
+          promscrape.streamParse: "true"
+
+    # ── VMAlert — replaces Prometheus alerting rules ──────────────────────────
+    vmalert:
+      enabled: true
+      spec:
+        evaluationInterval: 60s       # match scrape interval
+        resources:
+          requests:
+            cpu: 10m
+            memory: 32Mi
+          limits:
+            cpu: 100m
+            memory: 128Mi
+
+    # ── Alertmanager ──────────────────────────────────────────────────────────
+    alertmanager:
+      enabled: true
+      spec:
+        resources:
+          requests:
+            cpu: 10m
+            memory: 64Mi
+          limits:
+            cpu: 100m
+            memory: 256Mi
+
+        storage:
+          volumeClaimTemplate:
+            spec:
+              storageClassName: longhorn
+              accessModes:
+                - ReadWriteOnce
+              resources:
+                requests:
+                  storage: 5Gi
+
+        tolerations:
+          - operator: Exists
+
+    # ── Grafana ───────────────────────────────────────────────────────────────
+    # Grafana config is largely identical to your previous setup.
+    # The datasource URL changes from the Prometheus service to VMSingle.
+    grafana:
+      enabled: true
+      revisionHistoryLimit: 2
+
+      tolerations:
+        - operator: Exists
+        - key: "node.kubernetes.io/not-ready"
+          operator: "Exists"
+          effect: "NoExecute"
+          tolerationSeconds: 600
+        - key: "node.kubernetes.io/unreachable"
+          operator: "Exists"
+          effect: "NoExecute"
+          tolerationSeconds: 600
+
+      deploymentStrategy:
+        type: Recreate
+
+      grafana.ini:
+        unified_alerting:
+          enabled: true
+        alerting:
+          enabled: false
+
+      resources:
+        requests:
+          cpu: 50m
+          memory: 128Mi
+        limits:
+          cpu: 200m
+          memory: 512Mi
+
+      # Key change: datasource URL now points at VMSingle instead of Prometheus.
+      # The datasource type stays "prometheus" — VMSingle speaks PromQL natively.
+      datasources:
+        datasources.yaml:
+          apiVersion: 1
+          datasources:
+            - name: VictoriaMetrics
+              type: prometheus
+              uid: prometheus              # keep uid "prometheus" so existing dashboards don't break
+              url: http://vmsingle-victoria-metrics-k8s-stack.monitoring.svc.cluster.local:8428
+              access: proxy
+              isDefault: true
+              jsonData:
+                timeInterval: 60s
+            - name: Loki
+              type: loki
+              uid: loki
+              url: http://loki-gateway.monitoring.svc.cluster.local
+              access: proxy
+              isDefault: false
+              jsonData:
+                maxLines: 1000
+            - name: Tempo
+              type: tempo
+              uid: tempo
+              url: http://tempo.monitoring.svc.cluster.local:3100
+              access: proxy
+              isDefault: false
+
+      sidecar:
+        dashboards:
+          enabled: true
+          searchNamespace: ALL
+          label: grafana_dashboard
+          labelValue: "1"
+          folderAnnotation: grafana_folder
+          provider:
+            foldersFromFilesStructure: true
+        datasources:
+          enabled: false
+
+      admin:
+        existingSecret: grafana-admin
+
+      persistence:
+        enabled: true
+        storageClassName: longhorn
+        accessModes:
+          - ReadWriteOnce
+        size: 5Gi
+
+    # ── Node Exporter ─────────────────────────────────────────────────────────
+    prometheus-node-exporter:
+      hostRootFsMount:
+        enabled: false
+      resources:
+        requests:
+          cpu: 10m
+          memory: 32Mi
+        limits:
+          cpu: 100m
+          memory: 128Mi
+
+    # ── kube-state-metrics ────────────────────────────────────────────────────
+    kube-state-metrics:
+      resources:
+        requests:
+          cpu: 10m
+          memory: 32Mi
+        limits:
+          cpu: 100m
+          memory: 128Mi
+
+    # ── Disable VMCluster — we use VMSingle for homelab ───────────────────────
+    # VMCluster is the HA multi-node setup for production. Not needed here.
+    vmcluster:
+      enabled: false
+
+    # ── Disable VMAuth — not needed for single-node homelab ───────────────────
+    vmauth:
+      enabled: false
