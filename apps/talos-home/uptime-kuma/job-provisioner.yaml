@@ -4,11 +4,9 @@ metadata:
   name: uptime-kuma-provisioner
   namespace: uptime-kuma
   annotations:
-    # To re-run: delete this Job and let Flux recreate it (stamp file on PVC prevents re-provisioning).
-    # To force re-provision: delete Job AND the stamp at /app/data/.monitors-provisioned, then let Flux recreate.
+    # To re-run: delete this Job and let Flux recreate it.
+    # To force re-provision: also delete /app/data/.monitors-provisioned from the PVC.
 spec:
-  # No ttlSecondsAfterFinished — avoids Flux fighting GC by recreating the Job on every reconcile.
-  # The stamp file on the PVC is the idempotency guard.
   backoffLimit: 10
   template:
     spec:
@@ -62,5 +60,4 @@ spec:
             defaultMode: 0755
         - name: data
           persistentVolumeClaim:
-            # app-template v4 names PVCs as: <release-name>-<persistence-key>
             claimName: uptime-kuma-data
