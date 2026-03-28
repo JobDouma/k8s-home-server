@@ -50,6 +50,7 @@ resources:
   - victoria-metrics/helmrelease.yaml
   - victoria-metrics/ingressroute.yaml
   - victoria-metrics/pdb.yaml
+  - victoria-metrics/alertmanager-secret.yaml
 
   # ──────────────────────────────────────
   # Grafana
