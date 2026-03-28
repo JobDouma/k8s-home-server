@@ -126,6 +126,7 @@ spec:
     alertmanager:
       enabled: true
       spec:
+        configSecret: alertmanager-gotify-config
         resources:
           requests:
             cpu: 10m
