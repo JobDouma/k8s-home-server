@@ -34,13 +34,22 @@ resources:
   # ──────────────────────────────────────
   # monitoring / prometheus
   # ──────────────────────────────────────
-  - prometheus/namespace.yaml
-  - prometheus/helmrepository.yaml
-  - prometheus/helmrelease.yaml
-  - prometheus/ingressroute.yaml
-  - prometheus/service.yaml
-  - prometheus/certificate.yaml
-  - prometheus/pdb.yaml
+  # - prometheus/namespace.yaml
+  # - prometheus/helmrepository.yaml
+  # - prometheus/helmrelease.yaml
+  # - prometheus/ingressroute.yaml
+  # - prometheus/service.yaml
+  # - prometheus/certificate.yaml
+  # - prometheus/pdb.yaml
+
+  # ──────────────────────────────────────
+  # monitoring / VictoriaMetrics (lightweight Prometheus)
+  # ──────────────────────────────────────
+  - victoria-metrics/namespace.yaml
+  - victoria-metrics/helmrepository.yaml
+  - victoria-metrics/helmrelease.yaml
+  - victoria-metrics/ingressroute.yaml
+  - victoria-metrics/pdb.yaml
 
   # ──────────────────────────────────────
   # Grafana
