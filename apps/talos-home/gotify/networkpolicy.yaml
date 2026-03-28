@@ -34,11 +34,16 @@ spec:
               kubernetes.io/metadata.name: falco
       ports:
         - port: 80
-    # Add to your network-policy.yaml in the gotify namespace
     - from:
         - namespaceSelector:
             matchLabels:
               kubernetes.io/metadata.name: flux-system
+      ports:
+        - port: 80
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: monitoring
       ports:
         - port: 80
   egress:
