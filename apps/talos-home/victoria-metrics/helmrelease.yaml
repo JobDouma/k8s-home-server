@@ -127,6 +127,7 @@ spec:
       enabled: true
       spec:
         configSecret: alertmanager-gotify-config
+        templates: []
         resources:
           requests:
             cpu: 10m
