@@ -91,8 +91,6 @@ spec:
     persistence:
       data:
         type: persistentVolumeClaim
-        storageClass: longhorn
-        accessMode: ReadWriteOnce
-        size: 1Gi
+        existingClaim: uptime-kuma
         globalMounts:
           - path: /app/data
