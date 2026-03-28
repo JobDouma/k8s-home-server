@@ -31,6 +31,7 @@ spec:
       retries: 3
 
   values:
+    fullnameOverride: "vm-stack"
     # ── Operator ────────────────────────────────────────────────────────────
     # The VM operator converts prometheus-operator CRDs (ServiceMonitor,
     # PodMonitor, PrometheusRule) into VM equivalents automatically.
@@ -38,6 +39,7 @@ spec:
     # with zero changes.
     victoria-metrics-operator:
       enabled: true
+      fullnameOverride: "vm-operator"
       crds:
         plain: true
       operator:
