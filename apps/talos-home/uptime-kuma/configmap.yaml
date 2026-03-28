@@ -16,7 +16,6 @@ data:
 
     STAMP = "/app/data/.monitors-provisioned"
     SERVER = os.environ.get("UPTIME_KUMA_SERVER", "http://uptime-kuma.uptime-kuma.svc.cluster.local:3001")
-
     USERNAME = os.environ["UPTIME_KUMA_ADMIN_USER"]
     PASSWORD = os.environ["UPTIME_KUMA_ADMIN_PASS"]
 
@@ -50,23 +49,14 @@ data:
         log("ERROR: Uptime Kuma did not become ready in time.")
         sys.exit(1)
 
-    # On a brand-new instance, no admin account exists yet — setup() creates it.
-    # On subsequent runs the stamp file exits early, so this is safe to always call.
-    log(f"Setting up / logging in as {USERNAME}...")
+    log(f"Logging in as {USERNAME}...")
     try:
         api.login(USERNAME, PASSWORD)
-        log("Logged in to existing account.")
-    except Exception:
-        log("Login failed — attempting initial setup (first boot)...")
-        try:
-            api.setup(USERNAME, PASSWORD)
-            log("Setup complete, logging in...")
-            api.login(USERNAME, PASSWORD)
-            log("Authenticated after setup.")
-        except Exception as e:
-            log(f"ERROR: Setup/login failed: {e}")
-            api.disconnect()
-            sys.exit(1)
+        log("Authenticated.")
+    except Exception as e:
+        log(f"ERROR: Login failed: {e}")
+        api.disconnect()
+        sys.exit(1)
 
     existing = {m["name"] for m in api.get_monitors()}
     log(f"Found {len(existing)} existing monitors.")
