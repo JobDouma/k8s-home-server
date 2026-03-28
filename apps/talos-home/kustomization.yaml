@@ -32,17 +32,6 @@ resources:
   - qbittorrent/certificate.yaml
 
   # ──────────────────────────────────────
-  # monitoring / prometheus
-  # ──────────────────────────────────────
-  # - prometheus/namespace.yaml
-  # - prometheus/helmrepository.yaml
-  # - prometheus/helmrelease.yaml
-  # - prometheus/ingressroute.yaml
-  # - prometheus/service.yaml
-  # - prometheus/certificate.yaml
-  # - prometheus/pdb.yaml
-
-  # ──────────────────────────────────────
   # monitoring / VictoriaMetrics (lightweight Prometheus)
   # ──────────────────────────────────────
   - victoria-metrics/namespace.yaml
@@ -225,3 +214,14 @@ resources:
   - immich/ingressroute.yaml
   - immich/networkpolicy.yaml
   - immich/servicemonitor.yaml
+
+  # ──────────────────────────────────────
+  # Uptime Kuma
+  # ──────────────────────────────────────
+  - uptime-kuma/namespace.yaml
+  - uptime-kuma/secret.yaml
+  - uptime-kuma/certificate.yaml
+  - uptime-kuma/configmap.yaml
+  - uptime-kuma/helmrelease.yaml
+  - uptime-kuma/ingressroute.yaml
+  
