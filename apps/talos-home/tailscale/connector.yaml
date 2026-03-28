@@ -1,41 +1,44 @@
-# Connector: subnet router
+# Step 5 — HA Connector (subnet router with 2 replicas)
 #
-# Advertises your home LAN (192.168.2.0/24) to your tailnet so that
-# any Tailscale device can reach:
-#   - your Traefik ingress at 192.168.2.100  (all *.lan services)
-#   - TrueNAS at 192.168.2.5
-#   - router at 192.168.2.254
-#   - blocky DNS at 192.168.2.53
-#   - any other host on your LAN
+# Your current Connector runs as a single pod. If it restarts (Talos node
+# drain, OOM, upgrade), your phone loses access to .lan, blocky DNS, TrueNAS,
+# and the pod CIDR for ~30-60 seconds.
 #
-# Required ACL policy in the Tailscale admin console
-# (https://login.tailscale.com/admin/acls):
+# Adding replicas: 2 spins up TWO subnet router pods. Tailscale's control
+# plane automatically load-balances traffic across them and routes around
+# a pod that goes down. Both pods advertise the same routes; the autoApprovers
+# policy already covers this.
 #
-#   "tagOwners": {
-#     "tag:k8s-operator": [],                   // admins own this
-#     "tag:k8s":          ["tag:k8s-operator"],  // operator owns this
-#   },
-#   "autoApprovers": {
-#     "routes": {
-#       "192.168.2.0/24": ["tag:k8s"],           // auto-approve the subnet route
-#     },
-#   },
+# Requirements:
+#   - Tailscale operator >= 1.92 (you're on 1.94.2 ✓)
+#   - proxyClass: homelab → applies the metrics/resource config from step 2
 #
-# Without autoApprovers you must manually approve the route at:
-#   https://login.tailscale.com/admin/machines
+# IMPORTANT: delete the old single-replica Connector first if you're applying
+# this as a replacement, since the name stays the same:
+#   kubectl delete connector homelab-subnet-router -n tailscale
+#   kubectl apply -f step5-connector-ha.yaml
+# Or just apply directly — the operator will reconcile the new spec.
 apiVersion: tailscale.com/v1alpha1
 kind: Connector
 metadata:
   name: homelab-subnet-router
   namespace: tailscale
+  labels:
+    app.kubernetes.io/managed-by: flux
 spec:
   hostnamePrefix: talos-home-subnet
 
-  # tag:k8s is owned by the operator (tag:k8s-operator) — do NOT use tag:k8s-operator here
+  # 2 active subnet router replicas — one can restart without dropping LAN access
+  replicas: 2
+
+  # Apply metrics + resource limits from the ProxyClass above
+  proxyClass: homelab
+
+  # tag:k8s is owned by tag:k8s-operator — correct, do NOT use tag:k8s-operator here
   tags:
     - tag:k8s
 
   subnetRouter:
     advertiseRoutes:
       - "192.168.2.0/24"
-      - "10.244.0.0/16" # advertise the pod CIDR
+      - "10.244.0.0/16"

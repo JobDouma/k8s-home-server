@@ -1,0 +1,36 @@
+# Kubernetes RBAC: read-only access for tag:k8s-readers
+#
+# The ACL grant in step3-full-acl-policy.jsonc impersonates tag:k8s-readers
+# users as the Kubernetes group "tailscale-readers". But Kubernetes doesn't
+# know what permissions that group has yet — that's what this file does.
+#
+# HOW THE IMPERSONATION CHAIN WORKS:
+#   Tailscale device (tag:k8s-readers)
+#     → API server proxy (sees Tailscale identity)
+#     → impersonates as K8s group "tailscale-readers"
+#     → K8s RBAC evaluates: what can "tailscale-readers" do?
+#     → ClusterRoleBinding below: cluster-wide read-only (view)
+#
+# The built-in "view" ClusterRole allows:
+#   - kubectl get/describe/logs on pods, deployments, services, etc.
+#   - kubectl get nodes, namespaces, pvcs
+#   - Does NOT allow: exec into pods, create/delete anything, see secrets
+#
+# This is useful if you ever want to grant a friend or CI system
+# read access to your cluster without giving them system:masters.
+# For a solo homelab you can skip this for now, but it's good practice.
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: tailscale-readers-view
+  labels:
+    app.kubernetes.io/managed-by: flux
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: view   # built-in read-only role — no need to create it
+subjects:
+  - kind: Group
+    name: tailscale-readers   # matches the impersonate.groups value in the ACL grant
+    apiGroup: rbac.authorization.k8s.io

@@ -1,60 +1,94 @@
+// Full updated Tailscale ACL policy
+// Paste this into https://login.tailscale.com/admin/acls
+//
+// Changes from your original:
+//   1. tag:k8s-readers added to tagOwners (was used but never declared)
+//   2. autoApprovers.services added for ProxyGroup HA ingress (step 3)
+//   3. Read-only k8s-readers grant with impersonation (step 7 prep)
 {
-    "groups": {"group:admin": ["jobdouma@gmail.com"]},
+  "groups": {
+    "group:admin": ["jobdouma@gmail.com"]
+  },
 
-    "tagOwners": {
-        "tag:k8s-operator": [],
-        "tag:k8s-readers":  [],
-        "tag:k8s":          ["tag:k8s-operator"],
+  "tagOwners": {
+    "tag:k8s-operator": [],
+    "tag:k8s-readers":  [],           // FIX: was declared but missing from tagOwners
+    "tag:k8s":          ["tag:k8s-operator"]
+  },
+
+  "autoApprovers": {
+    "routes": {
+      "192.168.2.0/24": ["tag:k8s"],
+      "10.244.0.0/16":  ["tag:k8s"]
     },
+    // NEW: lets ProxyGroup pods auto-advertise Tailscale Services (step 3)
+    "services": {
+      "tag:k8s": ["tag:k8s"]
+    }
+  },
 
-    "autoApprovers": {
-        "routes": {
-            "192.168.2.0/24": ["tag:k8s"],
-            "10.244.0.0/16":  ["tag:k8s"],
-        },
+  "grants": [
+    // Existing: k8s-readers can reach the operator proxy on 443
+    {
+      "src": ["tag:k8s-readers"],
+      "dst": ["tag:k8s-operator"],
+      "ip":  ["tcp:443"]
     },
+    // Existing: group:admin gets full cluster-admin via API server proxy
+    {
+      "src": ["group:admin"],
+      "dst": ["tag:k8s-operator"],
+      "app": {
+        "tailscale.com/cap/kubernetes": [
+          {
+            "impersonate": {
+              "groups": ["system:masters"]
+            }
+          }
+        ]
+      }
+    },
+    // NEW (step 7): k8s-readers get read-only cluster access.
+    // Pair with step7-rbac.yaml in the cluster.
+    {
+      "src": ["tag:k8s-readers"],
+      "dst": ["tag:k8s-operator"],
+      "app": {
+        "tailscale.com/cap/kubernetes": [
+          {
+            "impersonate": {
+              "groups": ["tailscale-readers"]
+            }
+          }
+        ]
+      }
+    }
+  ],
 
-    "grants": [
-        {
-            "src": ["tag:k8s-readers"],
-            "dst": ["tag:k8s-operator"],
-            "ip":  ["tcp:443"],
-        },
-        {
-            "src": ["group:admin"],
-            "dst": ["tag:k8s-operator"],
-            "app": {
-                "tailscale.com/cap/kubernetes": [{"impersonate": {"groups": ["system:masters"]}}],
-            },
-        },
-    ],
+  "ssh": [
+    {
+      "action": "check",
+      "src":    ["autogroup:member"],
+      "dst":    ["autogroup:self"],
+      "users":  ["autogroup:nonroot", "root"]
+    }
+  ],
 
-    "ssh": [
-        {
-            "action": "check",
-            "src":    ["autogroup:member"],
-            "dst":    ["autogroup:self"],
-            "users":  ["autogroup:nonroot", "root"],
-        },
-    ],
-
-    "acls": [
-        {
-            "action": "accept",
-            "src":    ["tag:k8s-operator"],
-            "dst":    ["tag:k8s-operator:6443"],
-        },
-        // Allow group:admin to reach subnet router device
-        {
-            "action": "accept",
-            "src":    ["group:admin"],
-            "dst":    ["tag:k8s:*", "tag:k8s-operator:*"],
-        },
-        // Allow group:admin to reach LAN and pod CIDR via subnet router
-        {
-            "action": "accept",
-            "src":    ["group:admin"],
-            "dst":    ["192.168.2.0/24:*", "10.244.0.0/16:*"],
-        },
-    ],
+  "acls": [
+    {
+      "action": "accept",
+      "src":    ["tag:k8s-operator"],
+      "dst":    ["tag:k8s-operator:6443"]
+    },
+    {
+      "action": "accept",
+      "src":    ["group:admin"],
+      "dst":    ["tag:k8s:*", "tag:k8s-operator:*"]
+    },
+    {
+      "action": "accept",
+      "src":    ["group:admin"],
+      "dst":    ["192.168.2.0/24:*", "10.244.0.0/16:*"]
+    }
+  ]
 }

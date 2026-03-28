@@ -1,0 +1,37 @@
+# A ProxyClass is a template applied to ALL proxy pods the operator creates
+# (Connector, Ingress proxies, ProxyGroup pods). Think of it like a PodSpec
+# default that Tailscale layers on top of its own generated StatefulSets.
+#
+# What this does:
+#   - Enables /metrics endpoint on every proxy pod (port 9090)
+#   - Auto-creates a Prometheus ServiceMonitor for each proxy (so Grafana
+#     gets per-proxy metrics: latency, bytes transferred, peer count, etc.)
+#   - Sets resource requests/limits so the proxy pods don't starve or hog
+#
+# Reference it on your Connector and ProxyGroup (see those files).
+# You already have a ServiceMonitor on the operator pod itself —
+# this extends coverage to the actual data-plane proxies.
+apiVersion: tailscale.com/v1alpha1
+kind: ProxyClass
+metadata:
+  name: homelab
+  namespace: tailscale
+  labels:
+    app.kubernetes.io/managed-by: flux
+spec:
+  metrics:
+    enable: true
+    serviceMonitor:
+      enable: true   # operator auto-creates a ServiceMonitor per proxy
+ 
+  statefulSet:
+    pod:
+      tailscaleContainer:
+        resources:
+          requests:
+            cpu: 10m
+            memory: 32Mi
+          limits:
+            cpu: 200m
+            memory: 128Mi
+ 
