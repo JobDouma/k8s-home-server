@@ -8,24 +8,11 @@ data:
     upstreams:
       groups:
         default:
-          - https://one.one.one.one/dns-query    # Cloudflare DoH
-          - https://dns.google/dns-query          # Google DoH
-          - https://dns.quad9.net/dns-query       # Quad9 DoH (malware filtering at resolver level too)
+          - https://one.one.one.one/dns-query
+          - https://dns.google/dns-query
+          - https://dns.quad9.net/dns-query
       timeout: 2s
-      strategy: parallel_best   # query all upstreams, return fastest — reduces latency
-
-    # Prevent .lan queries leaking to upstream resolvers
-    conditional:
-      mapping:
-        lan: 192.168.2.53   # forward .lan queries back to yourself (or your router if it handles local DNS)
-        local: 192.168.2.53
-
-    # Resolve client hostnames from your local DNS for better logging
-    clientLookup:
-      upstream: 192.168.2.53
-      singleNameOrder:
-        - 2
-        - 1
+      strategy: parallel_best
 
     blocking:
       blackLists:
@@ -36,30 +23,28 @@ data:
           - https://raw.githubusercontent.com/hoshsadiq/adblock-nocoin-list/master/hosts.txt
           - https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts
           - https://big.oisd.nl
-          - https://raw.githubusercontent.com/hagezi/dns-blocklists/main/hosts/pro.txt        # Hagezi Pro — excellent low false-positive list
-          - https://raw.githubusercontent.com/badmojr/1Hosts/master/Pro/hosts.txt             # 1Hosts Pro
+          - https://raw.githubusercontent.com/hagezi/dns-blocklists/main/hosts/pro.txt
+          - https://raw.githubusercontent.com/badmojr/1Hosts/master/Pro/hosts.txt
         malware:
           - https://urlhaus.abuse.ch/downloads/hostfile/
           - https://raw.githubusercontent.com/nicehash/NiceHash-blocklist/master/blocklist.txt
           - https://phishing.army/download/phishing_army_blocklist_extended.txt
           - https://raw.githubusercontent.com/DandelionSprout/adfilt/master/Alternate%20versions%20Anti-Malware%20List/AntiMalwareHosts.txt
-          - https://raw.githubusercontent.com/hagezi/dns-blocklists/main/hosts/tif.txt        # Hagezi Threat Intelligence Feed
+          - https://raw.githubusercontent.com/hagezi/dns-blocklists/main/hosts/tif.txt
           - https://raw.githubusercontent.com/elliotwutingfeng/GlobalAntiScamOrg-blocklist/main/blocklist.txt
         tracking:
           - https://raw.githubusercontent.com/hagezi/dns-blocklists/main/hosts/native.apple.txt
           - https://raw.githubusercontent.com/hagezi/dns-blocklists/main/hosts/native.samsung.txt
           - https://raw.githubusercontent.com/hagezi/dns-blocklists/main/hosts/native.tiktok.txt
-          - https://raw.githubusercontent.com/hagezi/dns-blocklists/main/hosts/native.winspy.txt  # Windows telemetry
+          - https://raw.githubusercontent.com/hagezi/dns-blocklists/main/hosts/native.winspy.txt
 
       whiteLists:
         ads:
           - |
-            # Common false positives
             clients4.google.com
             clients2.google.com
             s.youtube.com
             time.windows.com
-            # Tailscale coordination
             controlplane.tailscale.com
             login.tailscale.com
             log.tailscale.io
@@ -71,7 +56,7 @@ data:
           - tracking
 
       blockType: zeroIp
-      blockTTL: 10s   # how long clients cache a blocked response — keep short so whitelist changes take effect fast
+      blockTTL: 10s
 
       loading:
         refreshPeriod: 4h
@@ -79,20 +64,19 @@ data:
           timeout: 60s
           attempts: 5
           cooldown: 10s
-        
+
     caching:
       minTime: 5m
-      maxTime: 12h          # raised — respect long TTLs from CDNs etc.
-      maxItemsCount: 0      # unlimited
+      maxTime: 12h
+      maxItemsCount: 0
       prefetching: true
       prefetchExpires: 2h
       prefetchThreshold: 5
 
-    # Redis for shared cache across your 2 replicas — add the redis deployment below
     redis:
       address: redis-blocky:6379
       database: 0
-      required: false        # if Redis is down, fall back to local cache rather than hard failing
+      required: false
 
     ports:
       dns: 53
@@ -104,22 +88,15 @@ data:
 
     log:
       level: info
-      privacy: false   # set true to hash client IPs in logs if you want GDPR-friendlier logs
+      privacy: false
 
     prometheus:
       enable: true
       path: /metrics
 
-    # Block dangerous/unwanted DNS record types
-    filtering:
-      queryTypes:
-        - HTTPS   # blocks HTTPS record type used by some ad/tracking CDNs
-        - SVCB    # similar to HTTPS record
-
     customDNS:
-      filterUnmappedTypes: true   # don't pass unknown types through for custom DNS entries
+      filterUnmappedTypes: true
       mapping:
-        # Kubernetes ingress
         dashy.lan: 192.168.2.100
         jellyfin.lan: 192.168.2.100
         jellyseerr.lan: 192.168.2.100
@@ -140,7 +117,6 @@ data:
         longhorn.lan: 192.168.2.100
         gotify.lan: 192.168.2.100
         immich.lan: 192.168.2.100
-        # External infra
         truenas.lan: 192.168.2.5
         router.lan: 192.168.2.254
         omni.lan: 192.168.2.12
