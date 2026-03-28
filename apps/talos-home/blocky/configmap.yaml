@@ -102,7 +102,6 @@ data:
         jellyseerr.lan: 192.168.2.100
         radarr.lan: 192.168.2.100
         sonarr.lan: 192.168.2.100
-        sabnzbd.lan: 192.168.2.100
         qbittorrent.lan: 192.168.2.100
         prowlarr.lan: 192.168.2.100
         prometheus.lan: 192.168.2.100
@@ -117,6 +116,7 @@ data:
         longhorn.lan: 192.168.2.100
         gotify.lan: 192.168.2.100
         immich.lan: 192.168.2.100
+        uptime-kuma.lan: 192.168.2.100
         truenas.lan: 192.168.2.5
         router.lan: 192.168.2.254
         omni.lan: 192.168.2.12
