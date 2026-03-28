@@ -21,7 +21,7 @@ data:
     sections:
 
       - name: Media
-        icon: fas fa-photo-video
+        icon: fas fa-play-circle
         displayData:
           sortBy: default
           rows: 2
@@ -98,6 +98,11 @@ data:
             icon: fas fa-fire
             url: https://prometheus.lan
 
+          - title: Uptime Kuma
+            description: Uptime Monitoring
+            icon: fas fa-heartbeat
+            url: https://uptime-kuma.lan
+
 
       - name: Kubernetes
         icon: fas fa-dharmachakra
@@ -137,9 +142,10 @@ data:
       - name: Networking
         icon: fas fa-network-wired
         items:
+
           - title: Blocky
             description: DNS Ad Blocking & Resolver
-            icon: fas fa-shield-virus
+            icon: fas fa-shield-alt
             url: https://blocky.lan
 
           - title: UniFi Controller
@@ -154,7 +160,7 @@ data:
 
 
       - name: Security
-        icon: fas fa-shield-alt
+        icon: fas fa-lock
         items:
 
           - title: Authentik
