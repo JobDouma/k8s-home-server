@@ -17,7 +17,6 @@ data:
     STAMP = "/app/data/.monitors-provisioned"
     SERVER = os.environ.get("UPTIME_KUMA_SERVER", "http://uptime-kuma.uptime-kuma.svc.cluster.local:3001")
 
-    # Fail loudly if secrets are not injected — no silent fallback defaults
     USERNAME = os.environ["UPTIME_KUMA_ADMIN_USER"]
     PASSWORD = os.environ["UPTIME_KUMA_ADMIN_PASS"]
 
@@ -28,40 +27,47 @@ data:
         log("Already provisioned. Skipping.")
         sys.exit(0)
 
-    # Install uptime-kuma-api
     log("Installing uptime-kuma-api...")
     import subprocess
     subprocess.run(
-        [sys.executable, "-m", "pip", "install", "uptime-kuma-api", "--quiet"],
+        [sys.executable, "-m", "pip", "install", "uptime-kuma-api", "--quiet",
+         "--root-user-action=ignore"],
         check=True
     )
 
     from uptime_kuma_api import UptimeKumaApi, MonitorType
 
-    # Wait for server to be ready
     log("Waiting for Uptime Kuma to be ready...")
+    api = None
     for i in range(60):
         try:
             api = UptimeKumaApi(SERVER, wait_events=1, ssl_verify=False)
             break
         except Exception as e:
-            log(f"Not ready yet... ({i+1}/60): {e}")
+            log(f"Not ready yet ({i+1}/60): {e}")
             time.sleep(3)
     else:
         log("ERROR: Uptime Kuma did not become ready in time.")
         sys.exit(1)
 
-    # Login
-    log(f"Logging in as {USERNAME}...")
+    # On a brand-new instance, no admin account exists yet — setup() creates it.
+    # On subsequent runs the stamp file exits early, so this is safe to always call.
+    log(f"Setting up / logging in as {USERNAME}...")
     try:
         api.login(USERNAME, PASSWORD)
-    except Exception as e:
-        log(f"ERROR: Login failed: {e}")
-        api.disconnect()
-        sys.exit(1)
-    log("Authenticated.")
+        log("Logged in to existing account.")
+    except Exception:
+        log("Login failed — attempting initial setup (first boot)...")
+        try:
+            api.setup(USERNAME, PASSWORD)
+            log("Setup complete, logging in...")
+            api.login(USERNAME, PASSWORD)
+            log("Authenticated after setup.")
+        except Exception as e:
+            log(f"ERROR: Setup/login failed: {e}")
+            api.disconnect()
+            sys.exit(1)
 
-    # Get existing monitors to avoid duplicates
     existing = {m["name"] for m in api.get_monitors()}
     log(f"Found {len(existing)} existing monitors.")
 
@@ -104,42 +110,42 @@ data:
 
     # ── Media ────────────────────────────────────────────────────────────────
     log("Adding Media monitors...")
-    add_http("Jellyfin",       "https://jellyfin.lan")
-    add_http("Jellyseerr",     "https://jellyseerr.lan")
-    add_http("Sonarr",         "https://sonarr.lan")
-    add_http("Radarr",         "https://radarr.lan")
-    add_http("Prowlarr",       "https://prowlarr.lan")
-    add_http("qBittorrent",    "https://qbittorrent.lan")
-    add_http("SABnzbd",        "https://sabnzbd.lan")
-    add_http("Immich",         "https://immich.lan")
+    add_http("Jellyfin",    "https://jellyfin.lan")
+    add_http("Jellyseerr",  "https://jellyseerr.lan")
+    add_http("Sonarr",      "https://sonarr.lan")
+    add_http("Radarr",      "https://radarr.lan")
+    add_http("Prowlarr",    "https://prowlarr.lan")
+    add_http("qBittorrent", "https://qbittorrent.lan")
+    add_http("SABnzbd",     "https://sabnzbd.lan")
+    add_http("Immich",      "https://immich.lan")
 
     # ── Monitoring ───────────────────────────────────────────────────────────
     log("Adding Monitoring monitors...")
-    add_http("Grafana",        "https://grafana.lan")
-    add_http("Prometheus",     "https://prometheus.lan")
-    add_http("Falco",          "https://falco.lan")
-    add_http("Longhorn",       "https://longhorn.lan")
-    add_http("Uptime Kuma",    "https://uptime-kuma.lan")
+    add_http("Grafana",     "https://grafana.lan")
+    add_http("Prometheus",  "https://prometheus.lan")
+    add_http("Falco",       "https://falco.lan")
+    add_http("Longhorn",    "https://longhorn.lan")
+    add_http("Uptime Kuma", "https://uptime-kuma.lan")
 
     # ── Networking ───────────────────────────────────────────────────────────
     log("Adding Networking monitors...")
-    add_http("Traefik",        "https://traefik.lan")
-    add_http("Blocky DNS",     "https://blocky.lan")
-    add_http("Authentik",      "https://auth.lan")
+    add_http("Traefik",     "https://traefik.lan")
+    add_http("Blocky DNS",  "https://blocky.lan")
+    add_http("Authentik",   "https://auth.lan")
 
     # ── Apps ─────────────────────────────────────────────────────────────────
     log("Adding App monitors...")
-    add_http("Dashy",          "https://dashy.lan")
-    add_http("FreshRSS",       "https://freshrss.lan")
-    add_http("Joplin",         "https://joplin.lan")
-    add_http("Gotify",         "https://gotify.lan")
-    add_http("Headlamp",       "https://headlamp.lan")
+    add_http("Dashy",       "https://dashy.lan")
+    add_http("FreshRSS",    "https://freshrss.lan")
+    add_http("Joplin",      "https://joplin.lan")
+    add_http("Gotify",      "https://gotify.lan")
+    add_http("Headlamp",    "https://headlamp.lan")
 
     # ── Infrastructure ───────────────────────────────────────────────────────
     log("Adding Infrastructure monitors...")
-    add_http("TrueNAS",        "https://truenas.lan")
-    add_http("Router",         "http://router.lan")
-    add_http("Omni",           "https://omni.lan")
+    add_http("TrueNAS",     "https://truenas.lan")
+    add_http("Router",      "http://router.lan")
+    add_http("Omni",        "https://omni.lan")
 
     # ── Talos nodes (TCP on k8s API port 6443) ───────────────────────────────
     log("Adding Talos node TCP monitors...")
@@ -148,6 +154,5 @@ data:
     add_tcp("talos-cp-3 (k8s API)", "192.168.2.16", 6443)
 
     api.disconnect()
-
     open(STAMP, "w").close()
     log("All monitors provisioned successfully.")
