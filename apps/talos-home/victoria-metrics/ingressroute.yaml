@@ -24,7 +24,6 @@ spec:
     kind: ClusterIssuer
     group: cert-manager.io
 ---
-# Keep the same prometheus.lan hostname — no bookmark changes needed
 apiVersion: traefik.io/v1alpha1
 kind: IngressRoute
 metadata:
@@ -40,7 +39,7 @@ spec:
         - name: traefik-chain
           namespace: networking
       services:
-        - name: vmsingle-victoria-metrics-k8s-stack
+        - name: vmsingle-vm-stack    # ← fixed
           port: 8428
   tls:
     secretName: prometheus-tls
