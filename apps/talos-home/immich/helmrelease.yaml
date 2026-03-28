@@ -32,6 +32,16 @@ spec:
         fsGroupChangePolicy: OnRootMismatch
         seccompProfile:
           type: RuntimeDefault
+      # Pin everything to talos-cp-1 (64GB RAM)
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: kubernetes.io/hostname
+                    operator: In
+                    values:
+                      - talos-cp-1
 
     controllers:
       immich-server:
@@ -61,7 +71,7 @@ spec:
                 memory: 512Mi
               limits:
                 cpu: 1000m
-                memory: 2Gi
+                memory: 4Gi
             probes:
               readiness:
                 enabled: true
@@ -108,6 +118,40 @@ spec:
               limits:
                 cpu: 2000m
                 memory: 4Gi
+            probes:
+              # ADDED: ML takes 30-60s to load models on first start.
+              # Without this the server hammers it immediately and floods
+              # logs with fetch failed errors on every pod restart.
+              startup:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /ping
+                    port: 3003
+                  initialDelaySeconds: 10
+                  periodSeconds: 10
+                  failureThreshold: 12   # 2 min max startup window
+              readiness:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /ping
+                    port: 3003
+                  initialDelaySeconds: 10
+                  periodSeconds: 10
+                  failureThreshold: 3
+              liveness:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /ping
+                    port: 3003
+                  initialDelaySeconds: 30
+                  periodSeconds: 30
+                  failureThreshold: 3
 
       immich-postgres:
         strategy: Recreate
@@ -146,7 +190,7 @@ spec:
                 cpu: 50m
                 memory: 256Mi
               limits:
-                cpu: 500m
+                cpu: 1000m   # was 500m — tight during vector indexing
                 memory: 1Gi
             probes:
               startup:
@@ -173,9 +217,12 @@ spec:
             image:
               repository: docker.io/valkey/valkey
               tag: "9-alpine@sha256:84c96f47ebe197e635cd3ddbe3ab74e8bdf783cf3befbfb1c36387275c1cd5d5"
+            # FIXED: each flag and value must be a separate list item
             args:
-              - --save ""
-              - --appendonly no
+              - --save
+              - ""
+              - --appendonly
+              - "no"
             resources:
               requests:
                 cpu: 10m

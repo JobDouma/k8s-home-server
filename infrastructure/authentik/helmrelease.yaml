@@ -32,7 +32,6 @@ spec:
     prometheus:
       rules:
         create: false
-    
 
     authentik:
       existingSecret:
