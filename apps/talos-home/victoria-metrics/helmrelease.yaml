@@ -46,6 +46,8 @@ spec:
         # Convert existing prometheus-operator objects (ServiceMonitor etc.)
         # into VictoriaMetrics equivalents automatically
         disable_prometheus_converter: false
+      admissionWebhooks:
+        enabled: false
 
     # ── VMSingle — replaces Prometheus ──────────────────────────────────────
     # VMSingle is a single-process replacement for Prometheus.
