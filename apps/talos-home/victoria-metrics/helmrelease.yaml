@@ -58,10 +58,6 @@ spec:
       spec:
         retentionPeriod: "5d"         # matches your previous 5d retention
 
-        # Hard size cap so it can't exceed the PVC
-        extraArgs:
-          storage.maxDiskUsageBytes: "15GB"
-
         resources:
           requests:
             cpu: 50m
