@@ -24,7 +24,7 @@ data:
 
         # Primary = Blocky, fallback = public DNS
         forward . 192.168.2.53 1.1.1.1 8.8.8.8 {
-            policy sequential
+            policy random
             max_fails 2
             health_check 5s
         }
