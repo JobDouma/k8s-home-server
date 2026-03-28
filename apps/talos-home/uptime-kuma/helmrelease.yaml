@@ -80,13 +80,16 @@ spec:
                   periodSeconds: 10
                   failureThreshold: 3
 
+          # Python sidecar that provisions monitors via Socket.IO API.
+          # Uses uptime-kuma-api library — the only supported way to add monitors.
+          # Runs once on first boot, idempotent via stamp file.
           provisioner:
             image:
-              repository: busybox
-              tag: "1.36.1"
+              repository: python
+              tag: "3.12-slim"
             command:
-              - /bin/sh
-              - /scripts/provision-monitors.sh
+              - python3
+              - /scripts/provision.py
             env:
               UPTIME_KUMA_ADMIN_USER:
                 valueFrom:
@@ -123,6 +126,6 @@ spec:
         name: uptime-kuma-monitors
         defaultMode: 0755
         globalMounts:
-          - path: /scripts/provision-monitors.sh
-            subPath: provision-monitors.sh
+          - path: /scripts/provision.py
+            subPath: provision.py
             readOnly: true

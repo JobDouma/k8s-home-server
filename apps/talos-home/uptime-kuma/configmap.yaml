@@ -4,128 +4,149 @@ metadata:
   name: uptime-kuma-monitors
   namespace: uptime-kuma
 data:
-  # This script provisions all monitors via the Uptime Kuma API on first boot.
-  # It is idempotent — a stamp file prevents re-running on subsequent restarts.
-  # Uptime Kuma must be fully started before this runs, so it waits for the API.
-  provision-monitors.sh: |
-    #!/bin/sh
-    set -eu
+  provision.py: |
+    #!/usr/bin/env python3
+    """
+    Provisions Uptime Kuma monitors via Socket.IO API on first boot.
+    Idempotent — stamp file prevents re-running on subsequent restarts.
+    """
+    import os
+    import sys
+    import time
 
-    STAMP="/app/data/.monitors-provisioned"
-    BASE_URL="http://localhost:3001"
-    USERNAME="${UPTIME_KUMA_ADMIN_USER:-admin}"
-    PASSWORD="${UPTIME_KUMA_ADMIN_PASS:-changeme}"
+    STAMP = "/app/data/.monitors-provisioned"
+    SERVER = "http://localhost:3001"
 
-    log() { echo "[provision] $*"; }
+    # Fail loudly if secrets are not injected — no silent fallback defaults
+    USERNAME = os.environ["UPTIME_KUMA_ADMIN_USER"]
+    PASSWORD = os.environ["UPTIME_KUMA_ADMIN_PASS"]
 
-    # Already provisioned
-    if [ -f "${STAMP}" ]; then
-      log "Monitors already provisioned. Skipping."
-      exit 0
-    fi
+    def log(msg):
+        print(f"[provision] {msg}", flush=True)
 
-    # Wait for Uptime Kuma API to be ready
-    log "Waiting for Uptime Kuma API..."
-    for i in $(seq 1 60); do
-      if wget -qO- "${BASE_URL}/api/entry-page" >/dev/null 2>&1; then
-        log "API is up."
-        break
-      fi
-      log "Not ready yet... (${i}/60)"
-      sleep 3
-    done
+    if os.path.exists(STAMP):
+        log("Already provisioned. Skipping.")
+        sys.exit(0)
 
-    # Login and get token
-    log "Logging in as ${USERNAME}..."
-    TOKEN=$(wget -qO- \
-      --header="Content-Type: application/json" \
-      --post-data="{\"username\":\"${USERNAME}\",\"password\":\"${PASSWORD}\"}" \
-      "${BASE_URL}/api/login" \
-      | grep -o '"token":"[^"]*"' | cut -d'"' -f4)
+    # Install uptime-kuma-api
+    log("Installing uptime-kuma-api...")
+    import subprocess
+    subprocess.run(
+        [sys.executable, "-m", "pip", "install", "uptime-kuma-api", "--quiet"],
+        check=True
+    )
 
-    if [ -z "${TOKEN}" ]; then
-      log "ERROR: Failed to get auth token. Check credentials."
-      exit 1
-    fi
-    log "Authenticated successfully."
+    from uptime_kuma_api import UptimeKumaApi, MonitorType
 
-    # Helper to add a monitor
-    add_monitor() {
-      NAME="$1"
-      URL="$2"
-      GROUP="$3"
+    # Wait for server to be ready
+    log("Waiting for Uptime Kuma to be ready...")
+    for i in range(60):
+        try:
+            api = UptimeKumaApi(SERVER, wait_events=1, ssl_verify=False)
+            break
+        except Exception as e:
+            log(f"Not ready yet... ({i+1}/60): {e}")
+            time.sleep(3)
+    else:
+        log("ERROR: Uptime Kuma did not become ready in time.")
+        sys.exit(1)
 
-      log "Adding monitor: ${NAME} -> ${URL}"
-      wget -qO- \
-        --header="Content-Type: application/json" \
-        --header="Authorization: Bearer ${TOKEN}" \
-        --post-data="{
-          \"type\": \"http\",
-          \"name\": \"${NAME}\",
-          \"url\": \"${URL}\",
-          \"interval\": 60,
-          \"retryInterval\": 60,
-          \"maxretries\": 3,
-          \"method\": \"GET\",
-          \"ignoreTls\": true,
-          \"accepted_statuscodes\": [\"200-299\"],
-          \"tags\": [{\"name\": \"${GROUP}\"}]
-        }" \
-        "${BASE_URL}/api/monitors" >/dev/null || log "WARNING: Failed to add ${NAME}"
-    }
+    # Login
+    log(f"Logging in as {USERNAME}...")
+    try:
+        api.login(USERNAME, PASSWORD)
+    except Exception as e:
+        log(f"ERROR: Login failed: {e}")
+        api.disconnect()
+        sys.exit(1)
+    log("Authenticated.")
 
-    # ── Media ─────────────────────────────────────────────────────────────────
-    add_monitor "Jellyfin"      "https://jellyfin.lan"      "media"
-    add_monitor "Jellyseerr"    "https://jellyseerr.lan"    "media"
-    add_monitor "Radarr"        "https://radarr.lan"        "media"
-    add_monitor "Sonarr"        "https://sonarr.lan"        "media"
-    add_monitor "Prowlarr"      "https://prowlarr.lan"      "media"
-    add_monitor "qBittorrent"   "https://qbittorrent.lan"   "media"
+    # Get existing monitors to avoid duplicates
+    existing = {m["name"] for m in api.get_monitors()}
+    log(f"Found {len(existing)} existing monitors.")
 
-    # ── Monitoring ────────────────────────────────────────────────────────────
-    add_monitor "Prometheus"    "https://prometheus.lan"    "monitoring"
-    add_monitor "Grafana"       "https://grafana.lan"       "monitoring"
-    add_monitor "Falco"         "https://falco.lan"         "monitoring"
-    add_monitor "Longhorn"      "https://longhorn.lan"      "monitoring"
-    add_monitor "Traefik"       "https://traefik.lan"       "networking"
+    def add_http(name, url):
+        if name in existing:
+            log(f"  SKIP (exists): {name}")
+            return
+        try:
+            api.add_monitor(
+                type=MonitorType.HTTP,
+                name=name,
+                url=url,
+                interval=60,
+                retryInterval=60,
+                maxretries=3,
+                ignoreTls=True,
+                accepted_statuscodes=["200-299"],
+            )
+            log(f"  OK: {name} -> {url}")
+        except Exception as e:
+            log(f"  WARN: Failed to add {name}: {e}")
 
-    # ── Networking & DNS ──────────────────────────────────────────────────────
-    add_monitor "Blocky DNS"    "https://blocky.lan"        "networking"
-    add_monitor "Authentik"     "https://auth.lan"          "networking"
+    def add_tcp(name, hostname, port):
+        if name in existing:
+            log(f"  SKIP (exists): {name}")
+            return
+        try:
+            api.add_monitor(
+                type=MonitorType.TCP_PING,
+                name=name,
+                hostname=hostname,
+                port=port,
+                interval=30,
+                retryInterval=30,
+                maxretries=3,
+            )
+            log(f"  OK: {name} -> {hostname}:{port}")
+        except Exception as e:
+            log(f"  WARN: Failed to add {name}: {e}")
 
-    # ── Apps ──────────────────────────────────────────────────────────────────
-    add_monitor "Dashy"         "https://dashy.lan"         "apps"
-    add_monitor "FreshRSS"      "https://freshrss.lan"      "apps"
-    add_monitor "Joplin"        "https://joplin.lan"        "apps"
-    add_monitor "Gotify"        "https://gotify.lan"        "apps"
-    add_monitor "Immich"        "https://immich.lan"        "apps"
-    add_monitor "Headlamp"      "https://headlamp.lan"      "apps"
+    # ── Media ────────────────────────────────────────────────────────────────
+    log("Adding Media monitors...")
+    add_http("Jellyfin",       "https://jellyfin.lan")
+    add_http("Jellyseerr",     "https://jellyseerr.lan")
+    add_http("Sonarr",         "https://sonarr.lan")
+    add_http("Radarr",         "https://radarr.lan")
+    add_http("Prowlarr",       "https://prowlarr.lan")
+    add_http("qBittorrent",    "https://qbittorrent.lan")
+    add_http("Immich",         "https://immich.lan")
 
-    # ── Infrastructure ────────────────────────────────────────────────────────
-    add_monitor "TrueNAS"       "https://truenas.lan"       "infrastructure"
-    add_monitor "Router"        "http://router.lan"         "infrastructure"
-    add_monitor "Omni"          "https://omni.lan"          "infrastructure"
+    # ── Monitoring ───────────────────────────────────────────────────────────
+    log("Adding Monitoring monitors...")
+    add_http("Grafana",        "https://grafana.lan")
+    add_http("Prometheus",     "https://prometheus.lan")
+    add_http("Falco",          "https://falco.lan")
+    add_http("Longhorn",       "https://longhorn.lan")
+    add_http("Uptime Kuma",    "https://uptime-kuma.lan")
 
-    # ── Talos nodes (TCP ping on port 6443 k8s API) ───────────────────────────
-    log "Adding TCP monitors for Talos nodes..."
-    for NODE in "talos-cp-1:192.168.2.22" "talos-cp-2:192.168.2.6" "talos-cp-3:192.168.2.16"; do
-      LABEL=$(echo "${NODE}" | cut -d: -f1)
-      IP=$(echo "${NODE}" | cut -d: -f2)
-      wget -qO- \
-        --header="Content-Type: application/json" \
-        --header="Authorization: Bearer ${TOKEN}" \
-        --post-data="{
-          \"type\": \"tcp-ping\",
-          \"name\": \"${LABEL} (k8s API)\",
-          \"hostname\": \"${IP}\",
-          \"port\": 6443,
-          \"interval\": 30,
-          \"retryInterval\": 30,
-          \"maxretries\": 3,
-          \"tags\": [{\"name\": \"infrastructure\"}]
-        }" \
-        "${BASE_URL}/api/monitors" >/dev/null || log "WARNING: Failed to add ${LABEL}"
-    done
+    # ── Networking ───────────────────────────────────────────────────────────
+    log("Adding Networking monitors...")
+    add_http("Traefik",        "https://traefik.lan")
+    add_http("Blocky DNS",     "https://blocky.lan")
+    add_http("Authentik",      "https://auth.lan")
 
-    touch "${STAMP}"
-    log "All monitors provisioned successfully."
+    # ── Apps ─────────────────────────────────────────────────────────────────
+    log("Adding App monitors...")
+    add_http("Dashy",          "https://dashy.lan")
+    add_http("FreshRSS",       "https://freshrss.lan")
+    add_http("Joplin",         "https://joplin.lan")
+    add_http("Gotify",         "https://gotify.lan")
+    add_http("Headlamp",       "https://headlamp.lan")
+
+    # ── Infrastructure ───────────────────────────────────────────────────────
+    log("Adding Infrastructure monitors...")
+    add_http("TrueNAS",        "https://truenas.lan")
+    add_http("Router",         "http://router.lan")
+    add_http("Omni",           "https://omni.lan")
+
+    # ── Talos nodes (TCP on k8s API port 6443) ───────────────────────────────
+    log("Adding Talos node TCP monitors...")
+    add_tcp("talos-cp-1 (k8s API)", "192.168.2.22", 6443)
+    add_tcp("talos-cp-2 (k8s API)", "192.168.2.6",  6443)
+    add_tcp("talos-cp-3 (k8s API)", "192.168.2.16", 6443)
+
+    api.disconnect()
+
+    open(STAMP, "w").close()
+    log("All monitors provisioned successfully.")
