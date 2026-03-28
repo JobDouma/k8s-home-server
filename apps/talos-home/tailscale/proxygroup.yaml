@@ -1,0 +1,30 @@
+# Without a ProxyGroup, each Tailscale Ingress you create spawns its OWN
+# single proxy pod. That means:
+#   - 5 services = 5 separate Tailscale devices + 5 StatefulSets
+#   - Each has a single pod: one restart = one service blips offline
+#
+# A ProxyGroup pre-creates a SHARED POOL of proxy pods. All your Ingress
+# resources then reference this pool via the annotation
+# tailscale.com/proxy-group: homelab-ingress
+#
+# Benefits:
+#   - 2 active replicas → zero-downtime on pod restarts (Tailscale Services
+#     feature routes traffic to the healthy replica automatically)
+#   - Many services share the same 2 pods → fewer Tailscale devices used
+#   - Each exposed service still gets its own MagicDNS name + Let's Encrypt cert
+#
+# Tailscale Services (the load-balancing mechanism) is in beta but
+# production-stable as of operator 1.84+. You're on 1.94.2 ✓
+#
+# After applying this, update your ACL autoApprovers (see step3-acl-patch.yaml)
+apiVersion: tailscale.com/v1alpha1
+kind: ProxyGroup
+metadata:
+  name: homelab-ingress
+  namespace: tailscale
+  labels:
+    app.kubernetes.io/managed-by: flux
+spec:
+  type: ingress
+  replicas: 2
+  proxyClass: homelab   # metrics + resource limits from step 2

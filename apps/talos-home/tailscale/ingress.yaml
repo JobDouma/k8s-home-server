@@ -1,0 +1,87 @@
+# Step 2 — Tailscale Ingress example: Grafana
+#
+# This exposes your in-cluster Grafana directly into the tailnet with:
+#   - A dedicated MagicDNS hostname: grafana.<tailnet>.ts.net
+#   - Auto-provisioned Let's Encrypt TLS cert (no cert-manager needed)
+#   - No public IP, no port-forwarding, no Traefik involvement
+#
+# HOW IT WORKS:
+#   1. The operator sees this Ingress with ingressClassName: tailscale
+#   2. It creates a Tailscale device for "grafana" in your tailnet
+#   3. Traffic from your phone/laptop → Tailscale → proxy pod → Grafana ClusterIP
+#   4. TLS terminates at the proxy pod using the Let's Encrypt cert
+#
+# The "tls.hosts" value sets the first label of the MagicDNS name.
+# "grafana" → grafana.<your-tailnet>.ts.net
+# Leave it out to default to <ingress-name>-<namespace>
+#
+# PREREQUISITES:
+#   - HTTPS enabled on your tailnet ✓ (you just did this)
+#   - ProxyGroup "homelab-ingress" created (step3-proxygroup.yaml)
+#   - autoApprovers.services added to ACL (step3-full-acl-policy.jsonc)
+#
+# Replace the service name/port with whatever matches your Grafana Service.
+# Common names: kube-prometheus-stack-grafana, grafana
+#
+# Check yours with:
+#   kubectl get svc -n monitoring | grep grafana
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: grafana
+  namespace: monitoring
+  annotations:
+    # Route through the shared HA ProxyGroup instead of a dedicated single pod
+    tailscale.com/proxy-group: "homelab-ingress"
+  labels:
+    app.kubernetes.io/managed-by: flux
+spec:
+  ingressClassName: tailscale
+  defaultBackend:
+    service:
+      name: kube-prometheus-stack-grafana   # adjust to your actual service name
+      port:
+        number: 80
+  tls:
+    - hosts:
+        - grafana   # becomes grafana.<tailnet>.ts.net
+---
+# More examples — uncomment and adjust as needed:
+#
+# apiVersion: networking.k8s.io/v1
+# kind: Ingress
+# metadata:
+#   name: prometheus
+#   namespace: monitoring
+#   annotations:
+#     tailscale.com/proxy-group: "homelab-ingress"
+# spec:
+#   ingressClassName: tailscale
+#   defaultBackend:
+#     service:
+#       name: kube-prometheus-stack-prometheus
+#       port:
+#         number: 9090
+#   tls:
+#     - hosts:
+#         - prometheus
+#
+# ---
+# apiVersion: networking.k8s.io/v1
+# kind: Ingress
+# metadata:
+#   name: alertmanager
+#   namespace: monitoring
+#   annotations:
+#     tailscale.com/proxy-group: "homelab-ingress"
+# spec:
+#   ingressClassName: tailscale
+#   defaultBackend:
+#     service:
+#       name: kube-prometheus-stack-alertmanager
+#       port:
+#         number: 9093
+#   tls:
+#     - hosts:
+#         - alertmanager

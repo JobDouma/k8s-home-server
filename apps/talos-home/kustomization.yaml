@@ -200,6 +200,10 @@ resources:
   - tailscale/connector.yaml
   - tailscale/servicemonitor.yaml
   - tailscale/secret.yaml
+  - tailscale/ingress.yaml
+  - tailscale/proxyclass.yaml
+  - tailscale/proxygroup.yaml
+  - tailscale/rbac.yaml
 
   # ──────────────────────────────────────
   # Immich
