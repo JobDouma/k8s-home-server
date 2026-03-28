@@ -133,7 +133,6 @@ spec:
           limits:
             cpu: 100m
             memory: 256Mi
-
         storage:
           volumeClaimTemplate:
             spec:
@@ -143,7 +142,6 @@ spec:
               resources:
                 requests:
                   storage: 5Gi
-
         tolerations:
           - operator: Exists
 
@@ -170,7 +168,7 @@ spec:
 
       grafana.ini:
         unified_alerting:
-          enabled: true
+          enabled: false
         alerting:
           enabled: false
 
