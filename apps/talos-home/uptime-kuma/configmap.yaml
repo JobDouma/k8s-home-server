@@ -15,7 +15,7 @@ data:
     import time
 
     STAMP = "/app/data/.monitors-provisioned"
-    SERVER = "http://localhost:3001"
+    SERVER = os.environ.get("UPTIME_KUMA_SERVER", "http://uptime-kuma.uptime-kuma.svc.cluster.local:3001")
 
     # Fail loudly if secrets are not injected — no silent fallback defaults
     USERNAME = os.environ["UPTIME_KUMA_ADMIN_USER"]
@@ -110,6 +110,7 @@ data:
     add_http("Radarr",         "https://radarr.lan")
     add_http("Prowlarr",       "https://prowlarr.lan")
     add_http("qBittorrent",    "https://qbittorrent.lan")
+    add_http("SABnzbd",        "https://sabnzbd.lan")
     add_http("Immich",         "https://immich.lan")
 
     # ── Monitoring ───────────────────────────────────────────────────────────
