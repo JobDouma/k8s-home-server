@@ -224,4 +224,5 @@ resources:
   - uptime-kuma/configmap.yaml
   - uptime-kuma/helmrelease.yaml
   - uptime-kuma/ingressroute.yaml
+  - uptime-kuma/job-provisioner.yaml
   
