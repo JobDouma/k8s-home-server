@@ -60,7 +60,6 @@ spec:
 
         # Hard size cap so it can't exceed the PVC
         extraArgs:
-          retentionFilters: ""
           storage.maxDiskUsageBytes: "15GB"
 
         resources:
@@ -196,7 +195,7 @@ spec:
             - name: VictoriaMetrics
               type: prometheus
               uid: prometheus              # keep uid "prometheus" so existing dashboards don't break
-              url: http://vmsingle-victoria-metrics-k8s-stack.monitoring.svc.cluster.local:8428
+              url: http://vmsingle-vm-stack.monitoring.svc.cluster.local:8428
               access: proxy
               isDefault: true
               jsonData:
