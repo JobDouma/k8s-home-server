@@ -1,0 +1,93 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: jellyfin-init
+  namespace: media
+data:
+  init.sh: |
+    #!/bin/sh
+    set -e
+
+    PLUGIN_DIR=/config/plugins
+    BRANDING=/config/branding.xml
+
+    mkdir -p "$PLUGIN_DIR"
+
+    download_plugin() {
+      NAME="$1"
+      URL="$2"
+      DEST="$PLUGIN_DIR/$NAME"
+      if [ ! -d "$DEST" ]; then
+        echo "[init] Installing plugin: $NAME"
+        mkdir -p "$DEST"
+        wget -qO /tmp/plugin.zip "$URL"
+        unzip -q /tmp/plugin.zip -d "$DEST"
+        rm /tmp/plugin.zip
+      else
+        echo "[init] Plugin already present: $NAME"
+      fi
+    }
+
+    # Intro Skipper (fork - most maintained)
+    download_plugin "intro-skipper" \
+      "https://github.com/intro-skipper/intro-skipper/releases/latest/download/intro-skipper.zip"
+
+    # Jellyscrub (trickplay thumbnails)
+    download_plugin "jellyscrub" \
+      "https://github.com/nicknsy/jellyscrub/releases/latest/download/jellyscrub.zip"
+
+    # Fanart metadata provider
+    download_plugin "fanart" \
+      "https://github.com/jellyfin/jellyfin-plugin-fanart/releases/latest/download/fanart.zip"
+
+    # TMDb Box Sets
+    download_plugin "tmdbboxsets" \
+      "https://github.com/jellyfin/jellyfin-plugin-tmdbboxsets/releases/latest/download/tmdbboxsets.zip"
+
+    # Playback Reporting
+    download_plugin "playbackreporting" \
+      "https://github.com/jellyfin/jellyfin-plugin-playbackreporting/releases/latest/download/playbackreporting.zip"
+
+    # Trakt
+    download_plugin "trakt" \
+      "https://github.com/nicknsy/jellyfin-plugin-trakt/releases/latest/download/trakt.zip"
+
+    # SSO Authentication (needs Authentik OIDC endpoint)
+    # download_plugin "sso-auth" \
+    #   "https://github.com/9p4/jellyfin-plugin-sso/releases/latest/download/sso-auth.zip"
+
+    # Home Screen Sections deps: File Transformation + Plugin Pages
+    download_plugin "filetransformation" \
+      "https://github.com/IAmParadox27/jellyfin-plugin-file-transformation/releases/latest/download/filetransformation.zip"
+
+    download_plugin "pluginpages" \
+      "https://github.com/IAmParadox27/jellyfin-plugin-pages/releases/latest/download/pluginpages.zip"
+
+    download_plugin "homescreensections" \
+      "https://github.com/IAmParadox27/jellyfin-plugin-home-sections/releases/latest/download/homescreensections.zip"
+
+    # Ultrachromic theme via branding.xml (only write if not customised yet)
+    if ! grep -q "Ultrachromic" "$BRANDING" 2>/dev/null; then
+      echo "[init] Writing Ultrachromic CSS to branding.xml"
+      cat > "$BRANDING" <<'EOF'
+<?xml version="1.0" encoding="utf-8"?>
+<BrandingOptions>
+  <LoginDisclaimer></LoginDisclaimer>
+  <CustomCss>
+@import url('https://cdn.jsdelivr.net/gh/CTalvio/Ultrachromic/fixes.css');
+@import url('https://cdn.jsdelivr.net/gh/CTalvio/Ultrachromic/jf_font.css');
+@import url('https://cdn.jsdelivr.net/gh/CTalvio/Ultrachromic/base.css');
+@import url('https://cdn.jsdelivr.net/gh/CTalvio/Ultrachromic/accentlist.css');
+@import url('https://cdn.jsdelivr.net/gh/CTalvio/Ultrachromic/rounding.css');
+@import url('https://cdn.jsdelivr.net/gh/CTalvio/Ultrachromic/type/logowhite.css');
+@import url('https://cdn.jsdelivr.net/gh/CTalvio/Ultrachromic/effects/hoverglow.css');
+@import url('https://cdn.jsdelivr.net/gh/CTalvio/Ultrachromic/overlaystyle/floating.css');
+  </CustomCss>
+  <SplashscreenEnabled>false</SplashscreenEnabled>
+</BrandingOptions>
+EOF
+    else
+      echo "[init] branding.xml already contains theme, skipping"
+    fi
+
+    echo "[init] Done."

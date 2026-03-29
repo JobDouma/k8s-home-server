@@ -22,6 +22,7 @@ resources:
   - jellyfin/helmrelease.yaml
   - jellyfin/ingressroute.yaml
   - jellyfin/certificate.yaml
+  - jellyfin/configmap-jellyfin-init.yaml
 
   # ──────────────────────────────────────
   # qBittorrent
