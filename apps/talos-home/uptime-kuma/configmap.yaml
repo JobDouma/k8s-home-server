@@ -9,9 +9,9 @@ data:
     """
     Provisions Uptime Kuma monitors by writing directly to SQLite.
     - No external libraries needed
-    - No auth/Socket.IO issues
     - Idempotent: skips monitors that already exist by name
-    - Restart Kuma after running to pick up new monitors immediately
+    - Handles deletions: removes monitors listed in REMOVED
+    - To re-run: bump job name suffix and commit
     """
     import sqlite3, sys, os, time
 
@@ -38,6 +38,21 @@ data:
     user_id = con.execute("SELECT id FROM user LIMIT 1").fetchone()["id"]
     log(f"Provisioning for user_id={user_id}")
 
+    # ── Monitors to remove ───────────────────────────────────────────────────
+    # Add names here when decommissioning a service. Safe to leave old entries.
+    REMOVED = [
+        "SABnzbd",
+        "Router",
+        "talos-cp-1 (k8s API)",
+        "talos-cp-2 (k8s API)",
+        "talos-cp-3 (k8s API)",
+    ]
+    for name in REMOVED:
+        row = con.execute("SELECT id FROM monitor WHERE name = ?", (name,)).fetchone()
+        if row:
+            con.execute("DELETE FROM monitor WHERE id = ?", (row["id"],))
+            log(f"  removed: {name}")
+
     existing = {r["name"] for r in con.execute("SELECT name FROM monitor")}
     log(f"Existing monitors: {len(existing)}")
 
@@ -57,7 +72,6 @@ data:
             log(f"  WARN {name}: {e}")
 
     def add_port(name, hostname, port):
-        """TCP port check — correct type for Kuma 2.x port monitoring."""
         if name in existing:
             log(f"  skip: {name}"); return
         try:
@@ -98,7 +112,7 @@ data:
     # Infrastructure
     add_http("TrueNAS",     "https://truenas.lan")
     add_http("Omni",        "https://omni.lan")
-    # Talos nodes — port check on k8s API (6443)
+    # Talos nodes — TCP port check on k8s API (6443)
     add_port("talos-cp-1", "192.168.2.22", 6443)
     add_port("talos-cp-2", "192.168.2.6",  6443)
     add_port("talos-cp-3", "192.168.2.16", 6443)
