@@ -69,23 +69,23 @@ data:
     # Ultrachromic theme via branding.xml (only write if not customised yet)
     if ! grep -q "Ultrachromic" "$BRANDING" 2>/dev/null; then
       echo "[init] Writing Ultrachromic CSS to branding.xml"
-      cat > "$BRANDING" <<'EOF'
-<?xml version="1.0" encoding="utf-8"?>
-<BrandingOptions>
-  <LoginDisclaimer></LoginDisclaimer>
-  <CustomCss>
-@import url('https://cdn.jsdelivr.net/gh/CTalvio/Ultrachromic/fixes.css');
-@import url('https://cdn.jsdelivr.net/gh/CTalvio/Ultrachromic/jf_font.css');
-@import url('https://cdn.jsdelivr.net/gh/CTalvio/Ultrachromic/base.css');
-@import url('https://cdn.jsdelivr.net/gh/CTalvio/Ultrachromic/accentlist.css');
-@import url('https://cdn.jsdelivr.net/gh/CTalvio/Ultrachromic/rounding.css');
-@import url('https://cdn.jsdelivr.net/gh/CTalvio/Ultrachromic/type/logowhite.css');
-@import url('https://cdn.jsdelivr.net/gh/CTalvio/Ultrachromic/effects/hoverglow.css');
-@import url('https://cdn.jsdelivr.net/gh/CTalvio/Ultrachromic/overlaystyle/floating.css');
-  </CustomCss>
-  <SplashscreenEnabled>false</SplashscreenEnabled>
-</BrandingOptions>
-EOF
+      printf '%s\n' \
+        '<?xml version="1.0" encoding="utf-8"?>' \
+        '<BrandingOptions>' \
+        '  <LoginDisclaimer></LoginDisclaimer>' \
+        '  <CustomCss>' \
+        "@import url('https://cdn.jsdelivr.net/gh/CTalvio/Ultrachromic/fixes.css');" \
+        "@import url('https://cdn.jsdelivr.net/gh/CTalvio/Ultrachromic/jf_font.css');" \
+        "@import url('https://cdn.jsdelivr.net/gh/CTalvio/Ultrachromic/base.css');" \
+        "@import url('https://cdn.jsdelivr.net/gh/CTalvio/Ultrachromic/accentlist.css');" \
+        "@import url('https://cdn.jsdelivr.net/gh/CTalvio/Ultrachromic/rounding.css');" \
+        "@import url('https://cdn.jsdelivr.net/gh/CTalvio/Ultrachromic/type/logowhite.css');" \
+        "@import url('https://cdn.jsdelivr.net/gh/CTalvio/Ultrachromic/effects/hoverglow.css');" \
+        "@import url('https://cdn.jsdelivr.net/gh/CTalvio/Ultrachromic/overlaystyle/floating.css');" \
+        '  </CustomCss>' \
+        '  <SplashscreenEnabled>false</SplashscreenEnabled>' \
+        '</BrandingOptions>' \
+        > "$BRANDING"
     else
       echo "[init] branding.xml already contains theme, skipping"
     fi
