@@ -6,107 +6,105 @@ metadata:
 data:
   provision.py: |
     #!/usr/bin/env python3
-    import os, sys, time, subprocess
+    """
+    Provisions Uptime Kuma monitors by writing directly to SQLite.
+    - No external libraries needed
+    - No auth/Socket.IO issues
+    - Idempotent: skips monitors that already exist by name
+    - Kuma picks up new monitors automatically on next heartbeat cycle
+    """
+    import sqlite3, sys, json, os, time
 
-    SERVER   = os.environ["UPTIME_KUMA_SERVER"]
-    USERNAME = os.environ["UPTIME_KUMA_ADMIN_USER"]
-    PASSWORD = os.environ["UPTIME_KUMA_ADMIN_PASS"]
+    DB = "/app/data/kuma.db"
 
     def log(msg): print(f"[provision] {msg}", flush=True)
 
-    log("Installing uptime-kuma-api...")
-    subprocess.run(
-        [sys.executable, "-m", "pip", "install", "uptime-kuma-api",
-         "--quiet", "--root-user-action=ignore"],
-        check=True
-    )
-
-    from uptime_kuma_api import UptimeKumaApi, MonitorType
-
-    log("Connecting...")
+    # Wait for Kuma to create the DB (it initializes on first boot)
     for i in range(60):
-        try:
-            api = UptimeKumaApi(SERVER, wait_events=2, ssl_verify=False)
-            break
-        except Exception as e:
-            log(f"  retry {i+1}/60: {e}"); time.sleep(3)
+        if os.path.exists(DB):
+            try:
+                con = sqlite3.connect(DB)
+                # Ensure schema is ready by checking the monitor table exists
+                con.execute("SELECT 1 FROM monitor LIMIT 1")
+                con.close()
+                break
+            except sqlite3.OperationalError:
+                con.close()
+        log(f"Waiting for DB ({i+1}/60)...")
+        time.sleep(3)
     else:
-        log("ERROR: could not connect"); sys.exit(1)
+        log("ERROR: DB not ready after 3 minutes"); sys.exit(1)
 
-    log(f"Logging in as {USERNAME}...")
-    try:
-        api.login(USERNAME, PASSWORD)
-        log("Authenticated.")
-    except Exception as login_err:
-        log(f"Login failed ({login_err}), trying setup (fresh instance)...")
-        try:
-            api.setup(USERNAME, PASSWORD)
-            api.login(USERNAME, PASSWORD)
-            log("Setup + login OK.")
-        except Exception as setup_err:
-            if "already" in str(setup_err).lower():
-                log("ERROR: instance initialized but login failed. Check credentials.")
-            else:
-                log(f"ERROR: setup failed: {setup_err}")
-            api.disconnect()
-            sys.exit(1)
+    con = sqlite3.connect(DB)
+    con.row_factory = sqlite3.Row
 
-    existing = {m["name"] for m in api.get_monitors()}
+    # Get the first user_id (always 1 on a fresh instance)
+    user_id = con.execute("SELECT id FROM user LIMIT 1").fetchone()
+    if not user_id:
+        log("ERROR: no user found in DB"); sys.exit(1)
+    user_id = user_id["id"]
+    log(f"Provisioning for user_id={user_id}")
+
+    existing = {r["name"] for r in con.execute("SELECT name FROM monitor")}
     log(f"Existing monitors: {len(existing)}")
 
-    def http(name, url):
-        if name in existing: log(f"  skip: {name}"); return
-        try:
-            api.add_monitor(type=MonitorType.HTTP, name=name, url=url,
-                            interval=60, retryInterval=60, maxretries=3,
-                            ignoreTls=True, accepted_statuscodes=["200-299"],
-                            conditions=[])
-            log(f"  added: {name}")
-        except Exception as e: log(f"  WARN {name}: {e}")
+    def add_http(name, url):
+        if name in existing:
+            log(f"  skip: {name}"); return
+        con.execute("""
+            INSERT INTO monitor (
+                name, type, url, method, interval, retry_interval, maxretries,
+                ignore_tls, upside_down, accepted_statuscodes_json,
+                conditions, user_id, active
+            ) VALUES (?, 'http', ?, 'GET', 60, 60, 3, 1, 0, '["200-299"]', '[]', ?, 1)
+        """, (name, url, user_id))
+        log(f"  added: {name}")
 
-    def tcp(name, host, port):
-        if name in existing: log(f"  skip: {name}"); return
-        try:
-            api.add_monitor(type=MonitorType.TCP_PING, name=name,
-                            hostname=host, port=port,
-                            interval=30, retryInterval=30, maxretries=3,
-                            conditions=[])
-            log(f"  added: {name}")
-        except Exception as e: log(f"  WARN {name}: {e}")
+    def add_tcp(name, hostname, port):
+        if name in existing:
+            log(f"  skip: {name}"); return
+        con.execute("""
+            INSERT INTO monitor (
+                name, type, hostname, port, interval, retry_interval, maxretries,
+                conditions, user_id, active
+            ) VALUES (?, 'tcp-ping', ?, ?, 30, 30, 3, '[]', ?, 1)
+        """, (name, hostname, port, user_id))
+        log(f"  added: {name}")
 
     # Media
-    http("Jellyfin",    "https://jellyfin.lan")
-    http("Jellyseerr",  "https://jellyseerr.lan")
-    http("Sonarr",      "https://sonarr.lan")
-    http("Radarr",      "https://radarr.lan")
-    http("Prowlarr",    "https://prowlarr.lan")
-    http("qBittorrent", "https://qbittorrent.lan")
-    http("SABnzbd",     "https://sabnzbd.lan")
-    http("Immich",      "https://immich.lan")
+    add_http("Jellyfin",    "https://jellyfin.lan")
+    add_http("Jellyseerr",  "https://jellyseerr.lan")
+    add_http("Sonarr",      "https://sonarr.lan")
+    add_http("Radarr",      "https://radarr.lan")
+    add_http("Prowlarr",    "https://prowlarr.lan")
+    add_http("qBittorrent", "https://qbittorrent.lan")
+    add_http("SABnzbd",     "https://sabnzbd.lan")
+    add_http("Immich",      "https://immich.lan")
     # Monitoring
-    http("Grafana",     "https://grafana.lan")
-    http("Prometheus",  "https://prometheus.lan")
-    http("Falco",       "https://falco.lan")
-    http("Longhorn",    "https://longhorn.lan")
-    http("Uptime Kuma", "https://uptime-kuma.lan")
+    add_http("Grafana",     "https://grafana.lan")
+    add_http("Prometheus",  "https://prometheus.lan")
+    add_http("Falco",       "https://falco.lan")
+    add_http("Longhorn",    "https://longhorn.lan")
+    add_http("Uptime Kuma", "https://uptime-kuma.lan")
     # Networking
-    http("Traefik",     "https://traefik.lan")
-    http("Blocky DNS",  "https://blocky.lan")
-    http("Authentik",   "https://auth.lan")
+    add_http("Traefik",     "https://traefik.lan")
+    add_http("Blocky DNS",  "https://blocky.lan")
+    add_http("Authentik",   "https://auth.lan")
     # Apps
-    http("Dashy",       "https://dashy.lan")
-    http("FreshRSS",    "https://freshrss.lan")
-    http("Joplin",      "https://joplin.lan")
-    http("Gotify",      "https://gotify.lan")
-    http("Headlamp",    "https://headlamp.lan")
+    add_http("Dashy",       "https://dashy.lan")
+    add_http("FreshRSS",    "https://freshrss.lan")
+    add_http("Joplin",      "https://joplin.lan")
+    add_http("Gotify",      "https://gotify.lan")
+    add_http("Headlamp",    "https://headlamp.lan")
     # Infrastructure
-    http("TrueNAS",     "https://truenas.lan")
-    http("Router",      "http://router.lan")
-    http("Omni",        "https://omni.lan")
+    add_http("TrueNAS",     "https://truenas.lan")
+    add_http("Router",      "http://router.lan")
+    add_http("Omni",        "https://omni.lan")
     # Talos nodes
-    tcp("talos-cp-1 (k8s API)", "192.168.2.22", 6443)
-    tcp("talos-cp-2 (k8s API)", "192.168.2.6",  6443)
-    tcp("talos-cp-3 (k8s API)", "192.168.2.16", 6443)
+    add_tcp("talos-cp-1 (k8s API)", "192.168.2.22", 6443)
+    add_tcp("talos-cp-2 (k8s API)", "192.168.2.6",  6443)
+    add_tcp("talos-cp-3 (k8s API)", "192.168.2.16", 6443)
 
-    api.disconnect()
+    con.commit()
+    con.close()
     log("Done.")
