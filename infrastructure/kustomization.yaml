@@ -50,7 +50,6 @@ resources:
   - authentik/helmrelease.yaml
   - authentik/ingressroute.yaml
   - authentik/secret.yaml
-  - authentik/oidc-secret.yaml
   - authentik/postgresql-secret.yaml
   - authentik/networkpolicy.yaml
   - authentik/pdb-server.yaml
