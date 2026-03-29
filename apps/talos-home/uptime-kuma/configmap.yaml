@@ -36,8 +36,21 @@ data:
     log(f"Logging in as {USERNAME}...")
     try:
         api.login(USERNAME, PASSWORD)
-    except Exception as e:
-        log(f"ERROR: login failed: {e}"); api.disconnect(); sys.exit(1)
+        log("Authenticated.")
+    except Exception as login_err:
+        log(f"Login failed ({login_err}), trying setup (fresh instance)...")
+        try:
+            api.setup(USERNAME, PASSWORD)
+            api.login(USERNAME, PASSWORD)
+            log("Setup + login OK.")
+        except Exception as setup_err:
+            if "already" in str(setup_err).lower():
+                # Already initialized but wrong credentials
+                log(f"ERROR: instance initialized but login failed. Check credentials.")
+            else:
+                log(f"ERROR: setup failed: {setup_err}")
+            api.disconnect()
+            sys.exit(1)
 
     existing = {m["name"] for m in api.get_monitors()}
     log(f"Existing monitors: {len(existing)}")
