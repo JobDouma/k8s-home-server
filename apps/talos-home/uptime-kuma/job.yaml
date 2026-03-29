@@ -1,14 +1,16 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: uptime-kuma-provisioner-v2  # bump this suffix whenever you change the configmap
+  name: uptime-kuma-provisioner-v3
   namespace: uptime-kuma
   labels:
     app.kubernetes.io/name: uptime-kuma-provisioner
   annotations:
-    # To add/change monitors: edit configmap.yaml, bump the name suffix above,
-    # commit and push. Flux will create a new Job. Old completed Jobs are left
-    # in place (harmless) or clean up with:
+    # Workflow for adding/removing monitors:
+    # 1. Edit configmap.yaml (add to monitor list or REMOVED list)
+    # 2. Bump this Job name suffix (v3 -> v4, etc.)
+    # 3. git commit + push — Flux creates a new Job automatically
+    # Clean up old jobs:
     #   kubectl delete job -n uptime-kuma -l app.kubernetes.io/name=uptime-kuma-provisioner
 spec:
   backoffLimit: 5
