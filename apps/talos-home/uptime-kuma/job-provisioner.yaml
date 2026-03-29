@@ -1,0 +1,54 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: uptime-kuma-provisioner
+  namespace: uptime-kuma
+  annotations:
+    # Safe to re-run at any time — skips monitors that already exist by name.
+    # To re-run: kubectl delete job uptime-kuma-provisioner -n uptime-kuma
+spec:
+  backoffLimit: 20
+  template:
+    spec:
+      restartPolicy: OnFailure
+
+      initContainers:
+        - name: wait-for-kuma
+          image: busybox:1.37.0@sha256:1487d0af5f52b4ba31c7e465126ee2123fe3f2305d638e7827681e7cf6c83d5e
+          command:
+            - /bin/sh
+            - -c
+            - |
+              until wget -qO- http://uptime-kuma.uptime-kuma.svc.cluster.local:3001 >/dev/null 2>&1; do
+                echo "Waiting for Uptime Kuma..."; sleep 5
+              done
+              echo "Ready."
+
+      containers:
+        - name: provisioner
+          image: python:3.12-slim@sha256:3d5ed973e45820f5ba5e46bd065bd88b3a504ff0724d85980dcd05eab361fcf4
+          command: [python3, /scripts/provision.py]
+          env:
+            - name: UPTIME_KUMA_ADMIN_USER
+              valueFrom:
+                secretKeyRef:
+                  name: uptime-kuma-credentials
+                  key: admin-user
+            - name: UPTIME_KUMA_ADMIN_PASS
+              valueFrom:
+                secretKeyRef:
+                  name: uptime-kuma-credentials
+                  key: admin-pass
+            - name: UPTIME_KUMA_SERVER
+              value: "http://uptime-kuma.uptime-kuma.svc.cluster.local:3001"
+          volumeMounts:
+            - name: scripts
+              mountPath: /scripts/provision.py
+              subPath: provision.py
+              readOnly: true
+
+      volumes:
+        - name: scripts
+          configMap:
+            name: uptime-kuma-monitors
+            defaultMode: 0755

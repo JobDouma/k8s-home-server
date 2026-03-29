@@ -6,143 +6,93 @@ metadata:
 data:
   provision.py: |
     #!/usr/bin/env python3
-    """
-    Provisions Uptime Kuma monitors via Socket.IO API on first boot.
-    Idempotent — stamp file prevents re-running on subsequent restarts.
-    """
-    import os
-    import sys
-    import time
+    import os, sys, time, subprocess
 
-    STAMP = "/app/data/.monitors-provisioned"
-    SERVER = os.environ.get("UPTIME_KUMA_SERVER", "http://uptime-kuma.uptime-kuma.svc.cluster.local:3001")
+    SERVER   = os.environ["UPTIME_KUMA_SERVER"]
     USERNAME = os.environ["UPTIME_KUMA_ADMIN_USER"]
     PASSWORD = os.environ["UPTIME_KUMA_ADMIN_PASS"]
 
-    def log(msg):
-        print(f"[provision] {msg}", flush=True)
-
-    if os.path.exists(STAMP):
-        log("Already provisioned. Skipping.")
-        sys.exit(0)
+    def log(msg): print(f"[provision] {msg}", flush=True)
 
     log("Installing uptime-kuma-api...")
-    import subprocess
     subprocess.run(
-        [sys.executable, "-m", "pip", "install", "uptime-kuma-api", "--quiet",
-         "--root-user-action=ignore"],
+        [sys.executable, "-m", "pip", "install", "uptime-kuma-api",
+         "--quiet", "--root-user-action=ignore"],
         check=True
     )
 
     from uptime_kuma_api import UptimeKumaApi, MonitorType
 
-    log("Waiting for Uptime Kuma to be ready...")
-    api = None
+    log("Connecting...")
     for i in range(60):
         try:
-            api = UptimeKumaApi(SERVER, wait_events=1, ssl_verify=False)
+            api = UptimeKumaApi(SERVER, wait_events=2, ssl_verify=False)
             break
         except Exception as e:
-            log(f"Not ready yet ({i+1}/60): {e}")
-            time.sleep(3)
+            log(f"  retry {i+1}/60: {e}"); time.sleep(3)
     else:
-        log("ERROR: Uptime Kuma did not become ready in time.")
-        sys.exit(1)
+        log("ERROR: could not connect"); sys.exit(1)
 
     log(f"Logging in as {USERNAME}...")
     try:
         api.login(USERNAME, PASSWORD)
-        log("Authenticated.")
     except Exception as e:
-        log(f"ERROR: Login failed: {e}")
-        api.disconnect()
-        sys.exit(1)
+        log(f"ERROR: login failed: {e}"); api.disconnect(); sys.exit(1)
 
     existing = {m["name"] for m in api.get_monitors()}
-    log(f"Found {len(existing)} existing monitors.")
+    log(f"Existing monitors: {len(existing)}")
 
-    def add_http(name, url):
-        if name in existing:
-            log(f"  SKIP (exists): {name}")
-            return
+    def http(name, url):
+        if name in existing: log(f"  skip: {name}"); return
         try:
-            api.add_monitor(
-                type=MonitorType.HTTP,
-                name=name,
-                url=url,
-                interval=60,
-                retryInterval=60,
-                maxretries=3,
-                ignoreTls=True,
-                accepted_statuscodes=["200-299"],
-            )
-            log(f"  OK: {name} -> {url}")
-        except Exception as e:
-            log(f"  WARN: Failed to add {name}: {e}")
+            api.add_monitor(type=MonitorType.HTTP, name=name, url=url,
+                            interval=60, retryInterval=60, maxretries=3,
+                            ignoreTls=True, accepted_statuscodes=["200-299"])
+            log(f"  added: {name}")
+        except Exception as e: log(f"  WARN {name}: {e}")
 
-    def add_tcp(name, hostname, port):
-        if name in existing:
-            log(f"  SKIP (exists): {name}")
-            return
+    def tcp(name, host, port):
+        if name in existing: log(f"  skip: {name}"); return
         try:
-            api.add_monitor(
-                type=MonitorType.TCP_PING,
-                name=name,
-                hostname=hostname,
-                port=port,
-                interval=30,
-                retryInterval=30,
-                maxretries=3,
-            )
-            log(f"  OK: {name} -> {hostname}:{port}")
-        except Exception as e:
-            log(f"  WARN: Failed to add {name}: {e}")
+            api.add_monitor(type=MonitorType.TCP_PING, name=name,
+                            hostname=host, port=port,
+                            interval=30, retryInterval=30, maxretries=3)
+            log(f"  added: {name}")
+        except Exception as e: log(f"  WARN {name}: {e}")
 
-    # ── Media ────────────────────────────────────────────────────────────────
-    log("Adding Media monitors...")
-    add_http("Jellyfin",    "https://jellyfin.lan")
-    add_http("Jellyseerr",  "https://jellyseerr.lan")
-    add_http("Sonarr",      "https://sonarr.lan")
-    add_http("Radarr",      "https://radarr.lan")
-    add_http("Prowlarr",    "https://prowlarr.lan")
-    add_http("qBittorrent", "https://qbittorrent.lan")
-    add_http("SABnzbd",     "https://sabnzbd.lan")
-    add_http("Immich",      "https://immich.lan")
-
-    # ── Monitoring ───────────────────────────────────────────────────────────
-    log("Adding Monitoring monitors...")
-    add_http("Grafana",     "https://grafana.lan")
-    add_http("Prometheus",  "https://prometheus.lan")
-    add_http("Falco",       "https://falco.lan")
-    add_http("Longhorn",    "https://longhorn.lan")
-    add_http("Uptime Kuma", "https://uptime-kuma.lan")
-
-    # ── Networking ───────────────────────────────────────────────────────────
-    log("Adding Networking monitors...")
-    add_http("Traefik",     "https://traefik.lan")
-    add_http("Blocky DNS",  "https://blocky.lan")
-    add_http("Authentik",   "https://auth.lan")
-
-    # ── Apps ─────────────────────────────────────────────────────────────────
-    log("Adding App monitors...")
-    add_http("Dashy",       "https://dashy.lan")
-    add_http("FreshRSS",    "https://freshrss.lan")
-    add_http("Joplin",      "https://joplin.lan")
-    add_http("Gotify",      "https://gotify.lan")
-    add_http("Headlamp",    "https://headlamp.lan")
-
-    # ── Infrastructure ───────────────────────────────────────────────────────
-    log("Adding Infrastructure monitors...")
-    add_http("TrueNAS",     "https://truenas.lan")
-    add_http("Router",      "http://router.lan")
-    add_http("Omni",        "https://omni.lan")
-
-    # ── Talos nodes (TCP on k8s API port 6443) ───────────────────────────────
-    log("Adding Talos node TCP monitors...")
-    add_tcp("talos-cp-1 (k8s API)", "192.168.2.22", 6443)
-    add_tcp("talos-cp-2 (k8s API)", "192.168.2.6",  6443)
-    add_tcp("talos-cp-3 (k8s API)", "192.168.2.16", 6443)
+    # Media
+    http("Jellyfin",    "https://jellyfin.lan")
+    http("Jellyseerr",  "https://jellyseerr.lan")
+    http("Sonarr",      "https://sonarr.lan")
+    http("Radarr",      "https://radarr.lan")
+    http("Prowlarr",    "https://prowlarr.lan")
+    http("qBittorrent", "https://qbittorrent.lan")
+    http("SABnzbd",     "https://sabnzbd.lan")
+    http("Immich",      "https://immich.lan")
+    # Monitoring
+    http("Grafana",     "https://grafana.lan")
+    http("Prometheus",  "https://prometheus.lan")
+    http("Falco",       "https://falco.lan")
+    http("Longhorn",    "https://longhorn.lan")
+    http("Uptime Kuma", "https://uptime-kuma.lan")
+    # Networking
+    http("Traefik",     "https://traefik.lan")
+    http("Blocky DNS",  "https://blocky.lan")
+    http("Authentik",   "https://auth.lan")
+    # Apps
+    http("Dashy",       "https://dashy.lan")
+    http("FreshRSS",    "https://freshrss.lan")
+    http("Joplin",      "https://joplin.lan")
+    http("Gotify",      "https://gotify.lan")
+    http("Headlamp",    "https://headlamp.lan")
+    # Infrastructure
+    http("TrueNAS",     "https://truenas.lan")
+    http("Router",      "http://router.lan")
+    http("Omni",        "https://omni.lan")
+    # Talos nodes
+    tcp("talos-cp-1 (k8s API)", "192.168.2.22", 6443)
+    tcp("talos-cp-2 (k8s API)", "192.168.2.6",  6443)
+    tcp("talos-cp-3 (k8s API)", "192.168.2.16", 6443)
 
     api.disconnect()
-    open(STAMP, "w").close()
-    log("All monitors provisioned successfully.")
+    log("Done.")
