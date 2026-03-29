@@ -14,7 +14,7 @@ spec:
 
       initContainers:
         - name: wait-for-kuma
-          image: busybox:1.36.1
+          image: busybox:1.37.0@sha256:1487d0af5f52b4ba31c7e465126ee2123fe3f2305d638e7827681e7cf6c83d5e
           command:
             - /bin/sh
             - -c
@@ -28,7 +28,7 @@ spec:
 
       containers:
         - name: provisioner
-          image: python:3.12-slim
+          image: python:3.14-slim@sha256:fb83750094b46fd6b8adaa80f66e2302ecbe45d513f6cece637a841e1025b4ca
           command:
             - python3
             - /scripts/provision.py
