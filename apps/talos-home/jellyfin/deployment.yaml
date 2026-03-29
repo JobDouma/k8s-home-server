@@ -59,11 +59,6 @@ spec:
             limits:
               memory: "2Gi"
               cpu: "1"
-          securityContext:
-            runAsUser: 1000
-            runAsGroup: 1000
-      securityContext:
-        fsGroup: 1000
       volumes:
         - name: config
           persistentVolumeClaim:
