@@ -1,21 +1,21 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: uptime-kuma-provisioner
+  name: uptime-kuma-provisioner-v2  # bump this suffix whenever you change the configmap
   namespace: uptime-kuma
+  labels:
+    app.kubernetes.io/name: uptime-kuma-provisioner
   annotations:
-    # Safe to re-run at any time — skips monitors that already exist by name.
-    # SQLite WAL mode allows concurrent access while Kuma is running.
-    # Kuma picks up new rows automatically on its next heartbeat cycle (~60s).
-    # To re-run: kubectl delete job uptime-kuma-provisioner -n uptime-kuma
+    # To add/change monitors: edit configmap.yaml, bump the name suffix above,
+    # commit and push. Flux will create a new Job. Old completed Jobs are left
+    # in place (harmless) or clean up with:
+    #   kubectl delete job -n uptime-kuma -l app.kubernetes.io/name=uptime-kuma-provisioner
 spec:
   backoffLimit: 5
   template:
     spec:
       restartPolicy: OnFailure
 
-      # Longhorn RWO volumes can only attach to one node at a time.
-      # This affinity ensures the Job lands on the same node as the Kuma pod.
       affinity:
         podAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:

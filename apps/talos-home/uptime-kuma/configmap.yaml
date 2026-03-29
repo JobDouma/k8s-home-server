@@ -11,23 +11,23 @@ data:
     - No external libraries needed
     - No auth/Socket.IO issues
     - Idempotent: skips monitors that already exist by name
-    - Kuma picks up new monitors automatically on next heartbeat cycle
+    - Restart Kuma after running to pick up new monitors immediately
     """
-    import sqlite3, sys, json, os, time
+    import sqlite3, sys, os, time
 
     DB = "/app/data/kuma.db"
 
     def log(msg): print(f"[provision] {msg}", flush=True)
 
-    # Wait for Kuma to create the DB (it initializes on first boot)
     for i in range(60):
         if os.path.exists(DB):
             try:
                 con = sqlite3.connect(DB)
-                # Ensure schema is ready by checking the monitor table exists
+                con.row_factory = sqlite3.Row
                 con.execute("SELECT 1 FROM monitor LIMIT 1")
+                if con.execute("SELECT id FROM user LIMIT 1").fetchone():
+                    break
                 con.close()
-                break
             except sqlite3.OperationalError:
                 con.close()
         log(f"Waiting for DB ({i+1}/60)...")
@@ -35,14 +35,7 @@ data:
     else:
         log("ERROR: DB not ready after 3 minutes"); sys.exit(1)
 
-    con = sqlite3.connect(DB)
-    con.row_factory = sqlite3.Row
-
-    # Get the first user_id (always 1 on a fresh instance)
-    user_id = con.execute("SELECT id FROM user LIMIT 1").fetchone()
-    if not user_id:
-        log("ERROR: no user found in DB"); sys.exit(1)
-    user_id = user_id["id"]
+    user_id = con.execute("SELECT id FROM user LIMIT 1").fetchone()["id"]
     log(f"Provisioning for user_id={user_id}")
 
     existing = {r["name"] for r in con.execute("SELECT name FROM monitor")}
@@ -51,25 +44,32 @@ data:
     def add_http(name, url):
         if name in existing:
             log(f"  skip: {name}"); return
-        con.execute("""
-            INSERT INTO monitor (
-                name, type, url, method, interval, retry_interval, maxretries,
-                ignore_tls, upside_down, accepted_statuscodes_json,
-                conditions, user_id, active
-            ) VALUES (?, 'http', ?, 'GET', 60, 60, 3, 1, 0, '["200-299"]', '[]', ?, 1)
-        """, (name, url, user_id))
-        log(f"  added: {name}")
+        try:
+            con.execute("""
+                INSERT INTO monitor (
+                    name, type, url, method, interval, retry_interval, maxretries,
+                    ignore_tls, upside_down, accepted_statuscodes_json,
+                    conditions, user_id, active
+                ) VALUES (?, 'http', ?, 'GET', 60, 60, 3, 1, 0, '["200-299"]', '[]', ?, 1)
+            """, (name, url, user_id))
+            log(f"  added: {name}")
+        except Exception as e:
+            log(f"  WARN {name}: {e}")
 
-    def add_tcp(name, hostname, port):
+    def add_port(name, hostname, port):
+        """TCP port check — correct type for Kuma 2.x port monitoring."""
         if name in existing:
             log(f"  skip: {name}"); return
-        con.execute("""
-            INSERT INTO monitor (
-                name, type, hostname, port, interval, retry_interval, maxretries,
-                conditions, user_id, active
-            ) VALUES (?, 'tcp-ping', ?, ?, 30, 30, 3, '[]', ?, 1)
-        """, (name, hostname, port, user_id))
-        log(f"  added: {name}")
+        try:
+            con.execute("""
+                INSERT INTO monitor (
+                    name, type, hostname, port, interval, retry_interval, maxretries,
+                    conditions, user_id, active
+                ) VALUES (?, 'port', ?, ?, 30, 30, 3, '[]', ?, 1)
+            """, (name, hostname, port, user_id))
+            log(f"  added: {name}")
+        except Exception as e:
+            log(f"  WARN {name}: {e}")
 
     # Media
     add_http("Jellyfin",    "https://jellyfin.lan")
@@ -78,7 +78,6 @@ data:
     add_http("Radarr",      "https://radarr.lan")
     add_http("Prowlarr",    "https://prowlarr.lan")
     add_http("qBittorrent", "https://qbittorrent.lan")
-    add_http("SABnzbd",     "https://sabnzbd.lan")
     add_http("Immich",      "https://immich.lan")
     # Monitoring
     add_http("Grafana",     "https://grafana.lan")
@@ -98,12 +97,11 @@ data:
     add_http("Headlamp",    "https://headlamp.lan")
     # Infrastructure
     add_http("TrueNAS",     "https://truenas.lan")
-    add_http("Router",      "http://router.lan")
     add_http("Omni",        "https://omni.lan")
-    # Talos nodes
-    add_tcp("talos-cp-1 (k8s API)", "192.168.2.22", 6443)
-    add_tcp("talos-cp-2 (k8s API)", "192.168.2.6",  6443)
-    add_tcp("talos-cp-3 (k8s API)", "192.168.2.16", 6443)
+    # Talos nodes — port check on k8s API (6443)
+    add_port("talos-cp-1", "192.168.2.22", 6443)
+    add_port("talos-cp-2", "192.168.2.6",  6443)
+    add_port("talos-cp-3", "192.168.2.16", 6443)
 
     con.commit()
     con.close()
