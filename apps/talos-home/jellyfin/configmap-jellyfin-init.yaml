@@ -6,57 +6,38 @@ metadata:
 data:
   init.sh: |
     #!/bin/sh
-    PLUGIN_DIR=/config/plugins
-    BRANDING=/config/branding.xml
+    CONFIG=/config
 
-    mkdir -p "$PLUGIN_DIR"
+    # ── Plugin repositories ──────────────────────────────────────────────
+    REPOS="$CONFIG/repositories.xml"
+    if [ ! -f "$REPOS" ]; then
+      echo "[init] Writing repositories.xml"
+      printf '%s\n' \
+        '<?xml version="1.0" encoding="utf-8"?>' \
+        '<ArrayOfRepositoryInfo xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">' \
+        '  <RepositoryInfo>' \
+        '    <Name>Jellyfin Stable</Name>' \
+        '    <Url>https://repo.jellyfin.org/releases/plugin/manifest-stable.json</Url>' \
+        '    <Enabled>true</Enabled>' \
+        '  </RepositoryInfo>' \
+        '  <RepositoryInfo>' \
+        '    <Name>Intro Skipper</Name>' \
+        '    <Url>https://manifest.intro-skipper.org/manifest.json</Url>' \
+        '    <Enabled>true</Enabled>' \
+        '  </RepositoryInfo>' \
+        '  <RepositoryInfo>' \
+        '    <Name>IAmParadox27</Name>' \
+        '    <Url>https://www.iamparadox.dev/jellyfin/plugins/manifest.json</Url>' \
+        '    <Enabled>true</Enabled>' \
+        '  </RepositoryInfo>' \
+        '</ArrayOfRepositoryInfo>' \
+        > "$REPOS"
+    else
+      echo "[init] repositories.xml already present, skipping"
+    fi
 
-    download_plugin() {
-      NAME="$1"
-      URL="$2"
-      DEST="$PLUGIN_DIR/$NAME"
-      if [ ! -d "$DEST" ]; then
-        echo "[init] Installing plugin: $NAME"
-        mkdir -p "$DEST"
-        wget -qO /tmp/plugin.zip "$URL"
-        unzip -q /tmp/plugin.zip -d "$DEST"
-        rm /tmp/plugin.zip
-      else
-        echo "[init] Plugin already present: $NAME"
-      fi
-    }
-
-    download_plugin "intro-skipper" \
-      "https://github.com/intro-skipper/intro-skipper/releases/latest/download/intro-skipper.zip"
-
-    download_plugin "jellyscrub" \
-      "https://github.com/nicknsy/jellyscrub/releases/latest/download/jellyscrub.zip"
-
-    download_plugin "fanart" \
-      "https://github.com/jellyfin/jellyfin-plugin-fanart/releases/latest/download/fanart.zip"
-
-    download_plugin "tmdbboxsets" \
-      "https://github.com/jellyfin/jellyfin-plugin-tmdbboxsets/releases/latest/download/tmdbboxsets.zip"
-
-    download_plugin "playbackreporting" \
-      "https://github.com/jellyfin/jellyfin-plugin-playbackreporting/releases/latest/download/playbackreporting.zip"
-
-    download_plugin "trakt" \
-      "https://github.com/nicknsy/jellyfin-plugin-trakt/releases/latest/download/trakt.zip"
-
-    # SSO Authentication (needs Authentik OIDC endpoint)
-    # download_plugin "sso-auth" \
-    #   "https://github.com/9p4/jellyfin-plugin-sso/releases/latest/download/sso-auth.zip"
-
-    download_plugin "filetransformation" \
-      "https://github.com/IAmParadox27/jellyfin-plugin-file-transformation/releases/latest/download/filetransformation.zip"
-
-    download_plugin "pluginpages" \
-      "https://github.com/IAmParadox27/jellyfin-plugin-pages/releases/latest/download/pluginpages.zip"
-
-    download_plugin "homescreensections" \
-      "https://github.com/IAmParadox27/jellyfin-plugin-home-sections/releases/latest/download/homescreensections.zip"
-
+    # ── Ultrachromic theme ───────────────────────────────────────────────
+    BRANDING="$CONFIG/branding.xml"
     if ! grep -q "Ultrachromic" "$BRANDING" 2>/dev/null; then
       echo "[init] Writing Ultrachromic CSS to branding.xml"
       printf '%s\n' \

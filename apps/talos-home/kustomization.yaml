@@ -18,8 +18,9 @@ resources:
   # ──────────────────────────────────────
   # Jellyfin
   # ──────────────────────────────────────
-  - jellyfin/helmrepository.yaml
-  - jellyfin/helmrelease.yaml
+  # - jellyfin/helmrepository.yaml
+  # - jellyfin/helmrelease.yaml
+  - jellyfin/deployment.yaml
   - jellyfin/ingressroute.yaml
   - jellyfin/certificate.yaml
   - jellyfin/configmap-jellyfin-init.yaml
