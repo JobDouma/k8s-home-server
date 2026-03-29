@@ -35,35 +35,6 @@ spec:
             runAsGroup: 0
             runAsNonRoot: false
 
-        initContainers:
-          provision:
-            image:
-              repository: python
-              tag: "3.12-slim"
-            command:
-              - /bin/sh
-              - -c
-              - |
-                if [ -f /app/data/.monitors-provisioned ]; then
-                  echo "[provision] Already provisioned. Skipping."
-                  exit 0
-                fi
-                pip install uptime-kuma-api --quiet --root-user-action=ignore
-                python3 /scripts/provision.py
-            env:
-              UPTIME_KUMA_ADMIN_USER:
-                valueFrom:
-                  secretKeyRef:
-                    name: uptime-kuma-credentials
-                    key: admin-user
-              UPTIME_KUMA_ADMIN_PASS:
-                valueFrom:
-                  secretKeyRef:
-                    name: uptime-kuma-credentials
-                    key: admin-pass
-              UPTIME_KUMA_SERVER:
-                value: "http://localhost:3001"
-
         containers:
           app:
             image:
@@ -125,14 +96,3 @@ spec:
         size: 1Gi
         globalMounts:
           - path: /app/data
-
-      scripts:
-        type: configMap
-        name: uptime-kuma-monitors
-        defaultMode: 0755
-        advancedMounts:
-          uptime-kuma:
-            provision:
-              - path: /scripts/provision.py
-                subPath: provision.py
-                readOnly: true
