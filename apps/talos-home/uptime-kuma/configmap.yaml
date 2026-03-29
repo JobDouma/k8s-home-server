@@ -45,8 +45,7 @@ data:
             log("Setup + login OK.")
         except Exception as setup_err:
             if "already" in str(setup_err).lower():
-                # Already initialized but wrong credentials
-                log(f"ERROR: instance initialized but login failed. Check credentials.")
+                log("ERROR: instance initialized but login failed. Check credentials.")
             else:
                 log(f"ERROR: setup failed: {setup_err}")
             api.disconnect()
@@ -60,7 +59,8 @@ data:
         try:
             api.add_monitor(type=MonitorType.HTTP, name=name, url=url,
                             interval=60, retryInterval=60, maxretries=3,
-                            ignoreTls=True, accepted_statuscodes=["200-299"])
+                            ignoreTls=True, accepted_statuscodes=["200-299"],
+                            conditions=[])
             log(f"  added: {name}")
         except Exception as e: log(f"  WARN {name}: {e}")
 
@@ -69,7 +69,8 @@ data:
         try:
             api.add_monitor(type=MonitorType.TCP_PING, name=name,
                             hostname=host, port=port,
-                            interval=30, retryInterval=30, maxretries=3)
+                            interval=30, retryInterval=30, maxretries=3,
+                            conditions=[])
             log(f"  added: {name}")
         except Exception as e: log(f"  WARN {name}: {e}")
 
