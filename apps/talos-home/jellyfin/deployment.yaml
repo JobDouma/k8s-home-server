@@ -15,19 +15,6 @@ spec:
       labels:
         app: jellyfin
     spec:
-      initContainers:
-        - name: jellyfin-init
-          image: alpine:3.21@sha256:a8560b36e8b8210634f77d9f7f9efd7ffa463e380b75e2e74aff4511df3ef88c
-          command: ["/bin/sh", "/scripts/init.sh"]
-          securityContext:
-            runAsUser: 1000
-            runAsGroup: 1000
-          volumeMounts:
-            - name: init-scripts
-              mountPath: /scripts
-            - name: config
-              mountPath: /config
-              subPath: jellyfin
       containers:
         - name: jellyfin
           image: jellyfin/jellyfin:10.11.6@sha256:333b647716631443a43c7fabac4b0c46b4e2f036bad19547e00958f10f721b85
@@ -68,10 +55,6 @@ spec:
             claimName: media
         - name: cache
           emptyDir: {}
-        - name: init-scripts
-          configMap:
-            name: jellyfin-init
-            defaultMode: 0755
       affinity:
         nodeAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:
