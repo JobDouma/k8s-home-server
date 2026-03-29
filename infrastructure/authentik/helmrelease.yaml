@@ -29,7 +29,6 @@ spec:
       enabled: true
       secrets:
         - authentik-blueprints
-        - authentik-oidc-clients # Includes Headlamp and all future OIDC clients
     prometheus:
       rules:
         create: false
