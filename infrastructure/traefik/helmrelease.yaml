@@ -59,13 +59,6 @@ spec:
         effect: NoExecute
         tolerationSeconds: 60
 
-    tracing:
-      otlp:
-        enabled: true
-        http:
-          enabled: true
-          endpoint: http://tempo.monitoring.svc.cluster.local:4318/v1/traces
-
     ingressClass:
       enabled: true
       isDefaultClass: true
@@ -135,9 +128,6 @@ spec:
       - "--entrypoints.web.http.redirections.entrypoint.scheme=https"
       - "--entrypoints.web.http.redirections.entrypoint.permanent=true"
       - "--providers.kubernetescrd.allowCrossNamespace=true"
-      - "--tracing=true"
-      - "--tracing.serviceName=traefik"
-      - "--tracing.sampleRate=1.0"
 
     logs:
       general:
