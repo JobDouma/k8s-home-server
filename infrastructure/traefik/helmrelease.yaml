@@ -25,22 +25,39 @@ spec:
     deployment:
       replicas: 2
       revisionHistoryLimit: 2
-      affinity:
-        nodeAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
-            nodeSelectorTerms:
-              - matchExpressions:
-                  - key: kubernetes.io/hostname
-                    operator: In
-                    values:
-                      - talos-cp-1
-                      - talos-cp-2
-        podAntiAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
-            - labelSelector:
-                matchLabels:
-                  app.kubernetes.io/name: traefik
-              topologyKey: kubernetes.io/hostname
+
+    # Affinity at top level — this is where traefik chart 39.x reads it
+    affinity:
+      nodeAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+          nodeSelectorTerms:
+            - matchExpressions:
+                - key: kubernetes.io/hostname
+                  operator: In
+                  values:
+                    - talos-cp-1
+                    - talos-cp-2
+      podAntiAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchLabels:
+                app.kubernetes.io/name: traefik
+            topologyKey: kubernetes.io/hostname
+
+    # Only tolerate control-plane taint — do NOT use operator: Exists globally
+    # as it overrides scheduling constraints
+    tolerations:
+      - key: node-role.kubernetes.io/control-plane
+        operator: Exists
+        effect: NoSchedule
+      - key: node.kubernetes.io/not-ready
+        operator: Exists
+        effect: NoExecute
+        tolerationSeconds: 60
+      - key: node.kubernetes.io/unreachable
+        operator: Exists
+        effect: NoExecute
+        tolerationSeconds: 60
 
     tracing:
       otlp:
@@ -48,17 +65,6 @@ spec:
         http:
           enabled: true
           endpoint: http://tempo.monitoring.svc.cluster.local:4318/v1/traces
-
-    tolerations:
-      - operator: Exists
-      - key: "node.kubernetes.io/not-ready"
-        operator: "Exists"
-        effect: "NoExecute"
-        tolerationSeconds: 60
-      - key: "node.kubernetes.io/unreachable"
-        operator: "Exists"
-        effect: "NoExecute"
-        tolerationSeconds: 60
 
     ingressClass:
       enabled: true
@@ -109,7 +115,6 @@ spec:
         enabled: true
         allowCrossNamespace: true
         allowExternalNameServices: true
-        # This tells Traefik to watch all namespaces for secrets
         namespaces: []
 
     rbac:
