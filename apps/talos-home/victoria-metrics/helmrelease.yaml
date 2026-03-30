@@ -57,6 +57,14 @@ spec:
       enabled: true
       spec:
         retentionPeriod: "5d"         # matches your previous 5d retention
+        affinity:
+          nodeAffinity:
+            requiredDuringSchedulingIgnoredDuringExecution:
+              nodeSelectorTerms:
+                - matchExpressions:
+                    - key: kubernetes.io/hostname
+                      operator: In
+                      values: [talos-cp-1]
 
         resources:
           requests:
@@ -93,6 +101,15 @@ spec:
       spec:
         scrapeInterval: 60s           # matches your previous 60s interval
         selectAllByDefault: true      # auto-discover all ServiceMonitors/PodMonitors
+        affinity:
+          nodeAffinity:
+            preferredDuringSchedulingIgnoredDuringExecution:
+              - weight: 100
+                preference:
+                  matchExpressions:
+                    - key: kubernetes.io/hostname
+                      operator: NotIn
+                      values: [talos-cp-3]
 
         resources:
           requests:
@@ -128,6 +145,14 @@ spec:
       spec:
         configSecret: alertmanager-gotify-config
         templates: []
+        affinity:
+          nodeAffinity:
+            requiredDuringSchedulingIgnoredDuringExecution:
+              nodeSelectorTerms:
+                - matchExpressions:
+                    - key: kubernetes.io/hostname
+                      operator: In
+                      values: [talos-cp-1]
         resources:
           requests:
             cpu: 10m
@@ -153,6 +178,14 @@ spec:
     grafana:
       enabled: true
       revisionHistoryLimit: 2
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: kubernetes.io/hostname
+                    operator: In
+                    values: [talos-cp-1, talos-cp-2]
 
       tolerations:
         - operator: Exists

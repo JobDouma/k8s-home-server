@@ -49,6 +49,14 @@ spec:
         delete_request_store: filesystem
       limits_config:
         retention_period: 168h
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: kubernetes.io/hostname
+                    operator: In
+                    values: [talos-cp-1]
 
     singleBinary:
       replicas: 1
