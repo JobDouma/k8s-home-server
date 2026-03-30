@@ -16,7 +16,14 @@ spec:
   values:
     replicaCount: 1
     nodeSelector: {}
-    affinity: {}
+    affinity:
+      nodeAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+          nodeSelectorTerms:
+            - matchExpressions:
+                - key: kubernetes.io/hostname
+                  operator: In
+                  values: [talos-cp-1, talos-cp-2]
     tolerations:
       - key: node-role.kubernetes.io/control-plane
         operator: Exists

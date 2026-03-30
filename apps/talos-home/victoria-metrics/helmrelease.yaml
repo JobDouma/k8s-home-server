@@ -99,8 +99,6 @@ spec:
     vmagent:
       enabled: true
       spec:
-        scrapeInterval: 60s           # matches your previous 60s interval
-        selectAllByDefault: true      # auto-discover all ServiceMonitors/PodMonitors
         affinity:
           nodeAffinity:
             preferredDuringSchedulingIgnoredDuringExecution:
@@ -110,6 +108,18 @@ spec:
                     - key: kubernetes.io/hostname
                       operator: NotIn
                       values: [talos-cp-3]
+        tolerations:
+          - key: node-role.kubernetes.io/control-plane
+            operator: Exists
+            effect: NoSchedule
+          - key: node.kubernetes.io/not-ready
+            operator: Exists
+            effect: NoExecute
+            tolerationSeconds: 600
+          - key: node.kubernetes.io/unreachable
+            operator: Exists
+            effect: NoExecute
+            tolerationSeconds: 600
 
         resources:
           requests:
@@ -188,14 +198,16 @@ spec:
                     values: [talos-cp-1, talos-cp-2]
 
       tolerations:
-        - operator: Exists
-        - key: "node.kubernetes.io/not-ready"
-          operator: "Exists"
-          effect: "NoExecute"
+        - key: node-role.kubernetes.io/control-plane
+          operator: Exists
+          effect: NoSchedule
+        - key: node.kubernetes.io/not-ready
+          operator: Exists
+          effect: NoExecute
           tolerationSeconds: 600
-        - key: "node.kubernetes.io/unreachable"
-          operator: "Exists"
-          effect: "NoExecute"
+        - key: node.kubernetes.io/unreachable
+          operator: Exists
+          effect: NoExecute
           tolerationSeconds: 600
 
       deploymentStrategy:
