@@ -27,8 +27,6 @@ data:
           <outline text="The Hacker News"          type="rss" xmlUrl="https://feeds.feedburner.com/TheHackersNews"/>
           <outline text="Dark Reading"             type="rss" xmlUrl="https://www.darkreading.com/rss.xml"/>
           <outline text="Security Week"            type="rss" xmlUrl="https://feeds.feedburner.com/securityweek"/>
-          <outline text="Security Magazine (CISO)" type="rss" xmlUrl="https://www.securitymagazine.com/rss/topic/2236"/>
-          <outline text="IBM Security Intelligence" type="rss" xmlUrl="https://securityintelligence.com/feed/"/>
 
           <!-- Vulnerability tracking -->
           <outline text="NVD Recent CVEs"          type="rss" xmlUrl="https://nvd.nist.gov/feeds/xml/cve/misc/nvd-rss.xml"/>
@@ -37,23 +35,45 @@ data:
 
           <!-- Vendor threat research -->
           <outline text="Google Project Zero"      type="rss" xmlUrl="https://googleprojectzero.blogspot.com/feeds/posts/default"/>
+          <outline text="Google Online Security Blog" type="rss" xmlUrl="https://security.googleblog.com/feeds/posts/default"/>
           <outline text="Mandiant Blog"            type="rss" xmlUrl="https://www.mandiant.com/resources/blog/rss.xml"/>
-          <outline text="CrowdStrike Blog"         type="rss" xmlUrl="https://www.crowdstrike.com/blog/feed/"/>
           <outline text="SentinelOne Blog"         type="rss" xmlUrl="https://www.sentinelone.com/blog/feed/"/>
           <outline text="Securelist (Kaspersky)"   type="rss" xmlUrl="https://securelist.com/feed/"/>
           <outline text="Recorded Future Blog"     type="rss" xmlUrl="https://www.recordedfuture.com/feed"/>
+          <outline text="Red Canary Blog"          type="rss" xmlUrl="https://redcanary.com/blog/feed/"/>
+
+          <!-- Cloud-native & container security -->
+          <outline text="Aqua Security Blog"       type="rss" xmlUrl="https://blog.aquasec.com/rss.xml"/>
+          <outline text="Sysdig Blog"              type="rss" xmlUrl="https://sysdig.com/blog/feed/"/>
+          <outline text="Wiz Blog"                 type="rss" xmlUrl="https://www.wiz.io/blog/rss.xml"/>
 
           <!-- Offensive security & research -->
+          <outline text="SpecterOps"               type="rss" xmlUrl="https://posts.specterops.io/feed"/>
+          <outline text="Trail of Bits Blog"       type="rss" xmlUrl="https://blog.trailofbits.com/feed/"/>
           <outline text="PortSwigger Research"     type="rss" xmlUrl="https://portswigger.net/research/rss"/>
           <outline text="NCC Group Research"       type="rss" xmlUrl="https://research.nccgroup.com/feed/"/>
           <outline text="Malwarebytes Labs"        type="rss" xmlUrl="https://blog.malwarebytes.com/feed/"/>
-          <outline text="Rapid7 Blog"              type="rss" xmlUrl="https://blog.rapid7.com/rss/"/>
           <outline text="Qualys Security Blog"     type="rss" xmlUrl="https://blog.qualys.com/feed"/>
           <outline text="Tenable Blog"             type="rss" xmlUrl="https://www.tenable.com/blog/feed"/>
+
+          <!-- Applied cryptography -->
+          <outline text="Cryptography Engineering (Matt Green)" type="rss" xmlUrl="https://blog.cryptographyengineering.com/feed/"/>
 
           <!-- Incident response & forensics -->
           <outline text="The DFIR Report"          type="rss" xmlUrl="https://thedfirreport.com/feed/"/>
           <outline text="SANS Blog"                type="rss" xmlUrl="https://www.sans.org/blog/feed/"/>
+
+        </outline>
+
+        <!-- ═══════════════════════════════════════════════════════════ -->
+        <!--  SUPPLY CHAIN & SECRETS SECURITY                            -->
+        <!-- ═══════════════════════════════════════════════════════════ -->
+        <outline text="Supply Chain &amp; Secrets Security">
+
+          <outline text="GitGuardian Blog"         type="rss" xmlUrl="https://blog.gitguardian.com/rss/"/>
+          <outline text="Sonatype Blog"            type="rss" xmlUrl="https://blog.sonatype.com/rss.xml"/>
+          <outline text="OpenSSF Blog"             type="rss" xmlUrl="https://openssf.org/feed/"/>
+          <outline text="Sigstore Blog"            type="rss" xmlUrl="https://blog.sigstore.dev/feed"/>
 
         </outline>
 
@@ -66,8 +86,6 @@ data:
           <outline text="ReliaQuest Blog (ex-Digital Shadows)" type="rss" xmlUrl="https://www.reliaquest.com/blog/feed/"/>
           <outline text="Flashpoint Intel Blog"    type="rss" xmlUrl="https://flashpoint.io/blog/feed/"/>
           <outline text="Intel 471 Blog"           type="rss" xmlUrl="https://intel471.com/blog/feed"/>
-          <outline text="DarkOwl Blog"             type="rss" xmlUrl="https://www.darkowl.com/blog-content/feed/"/>
-          <outline text="Cybercrime Magazine"      type="rss" xmlUrl="https://cybersecurityventures.com/feed/"/>
 
         </outline>
 
@@ -125,9 +143,12 @@ data:
           <outline text="arXiv Distributed Systems" type="rss" xmlUrl="http://export.arxiv.org/rss/cs.DC"/>
           <outline text="arXiv Networking"         type="rss" xmlUrl="http://export.arxiv.org/rss/cs.NI"/>
           <outline text="Nature Technology"        type="rss" xmlUrl="https://www.nature.com/subjects/computer-science.rss"/>
-          <outline text="ScienceDaily Tech"        type="rss" xmlUrl="https://www.sciencedaily.com/rss/computers_math.xml"/>
+          <outline text="npj Cybersecurity (Nature)" type="rss" xmlUrl="https://www.nature.com/npjcybersecur.rss"/>
           <outline text="USENIX ;login:"           type="rss" xmlUrl="https://www.usenix.org/publications/loginonline/rss.xml"/>
+          <outline text="USENIX Security Proceedings" type="rss" xmlUrl="https://www.usenix.org/conference/usenixsecurity25/rss"/>
+          <outline text="ScienceDaily Tech"        type="rss" xmlUrl="https://www.sciencedaily.com/rss/computers_math.xml"/>
           <outline text="ACM TechNews"             type="rss" xmlUrl="https://technews.acm.org/rss.cfm"/>
+          <outline text="Quanta Magazine"          type="rss" xmlUrl="https://www.quantamagazine.org/feed/"/>
 
         </outline>
 
@@ -135,6 +156,10 @@ data:
         <!--  GOVERNANCE, COMPLIANCE & FINANCIAL SECTOR                  -->
         <!-- ═══════════════════════════════════════════════════════════ -->
         <outline text="Governance &amp; Compliance">
+
+          <!-- NL-specific -->
+          <outline text="NCSC-NL Advisories"       type="rss" xmlUrl="https://advisories.ncsc.nl/rss/advisories"/>
+          <outline text="DNB Supervisory News"     type="rss" xmlUrl="https://www.dnb.nl/en/rss/news/"/>
 
           <!-- EU regulatory bodies — DORA / NIS2 / GDPR / banking -->
           <outline text="ENISA News"               type="rss" xmlUrl="https://www.enisa.europa.eu/news/rss"/>
@@ -162,6 +187,18 @@ data:
           <outline text="BBC World"                type="rss" xmlUrl="http://feeds.bbci.co.uk/news/world/rss.xml"/>
           <outline text="Associated Press"         type="rss" xmlUrl="https://feeds.apnews.com/apnews"/>
           <outline text="The Economist"            type="rss" xmlUrl="https://www.economist.com/international/rss.xml"/>
+
+        </outline>
+
+        <!-- ═══════════════════════════════════════════════════════════ -->
+        <!--  LONG-FORM & HIGH-SIGNAL (non-tech)                         -->
+        <!-- ═══════════════════════════════════════════════════════════ -->
+        <outline text="Long-Form &amp; High-Signal">
+
+          <outline text="Stratechery"              type="rss" xmlUrl="https://stratechery.com/feed/"/>
+          <outline text="Works in Progress"        type="rss" xmlUrl="https://worksinprogress.co/feed/"/>
+          <outline text="Gwern.net"                type="rss" xmlUrl="https://www.gwern.net/feed"/>
+          <outline text="Epsilon Theory"           type="rss" xmlUrl="https://www.epsilontheory.com/feed/"/>
 
         </outline>
 
