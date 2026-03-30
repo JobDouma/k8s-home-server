@@ -77,6 +77,34 @@ kubectl get pods -A -o json | \
     kubectl delete pod -n "$NS" "$POD" --force --grace-period=0 2>/dev/null || true
   done
   
+# ── Step 3c: Wait for Longhorn replicas on this node to evacuate ──
+log "Waiting for Longhorn replicas on $K8S_NODE to evacuate..."
+LONGHORN_TIMEOUT=180
+LONGHORN_ELAPSED=0
+while true; do
+  REPLICA_COUNT=$(kubectl get replicas -n longhorn \
+    --field-selector "spec.nodeID=${K8S_NODE}" \
+    -o json 2>/dev/null | jq '.items | length')
+  if [[ "$REPLICA_COUNT" -eq 0 ]]; then
+    log "All Longhorn replicas evacuated from $K8S_NODE."
+    break
+  fi
+  if (( LONGHORN_ELAPSED >= LONGHORN_TIMEOUT )); then
+    log "WARNING: $REPLICA_COUNT Longhorn replicas still on $K8S_NODE after ${LONGHORN_TIMEOUT}s — forcing detach and continuing."
+    # Force numberOfReplicas down so volumes can attach elsewhere
+    kubectl get volumes -n longhorn -o json | \
+      jq -r '.items[] | select(.status.state != "detached") | .metadata.name' | \
+      while read -r VOL; do
+        kubectl patch volume -n longhorn "$VOL" \
+          --type=merge -p '{"spec":{"numberOfReplicas":1}}' 2>/dev/null || true
+      done
+    break
+  fi
+  log "  $REPLICA_COUNT replicas still on $K8S_NODE... (${LONGHORN_ELAPSED}s elapsed)"
+  sleep 10
+  (( LONGHORN_ELAPSED += 10 ))
+done
+
 # ── Step 4: Talos graceful shutdown ──────────────────────────
 log "Sending graceful shutdown to Talos node $TALOS_NODE_IP..."
 talosctl shutdown \
