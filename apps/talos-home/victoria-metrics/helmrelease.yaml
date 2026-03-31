@@ -67,12 +67,12 @@ spec:
                       values: [talos-cp-1]
 
         resources:
-          requests:
-            cpu: 50m
-            memory: 128Mi           # down from 400Mi — VM is far more efficient
           limits:
-            cpu: 500m
-            memory: 512Mi           # down from 1Gi
+            cpu: 1000m
+            memory: 2Gi
+          requests:
+            cpu: 100m
+            memory: 512Mi
 
         storage:
           accessModes:
