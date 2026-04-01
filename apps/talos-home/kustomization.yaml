@@ -43,10 +43,10 @@ resources:
   # ──────────────────────────────────────
   # Grafana
   # ──────────────────────────────────────
-  - grafana/ingressroute.yaml
-  - grafana/admin-secret.yaml
-  - grafana/certificate.yaml
-  - grafana/dashboards/
+  # - grafana/ingressroute.yaml
+  # - grafana/admin-secret.yaml
+  # - grafana/certificate.yaml
+  # - grafana/dashboards/
 
   # ──────────────────────────────────────
   # Promtail
