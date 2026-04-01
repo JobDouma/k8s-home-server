@@ -33,33 +33,33 @@ resources:
   # ──────────────────────────────────────
   # monitoring / VictoriaMetrics (lightweight Prometheus)
   # ──────────────────────────────────────
-  # - victoria-metrics/namespace.yaml
-  # - victoria-metrics/helmrepository.yaml
-  # - victoria-metrics/helmrelease.yaml
-  # - victoria-metrics/ingressroute.yaml
-  # - victoria-metrics/pdb.yaml
-  # - victoria-metrics/alertmanager-secret.yaml
+  - victoria-metrics/namespace.yaml
+  - victoria-metrics/helmrepository.yaml
+  - victoria-metrics/helmrelease.yaml
+  - victoria-metrics/ingressroute.yaml
+  - victoria-metrics/pdb.yaml
+  - victoria-metrics/alertmanager-secret.yaml
 
   # ──────────────────────────────────────
   # Grafana
   # ──────────────────────────────────────
-  # - grafana/ingressroute.yaml
-  # - grafana/admin-secret.yaml
-  # - grafana/certificate.yaml
-  # - grafana/dashboards/
+  - grafana/ingressroute.yaml
+  - grafana/admin-secret.yaml
+  - grafana/certificate.yaml
+  - grafana/dashboards/
 
   # ──────────────────────────────────────
   # Promtail
   # ──────────────────────────────────────
-  # - promtail/helmrelease.yaml
+  - promtail/helmrelease.yaml
 
   # ──────────────────────────────────────
   # Loki
   # ──────────────────────────────────────
-  # - loki/helmrepository.yaml
-  # - loki/helmrelease.yaml
-  # - loki/servicemonitor.yaml
-  # - loki/pdb.yaml
+  - loki/helmrepository.yaml
+  - loki/helmrelease.yaml
+  - loki/servicemonitor.yaml
+  - loki/pdb.yaml
 
   # ──────────────────────────────────────
   # Jellyseerr
