@@ -51,15 +51,15 @@ resources:
   # ──────────────────────────────────────
   # Promtail
   # ──────────────────────────────────────
-  - promtail/helmrelease.yaml
+  # - promtail/helmrelease.yaml
 
   # ──────────────────────────────────────
   # Loki
   # ──────────────────────────────────────
-  - loki/helmrepository.yaml
-  - loki/helmrelease.yaml
-  - loki/servicemonitor.yaml
-  - loki/pdb.yaml
+  # - loki/helmrepository.yaml
+  # - loki/helmrelease.yaml
+  # - loki/servicemonitor.yaml
+  # - loki/pdb.yaml
 
   # ──────────────────────────────────────
   # Jellyseerr
