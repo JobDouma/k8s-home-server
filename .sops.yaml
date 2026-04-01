@@ -1,4 +1,6 @@
 creation_rules:
+  - path_regex: 'cosign\.key(\.sops)?$'
+    age: 'age18zx3u4cnpe3y55rruzp5v4uregm0kxe2ge6wzle54nu9vlxlndmqweckld'
   - path_regex: '.*secret(\.yaml|\.yml)$'
     encrypted_regex: '^(data|stringData)$'
     age: 'age18zx3u4cnpe3y55rruzp5v4uregm0kxe2ge6wzle54nu9vlxlndmqweckld'
