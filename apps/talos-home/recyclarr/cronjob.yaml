@@ -24,26 +24,23 @@ spec:
             - name: config-file
               configMap:
                 name: recyclarr-config
-            # Writable space for Recyclarr's database, cache, and logs
             - name: app-data
               emptyDir: {}
           containers:
             - name: recyclarr
-              image: ghcr.io/recyclarr/recyclarr:latest
+              image: ghcr.io/recyclarr/recyclarr:8.5.1@sha256:734cecf44ae9be7cf0cb05b2c1bc7da0abef9d938cc11b605e58b3146205e5c0
               imagePullPolicy: IfNotPresent
               args: ["sync"]
               securityContext:
                 allowPrivilegeEscalation: false
                 capabilities:
                   drop: ["ALL"]
-                readOnlyRootFilesystem: true # Best practice
+                readOnlyRootFilesystem: true
               env:
                 - name: TZ
                   value: Europe/Amsterdam
-                # Use the new variable name instead of RECYCLARR_APP_DATA
                 - name: RECYCLARR_CONFIG_DIR
                   value: /config
-                # Optional: specify a separate path for the cache/db if you want
                 - name: RECYCLARR_DATA_DIR
                   value: /tmp/recyclarr
                 - name: RADARR_URL
@@ -67,11 +64,9 @@ spec:
                       name: recyclarr-secrets
                       key: sonarr_apikey
               volumeMounts:
-                # Mount the config file specifically
                 - name: config-file
                   mountPath: /config/recyclarr.yml
                   subPath: recyclarr.yml
                   readOnly: true
-                # Mount the writable scratch space
                 - name: app-data
                   mountPath: /tmp/recyclarr
