@@ -1,38 +1,38 @@
 # k8s-home-server
-
 Personal Kubernetes homelab running on [Talos Linux](https://www.talos.dev/), managed with [Flux](https://fluxcd.io/) GitOps.
 
 ## Stack
-
 | Layer | Tool |
 |---|---|
 | OS | Talos Linux |
 | GitOps | Flux v2 |
 | Ingress | Traefik |
 | Certificates | cert-manager |
-| Storage | Longhorn |
-| Auth | Authentik |
+| Storage | Longhorn + TrueNAS NFS |
+| Auth | Authentik (SSO) |
+| DNS | Blocky |
 | Secrets | SOPS + age |
+| Networking | MetalLB, Tailscale |
 | Notifications | Gotify |
 | Dependency updates | Renovate |
 
 ## Structure
-
 ```
 clusters/        # Flux bootstrap and cluster config
-infrastructure/  # Core platform (cert-manager, traefik, longhorn, authentik, ...)
-apps/            # Applications (jellyfin, sonarr, radarr, gotify, ...)
+infrastructure/  # Core platform (cert-manager, traefik, longhorn, authentik, metallb, ...)
+apps/            # Applications (jellyfin, sonarr, radarr, immich, ...)
 ```
 
 ## Apps
-
-- **Media:** Jellyfin, Sonarr, Radarr, Prowlarr, SABnzbd, qBittorrent, Recyclarr, Jellyseerr
-- **Monitoring:** Prometheus, Grafana, Loki, Promtail, Tempo, Falco
-- **Tools:** Joplin, FreshRSS, Dashy, Headlamp, Blocky, Gotify, Renovate, Velero
+| Category | Apps |
+|---|---|
+| Media | Jellyfin, Sonarr, Radarr, Prowlarr, qBittorrent, Recyclarr, Jellyseerr |
+| Photos | Immich |
+| Monitoring | VictoriaMetrics, Grafana, Loki, Promtail, Falco, Uptime Kuma |
+| Tools | Joplin, FreshRSS, Dashy, Headlamp, Renovate, Velero |
 
 ## Secrets
-
-All secrets are encrypted with [SOPS](https://github.com/getsops/sops) using age before being committed. Never commit plaintext secrets.
+All secrets are encrypted with [SOPS](https://github.com/getsops/sops) using age before being committed.
 
 ```bash
 # Encrypt a secret
@@ -40,7 +40,6 @@ sops --encrypt --age <recipient> --encrypted-regex '^(data|stringData)$' secret.
 ```
 
 ## Flux
-
 ```bash
 # Check status
 flux get all -A
