@@ -18,6 +18,7 @@ spec:
       verifyImages:
         - imageReferences:
             - "ghcr.io/jobdouma/*"   # scope to your own images first
+          mutateDigest: false
           attestors:
             - entries:
                 - keys:
