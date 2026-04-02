@@ -37,7 +37,6 @@ data:
         ka.verb in (get, list, watch) and
         ka.target.resource = secrets and
         not ka.user.name in (
-          "system:serviceaccount:velero:velero",
           "system:serviceaccount:monitoring:kube-prometheus-stack-prometheus",
           "system:serviceaccount:flux-system:kube-apiserver-health-check"
         )

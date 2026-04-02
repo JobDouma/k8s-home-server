@@ -7,7 +7,6 @@ metadata:
   name: tank-configs
   namespace: media
   labels:
-    backup.velero.io/exclude-from-backup: "true"
 spec:
   accessModes:
     - ReadWriteMany
