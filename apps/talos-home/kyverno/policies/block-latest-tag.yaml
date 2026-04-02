@@ -1,0 +1,31 @@
+# Bonus: enforce no :latest tags across all your namespaces
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: block-latest-tag
+  annotations:
+    policies.kyverno.io/title: Block Latest Image Tag
+    policies.kyverno.io/severity: medium
+spec:
+  validationFailureAction: Audit  # flip to Enforce once you've verified all your images are pinned
+  background: true
+  rules:
+    - name: block-latest-tag
+      match:
+        any:
+          - resources:
+              kinds:
+                - Pod
+      validate:
+        message: "Image tag ':latest' is not allowed. Pin to a specific tag or digest."
+        foreach:
+          - list: "request.object.spec.containers"
+            deny:
+              conditions:
+                any:
+                  - key: "{{ element.image }}"
+                    operator: Equals
+                    value: "*:latest"
+                  - key: "{{ element.image }}"
+                    operator: NotContains
+                    value: ":"

@@ -231,4 +231,7 @@ resources:
   - kyverno/namespace.yaml
   - kyverno/helmrepository.yaml
   - kyverno/helmrelease.yaml
+  - kyverno/cosign-secret.sops.yaml
+  - kyverno/pdb.yaml
   - kyverno/policies/enforce-image-signatures.yaml
+  - kyverno/policies/block-latest-tag.yaml
