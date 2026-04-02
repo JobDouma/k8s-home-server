@@ -225,4 +225,9 @@ resources:
   - uptime-kuma/helmrelease.yaml
   - uptime-kuma/ingressroute.yaml
   
-  
+  # ──────────────────────────────────────
+  # Kyverno
+  # ──────────────────────────────────────
+  - kyverno/namespace.yaml
+  - kyverno/helmrepository.yaml
+  - kyverno/helmrelease.yaml
