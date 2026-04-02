@@ -231,3 +231,4 @@ resources:
   - kyverno/namespace.yaml
   - kyverno/helmrepository.yaml
   - kyverno/helmrelease.yaml
+  - kyverno/policies/enforce-image-signatures.yaml
