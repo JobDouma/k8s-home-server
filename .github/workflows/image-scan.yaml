@@ -25,19 +25,24 @@ jobs:
           output-file: repo-sbom.spdx.json
 
       - name: Scan repo SBOM with Grype
-        id: grype
         uses: anchore/scan-action@v3
         with:
           sbom: repo-sbom.spdx.json
-          fail-build: false            # don't fail — this is a k8s config repo, not an app
+          fail-build: false
           severity-cutoff: high
           output-format: sarif
+          output-file: grype-results.sarif
+
+      - name: Verify sarif exists
+        run: |
+          ls -la grype-results.sarif
+          cat grype-results.sarif | python3 -m json.tool > /dev/null && echo "Valid JSON" || echo "Invalid JSON"
 
       - name: Upload scan results to GitHub Security tab
-        uses: github/codeql-action/upload-sarif@v4   # updated to v4
+        uses: github/codeql-action/upload-sarif@v4
         if: always()
         with:
-          sarif_file: ${{ steps.grype.outputs.sarif }}
+          sarif_file: grype-results.sarif
 
   build-sign:
     name: Build, scan & sign image
