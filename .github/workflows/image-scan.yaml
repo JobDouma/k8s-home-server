@@ -24,19 +24,23 @@ jobs:
           artifact-name: repo-sbom.spdx.json
           output-file: repo-sbom.spdx.json
 
-      - name: Scan repo SBOM with Grype
-        uses: anchore/scan-action@v3
-        with:
-          sbom: repo-sbom.spdx.json
-          fail-build: false
-          severity-cutoff: high
-          output-format: sarif
+      - name: Install Grype
+        run: |
+          curl -sSfL https://raw.githubusercontent.com/anchore/grype/main/install.sh | sh -s -- -b /usr/local/bin
+          grype db update
+
+      - name: Scan SBOM with Grype
+        run: |
+          grype sbom:repo-sbom.spdx.json \
+            --fail-on high \
+            --output sarif \
+            > results.sarif || true   # don't fail the step, let upload-sarif handle it
 
       - name: Upload scan results to GitHub Security tab
         uses: github/codeql-action/upload-sarif@v4
         if: always()
         with:
-          sarif_file: results.sarif   # hardcoded default output of scan-action
+          sarif_file: results.sarif
 
   build-sign:
     name: Build, scan & sign image
