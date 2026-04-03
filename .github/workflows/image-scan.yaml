@@ -9,7 +9,7 @@ env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
   
 jobs:
-  scan-repo:
+    scan-repo:
     name: SBOM + CVE scan (repo)
     runs-on: ubuntu-latest
     permissions:
@@ -19,6 +19,13 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0             # gitleaks needs full history to scan all commits
+
+      - name: Scan for secrets with Gitleaks
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Generate SBOM from repo
         uses: anchore/sbom-action@v0
@@ -37,7 +44,7 @@ jobs:
           grype sbom:repo-sbom.spdx.json \
             --fail-on high \
             --output sarif \
-            > results.sarif || true   # don't fail the step, let upload-sarif handle it
+            > results.sarif || true
 
       - name: Upload scan results to GitHub Security tab
         uses: github/codeql-action/upload-sarif@v4
