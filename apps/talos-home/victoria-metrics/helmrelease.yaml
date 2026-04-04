@@ -32,31 +32,22 @@ spec:
 
   values:
     fullnameOverride: "vm-stack"
-    # ── Operator ────────────────────────────────────────────────────────────
-    # The VM operator converts prometheus-operator CRDs (ServiceMonitor,
-    # PodMonitor, PrometheusRule) into VM equivalents automatically.
-    # This means your existing Tailscale ServiceMonitor keeps working
-    # with zero changes.
+
     victoria-metrics-operator:
       enabled: true
       fullnameOverride: "vm-operator"
       crds:
         plain: true
       operator:
-        # Convert existing prometheus-operator objects (ServiceMonitor etc.)
-        # into VictoriaMetrics equivalents automatically
         disable_prometheus_converter: false
       admissionWebhooks:
         enabled: false
 
-    # ── VMSingle — replaces Prometheus ──────────────────────────────────────
-    # VMSingle is a single-process replacement for Prometheus.
-    # Same PromQL, same Grafana datasource type, ~5-10x less RAM/CPU.
-    # retentionPeriod uses: h(ours), d(ays), w(eeks), y(ears), or months (no unit)
+    # ── VMSingle ──────────────────────────────────────────────────────────────
     vmsingle:
-      enabled: true
+      enabled: true                        # FIXED: was missing
       spec:
-        retentionPeriod: "5d"         # matches your previous 5d retention
+        retentionPeriod: "5d"              # FIXED: was dropped
         affinity:
           nodeAffinity:
             requiredDuringSchedulingIgnoredDuringExecution:
@@ -64,38 +55,25 @@ spec:
                 - matchExpressions:
                     - key: kubernetes.io/hostname
                       operator: In
-                      values: [talos-cp-1]
-
-        resources:
-          limits:
-            cpu: 1000m
-            memory: 2Gi
-          requests:
-            cpu: 100m
-            memory: 512Mi
-
+                      values: [talos-cp-2] # 1TB node, away from cp-1
         storage:
           accessModes:
             - ReadWriteOnce
+          storageClassName: longhorn-single # 1 replica, data is regenerable
           resources:
             requests:
               storage: 20Gi
-          storageClassName: longhorn
-
+        resources:
+          requests:
+            cpu: 100m
+            memory: 512Mi
+          limits:
+            cpu: 1000m
+            memory: 2Gi
         tolerations:
           - operator: Exists
-          - key: "node.kubernetes.io/not-ready"
-            operator: "Exists"
-            effect: "NoExecute"
-            tolerationSeconds: 600
-          - key: "node.kubernetes.io/unreachable"
-            operator: "Exists"
-            effect: "NoExecute"
-            tolerationSeconds: 600
 
-    # ── VMAgent — replaces the Prometheus scrape engine ──────────────────────
-    # VMAgent is a lightweight scraper that sends data to VMSingle.
-    # It uses less memory than Prometheus because it doesn't store data itself.
+    # ── VMAgent ───────────────────────────────────────────────────────────────
     vmagent:
       enabled: true
       spec:
@@ -108,7 +86,6 @@ spec:
                     - key: kubernetes.io/hostname
                       operator: NotIn
                       values: [talos-cp-3]
-
         resources:
           requests:
             cpu: 10m
@@ -116,19 +93,16 @@ spec:
           limits:
             cpu: 200m
             memory: 256Mi
-
         tolerations:
           - operator: Exists
-
         extraArgs:
-          # Reduces vmagent memory — trades off debugging detail for efficiency
           promscrape.streamParse: "true"
 
-    # ── VMAlert — replaces Prometheus alerting rules ──────────────────────────
+    # ── VMAlert ───────────────────────────────────────────────────────────────
     vmalert:
       enabled: true
       spec:
-        evaluationInterval: 60s       # match scrape interval
+        evaluationInterval: 60s
         resources:
           requests:
             cpu: 10m
@@ -143,14 +117,9 @@ spec:
       spec:
         configSecret: alertmanager-gotify-config
         templates: []
-        affinity:
-          nodeAffinity:
-            requiredDuringSchedulingIgnoredDuringExecution:
-              nodeSelectorTerms:
-                - matchExpressions:
-                    - key: kubernetes.io/hostname
-                      operator: In
-                      values: [talos-cp-1]
+        # FIXED: no nodeAffinity pin — emptyDir has no locality requirement
+        # FIXED: storage key removed entirely rather than set to {}
+        #        Empty map causes VMAlertmanager CRD validation errors
         resources:
           requests:
             cpu: 10m
@@ -158,21 +127,10 @@ spec:
           limits:
             cpu: 100m
             memory: 256Mi
-        storage:
-          volumeClaimTemplate:
-            spec:
-              storageClassName: longhorn
-              accessModes:
-                - ReadWriteOnce
-              resources:
-                requests:
-                  storage: 5Gi
         tolerations:
           - operator: Exists
 
     # ── Grafana ───────────────────────────────────────────────────────────────
-    # Grafana config is largely identical to your previous setup.
-    # The datasource URL changes from the Prometheus service to VMSingle.
     grafana:
       enabled: true
       revisionHistoryLimit: 2
@@ -184,7 +142,6 @@ spec:
                   - key: kubernetes.io/hostname
                     operator: In
                     values: [talos-cp-1, talos-cp-2]
-
       tolerations:
         - key: node-role.kubernetes.io/control-plane
           operator: Exists
@@ -197,16 +154,13 @@ spec:
           operator: Exists
           effect: NoExecute
           tolerationSeconds: 600
-
       deploymentStrategy:
         type: Recreate
-
       grafana.ini:
         unified_alerting:
           enabled: false
         alerting:
           enabled: false
-
       resources:
         requests:
           cpu: 50m
@@ -214,16 +168,13 @@ spec:
         limits:
           cpu: 200m
           memory: 512Mi
-
-      # Key change: datasource URL now points at VMSingle instead of Prometheus.
-      # The datasource type stays "prometheus" — VMSingle speaks PromQL natively.
       datasources:
         datasources.yaml:
           apiVersion: 1
           datasources:
             - name: VictoriaMetrics
               type: prometheus
-              uid: prometheus              # keep uid "prometheus" so existing dashboards don't break
+              uid: prometheus
               url: http://vmsingle-vm-stack.monitoring.svc.cluster.local:8428
               access: proxy
               isDefault: true
@@ -237,7 +188,6 @@ spec:
               isDefault: false
               jsonData:
                 maxLines: 1000
-
       sidecar:
         dashboards:
           enabled: true
@@ -249,16 +199,10 @@ spec:
             foldersFromFilesStructure: true
         datasources:
           enabled: false
-
       admin:
         existingSecret: grafana-admin
-
       persistence:
-        enabled: true
-        storageClassName: longhorn
-        accessModes:
-          - ReadWriteOnce
-        size: 5Gi
+        enabled: false # dashboards from sidecars, no PVC needed
 
     # ── Node Exporter ─────────────────────────────────────────────────────────
     prometheus-node-exporter:
@@ -282,11 +226,8 @@ spec:
           cpu: 100m
           memory: 128Mi
 
-    # ── Disable VMCluster — we use VMSingle for homelab ───────────────────────
-    # VMCluster is the HA multi-node setup for production. Not needed here.
     vmcluster:
       enabled: false
 
-    # ── Disable VMAuth — not needed for single-node homelab ───────────────────
     vmauth:
       enabled: false

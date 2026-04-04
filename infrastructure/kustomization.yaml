@@ -43,6 +43,7 @@ resources:
   - longhorn/recurringjob.yaml
   - longhorn/certificate.yaml
   - longhorn/pdb.yaml
+  - longhorn/longhorn-single.yaml
 
   - authentik/namespace.yaml
   - authentik/certificate.yaml
