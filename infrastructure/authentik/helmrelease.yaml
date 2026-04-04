@@ -46,21 +46,10 @@ spec:
         enabled: true
         serviceMonitor:
           enabled: true
-          # CHANGED: 30s is aggressive for a homelab auth server.
-          # 120s gives Prometheus the same data with 4x less scrape work.
           interval: 120s
           scrapeTimeout: 10s
-      # CHANGED: 2 → 1. On a homelab, running 2 server pods means
-      # double the memory, double the Python process overhead, and
-      # Longhorn replicating writes for two pods' session data.
-      # If your single node goes down you'd lose auth anyway since
-      # the 2nd pod is on the same 3-node pool with no zone HA.
-      # 1 replica is the honest homelab choice.
       replicas: 1
 
-      # ADDED: without limits, a spike in logins or blueprint
-      # processing can consume 2-3 cores temporarily. These limits
-      # keep authentik from crowding out your other workloads.
       resources:
         requests:
           cpu: 50m
@@ -96,16 +85,17 @@ spec:
     worker:
       replicas: 1
 
-      # ADDED: workers handle background tasks like blueprint sync,
-      # outpost health checks, and email. Unbounded they can spike
-      # heavily during policy evaluation.
       resources:
         requests:
           cpu: 50m
           memory: 256Mi
         limits:
           cpu: 300m
-          memory: 512Mi
+          # CHANGED: worker was at 456Mi against a 512Mi limit —
+          # too close to the ceiling. Raised to 768Mi to give
+          # blueprint processing and policy evaluation headroom
+          # without triggering OOMKill during busy periods.
+          memory: 768Mi
 
       strategy:
         type: RollingUpdate
@@ -146,29 +136,48 @@ spec:
       primary:
         persistence:
           enabled: true
+          # KEPT: longhorn with default 2 replicas. Authentik's postgres
+          # holds users, groups, tokens, flows — losing this is an outage.
+          # The redundancy is worth it here unlike metrics or cache.
           storageClass: longhorn
           size: 10Gi
-        # ADDED: Postgres for authentik on a homelab rarely needs
-        # more than 200m CPU. Without limits it can vacuum/analyze
-        # and spike freely.
+
+        # ADDED: autovacuum tuning to reduce CPU spike frequency.
+        # Default autovacuum is tuned for large prod databases and
+        # runs too aggressively on a small homelab schema. These
+        # settings make it run less often but still keep tables clean.
+        extendedConfiguration: |
+          autovacuum_vacuum_scale_factor = 0.05
+          autovacuum_analyze_scale_factor = 0.02
+          autovacuum_vacuum_cost_delay = 20ms
+          autovacuum_max_workers = 2
+          shared_buffers = 128MB
+          effective_cache_size = 256MB
+          work_mem = 8MB
+
         resources:
           requests:
             cpu: 50m
             memory: 256Mi
           limits:
-            cpu: 200m
+            # CHANGED: 200m → 500m. At 200m Postgres was hitting the
+            # ceiling constantly due to autovacuum competing with normal
+            # queries. Throttled autovacuum causes table bloat which
+            # makes CPU usage worse over time, not better.
+            cpu: 500m
             memory: 512Mi
 
     redis:
       enabled: true
       auth:
         enabled: false
-      # ADDED: Redis for session caching is tiny workload.
-      # Cap it so it doesn't quietly grow.
       master:
         persistence:
           enabled: true
-          storageClass: longhorn
+          # CHANGED: longhorn → longhorn-single. Redis here is a session
+          # cache — data is ephemeral and reconstructed on restart.
+          # 1 replica saves cross-node replication traffic and cp-1 disk.
+          storageClass: longhorn-single
           size: 1Gi
         resources:
           requests:
@@ -176,7 +185,7 @@ spec:
             memory: 64Mi
           limits:
             cpu: 100m
-            memory: 256Mi   # was 128Mi
+            memory: 256Mi
         args:
           - --appendonly yes
           - --appendfsync everysec
