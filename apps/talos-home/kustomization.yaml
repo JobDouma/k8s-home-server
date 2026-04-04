@@ -224,10 +224,6 @@ resources:
   - uptime-kuma/configmap.yaml
   - uptime-kuma/helmrelease.yaml
   - uptime-kuma/ingressroute.yaml
-  - uptime-kuma/imagerepository.yaml
-  - uptime-kuma/imagepolicy.yaml
-  # Cluster-wide image update automation
-  - imageupdateautomation.yaml
   
   # ──────────────────────────────────────
   # Kyverno
