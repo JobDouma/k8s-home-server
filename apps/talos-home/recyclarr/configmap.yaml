@@ -23,3 +23,19 @@ data:
         api_key: ${SONARR_APIKEY}
         include:
           - template: sonarr-quality-definition-series-web-1080p
+        custom_formats:
+        - trash_ids: []
+          assign_scores_to:
+            - name: series
+        - assign_scores_to:
+            - name: series
+              score: -10000
+          custom_formats:
+            - name: Non-English Audio
+              specifications:
+                - name: Not English
+                  implementation: LanguageSpecification
+                  negate: true
+                  required: false
+                  fields:
+                    value: 1  # 1 = English
