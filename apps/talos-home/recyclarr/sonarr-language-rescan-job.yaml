@@ -1,29 +1,29 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: sonarr-language-rescan-v1
+  name: sonarr-language-rescan-v2   # bumped
   namespace: media
   labels:
     app: sonarr-language-rescan
 spec:
-  ttlSecondsAfterFinished: 86400  # clean up after 24h
+  ttlSecondsAfterFinished: 86400
   template:
     spec:
       restartPolicy: OnFailure
       containers:
         - name: rescan
-          image: python:3.12-alpine@sha256:<digest>
+          image: python:3.12-alpine@sha256:7747d47f92cfca63a6e2b50275e23dba8407c30d8ae929a88ddd49a5d3f2d331
           env:
             - name: SONARR_URL
               valueFrom:
                 secretKeyRef:
-                  name: sonarr-secret
-                  key: url
+                  name: recyclarr-secrets   # correct secret
+                  key: sonarr_url           # correct key
             - name: SONARR_APIKEY
               valueFrom:
                 secretKeyRef:
-                  name: sonarr-secret
-                  key: api-key
+                  name: recyclarr-secrets
+                  key: sonarr_apikey
           command: [python, -c]
           args:
             - |
