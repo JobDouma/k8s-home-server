@@ -1,0 +1,67 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: sonarr-language-rescan-v1
+  namespace: media
+  labels:
+    app: sonarr-language-rescan
+spec:
+  ttlSecondsAfterFinished: 86400  # clean up after 24h
+  template:
+    spec:
+      restartPolicy: OnFailure
+      containers:
+        - name: rescan
+          image: python:3.12-alpine@sha256:<digest>
+          env:
+            - name: SONARR_URL
+              valueFrom:
+                secretKeyRef:
+                  name: sonarr-secret
+                  key: url
+            - name: SONARR_APIKEY
+              valueFrom:
+                secretKeyRef:
+                  name: sonarr-secret
+                  key: api-key
+          command: [python, -c]
+          args:
+            - |
+              import urllib.request, urllib.error, json, os, time
+
+              base = os.environ["SONARR_URL"].rstrip("/")
+              key  = os.environ["SONARR_APIKEY"]
+              headers = {"X-Api-Key": key, "Content-Type": "application/json"}
+
+              def api(method, path, body=None):
+                  req = urllib.request.Request(
+                      f"{base}/api/v3{path}",
+                      data=json.dumps(body).encode() if body else None,
+                      headers=headers,
+                      method=method,
+                  )
+                  with urllib.request.urlopen(req) as r:
+                      return json.load(r)
+
+              series_list = api("GET", "/series")
+              print(f"Found {len(series_list)} series")
+
+              for s in series_list:
+                  # Check episode files for non-English audio
+                  files = api("GET", f"/episodefile?seriesId={s['id']}")
+                  non_english = [
+                      f for f in files
+                      if not any(
+                          lang.get("name", "").lower() == "english"
+                          for lang in f.get("languages", [])
+                      )
+                  ]
+                  if non_english:
+                      print(f"  → Triggering search for: {s['title']} ({len(non_english)} non-English files)")
+                      api("POST", "/command", {
+                          "name": "SeriesSearch",
+                          "seriesId": s["id"],
+                      })
+                      time.sleep(2)  # be kind to indexers
+
+              print("Done.")
