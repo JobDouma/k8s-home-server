@@ -7,26 +7,13 @@ metadata:
     app: recyclarr
 data:
   recyclarr.yml: |
-    # Recyclarr Configuration (v7+ compatible)
-    radarr:
-      - name: movies
-        base_url: ${RADARR_URL}
-        api_key: ${RADARR_APIKEY}
-        include:
-          # Note the 'radarr-' prefix now required for these specific templates
-          - template: radarr-quality-definition-movie-remux-web-2160p
-          - template: radarr-quality-definition-movie-hd-bluray-web
-
     sonarr:
-      - name: series
+      series:                          # named key, not a list item
         base_url: ${SONARR_URL}
         api_key: ${SONARR_APIKEY}
         include:
           - template: sonarr-quality-definition-series-web-1080p
         custom_formats:
-          - trash_ids: []
-            assign_scores_to:
-              - name: series
           - assign_scores_to:
               - name: series
                 score: -10000
@@ -38,4 +25,12 @@ data:
                     negate: true
                     required: false
                     fields:
-                      value: 1  # 1 = English
+                      value: 1
+
+    radarr:
+      movies:                          # same fix for radarr
+        base_url: ${RADARR_URL}
+        api_key: ${RADARR_APIKEY}
+        include:
+          - template: radarr-quality-definition-movie-remux-web-2160p
+          - template: radarr-quality-definition-movie-hd-bluray-web
