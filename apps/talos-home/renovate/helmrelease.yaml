@@ -49,7 +49,7 @@ spec:
     renovate:
       image:
         repository: ghcr.io/renovatebot/renovate
-        tag: "46.101.0"
+        tag: "43.104.4@sha256:54369958207b06c85398d8c4dffc70997c89f07546fa0a4703b3774f48f48dab"
       config: |
         {
           "$schema": "https://docs.renovatebot.com/renovate-schema.json",
