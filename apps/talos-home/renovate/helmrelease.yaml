@@ -6,7 +6,6 @@ metadata:
 spec:
   interval: 1h
   timeout: 20m
-
   chart:
     spec:
       chart: renovate
@@ -15,15 +14,13 @@ spec:
         kind: HelmRepository
         name: renovate
         namespace: flux-system
-
   values:
-
     cronjob:
       schedule: "10 3 * * *"
       concurrencyPolicy: Forbid
       successfulJobsHistoryLimit: 0
       failedJobsHistoryLimit: 1
-      ttlSecondsAfterFinished: 36000
+      ttlSecondsAfterFinished: 300  # was 36000 (10h); clean up quickly
       commandOverride:
         - /bin/bash
         - -c
@@ -36,50 +33,46 @@ spec:
             STATUS="❌ Renovate failed (exit: $EXIT)"
             PRIORITY=8
           fi
-          curl -s -X POST "http://gotify.gotify.svc.cluster.local/message?token=${RENOVATE_GOTIFY_TOKEN}" \
-            -H "Content-Type: application/json" \
-            -d "{\"title\": \"Renovate\", \"message\": \"${STATUS}\", \"priority\": ${PRIORITY}}"
+          if [ -z "${RENOVATE_GOTIFY_TOKEN}" ]; then
+            echo "WARNING: RENOVATE_GOTIFY_TOKEN is unset, skipping notification"
+          else
+            curl -s -X POST "http://gotify.gotify.svc.cluster.local/message?token=${RENOVATE_GOTIFY_TOKEN}" \
+              -H "Content-Type: application/json" \
+              -d "{\"title\": \"Renovate\", \"message\": \"${STATUS}\", \"priority\": ${PRIORITY}}"
+          fi
           exit $EXIT
-
     envFrom:
       - secretRef:
           name: renovate-secret
-
     env:
       LOG_LEVEL: info
-
     renovate:
-
       image:
         repository: ghcr.io/renovatebot/renovate
-        tag: "43.104.4@sha256:54369958207b06c85398d8c4dffc70997c89f07546fa0a4703b3774f48f48dab"
-
+        tag: "46.101.0"  # keep in sync with chart version; update digest after
       config: |
         {
-          "pinDigests": true,
           "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-
           "platform": "github",
           "repositories": ["jobdouma/k8s-home-server"],
-
           "autodiscover": false,
           "onboarding": false,
           "requireConfig": "optional",
-
           "dependencyDashboard": true,
+          "pinDigests": true,
           "baseBranchPatterns": ["main"],
-
+          "schedule": ["after 3am and before 5am"],
+          "prCreation": "immediate",
+          "prHourlyLimit": 10,
+          "prConcurrentLimit": 15,
+          "rebaseWhen": "conflicted",  // was "never"
           "enabledManagers": [
             "flux",
             "helm-values",
             "kubernetes"
           ],
-
           "platformAutomerge": true,
           "automergeStrategy": "squash",
-          "prCreation": "immediate",
-          "rebaseWhen": "never",
-
           "flux": {
             "fileMatch": [
               "(^|/)clusters/.+\\.ya?ml$",
@@ -88,14 +81,12 @@ spec:
             ],
             "pinDigests": true
           },
-
           "helm-values": {
             "fileMatch": [
               "(^|/)apps/.+\\.ya?ml$",
               "(^|/)infrastructure/.+\\.ya?ml$"
             ]
           },
-
           "kubernetes": {
             "fileMatch": [
               "(^|/)apps/.+\\.ya?ml$",
@@ -103,7 +94,6 @@ spec:
               "(^|/)clusters/.+\\.ya?ml$"
             ]
           },
-
           "packageRules": [
             {
               "matchUpdateTypes": ["minor", "patch", "digest"],
