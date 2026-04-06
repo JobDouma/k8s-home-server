@@ -20,7 +20,7 @@ spec:
       concurrencyPolicy: Forbid
       successfulJobsHistoryLimit: 0
       failedJobsHistoryLimit: 1
-      ttlSecondsAfterFinished: 300  # was 36000 (10h); clean up quickly
+      ttlSecondsAfterFinished: 300
       commandOverride:
         - /bin/bash
         - -c
@@ -49,7 +49,7 @@ spec:
     renovate:
       image:
         repository: ghcr.io/renovatebot/renovate
-        tag: "46.101.0"  # keep in sync with chart version; update digest after
+        tag: "46.101.0"
       config: |
         {
           "$schema": "https://docs.renovatebot.com/renovate-schema.json",
@@ -65,7 +65,8 @@ spec:
           "prCreation": "immediate",
           "prHourlyLimit": 10,
           "prConcurrentLimit": 15,
-          "rebaseWhen": "conflicted",  // was "never"
+          "rebaseWhen": "conflicted",
+          "gitAuthor": "JobDouma <7521465+JobDouma@users.noreply.github.com>",
           "enabledManagers": [
             "flux",
             "helm-values",
@@ -74,24 +75,23 @@ spec:
           "platformAutomerge": true,
           "automergeStrategy": "squash",
           "flux": {
-            "fileMatch": [
-              "(^|/)clusters/.+\\.ya?ml$",
-              "(^|/)infrastructure/.+\\.ya?ml$",
-              "(^|/)apps/.+\\.ya?ml$"
+            "managerFilePatterns": [
+              "/(^|/)clusters/.+\\.ya?ml$/",
+              "/(^|/)infrastructure/.+\\.ya?ml$/",
+              "/(^|/)apps/.+\\.ya?ml$/"
             ],
             "pinDigests": true
           },
           "helm-values": {
-            "fileMatch": [
-              "(^|/)apps/.+\\.ya?ml$",
-              "(^|/)infrastructure/.+\\.ya?ml$"
+            "managerFilePatterns": [
+              "/(^|/)apps/.+\\.ya?ml$/",
+              "/(^|/)infrastructure/.+\\.ya?ml$/"
             ]
           },
           "kubernetes": {
-            "fileMatch": [
-              "(^|/)apps/.+\\.ya?ml$",
-              "(^|/)infrastructure/.+\\.ya?ml$",
-              "(^|/)clusters/.+\\.ya?ml$"
+            "managerFilePatterns": [
+              "/(^|/)apps/.+\\.ya?ml$/",
+              "/(^|/)infrastructure/.+\\.ya?ml$/"
             ]
           },
           "packageRules": [
