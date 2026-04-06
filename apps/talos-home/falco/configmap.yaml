@@ -12,8 +12,7 @@ data:
       condition: and not (container.image.repository in (
         "ghcr.io/linuxserver/sonarr",
         "ghcr.io/linuxserver/radarr",
-        "ghcr.io/linuxserver/prowlarr",
-        "ghcr.io/linuxserver/sabnzbd"
+        "ghcr.io/linuxserver/prowlarr"
       ))
       override:
         condition: append
