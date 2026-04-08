@@ -1,7 +1,7 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: uptime-kuma-provisioner-v3
+  name: uptime-kuma-provisioner-v4
   namespace: uptime-kuma
   labels:
     app.kubernetes.io/name: uptime-kuma-provisioner

@@ -221,7 +221,7 @@ resources:
   - uptime-kuma/namespace.yaml
   - uptime-kuma/secret.yaml
   - uptime-kuma/certificate.yaml
-  - uptime-kuma/job.yaml
+  # - uptime-kuma/job.yaml
   - uptime-kuma/configmap.yaml
   - uptime-kuma/helmrelease.yaml
   - uptime-kuma/ingressroute.yaml
