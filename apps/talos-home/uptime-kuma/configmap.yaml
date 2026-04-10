@@ -44,7 +44,7 @@ data:
         "SABnzbd",
         "Router",
         "talos-cp-1 (k8s API)",
-        "talos-cp-2 (k8s API)",
+        "talos-wk-1 (k8s API)",
         "talos-cp-3 (k8s API)",
     ]
     for name in REMOVED:
@@ -114,7 +114,7 @@ data:
     add_http("Omni",        "https://omni.lan")
     # Talos nodes — TCP port check on k8s API (6443)
     add_port("talos-cp-1", "192.168.2.22", 6443)
-    add_port("talos-cp-2", "192.168.2.6",  6443)
+    add_port("talos-wk-1", "192.168.2.6",  6443)
     add_port("talos-cp-3", "192.168.2.16", 6443)
 
     con.commit()

@@ -55,7 +55,7 @@ spec:
                 - matchExpressions:
                     - key: kubernetes.io/hostname
                       operator: In
-                      values: [talos-cp-2] # 1TB node, away from cp-1
+                      values: [talos-wk-1] # 1TB node, away from cp-1
         storage:
           accessModes:
             - ReadWriteOnce
@@ -141,7 +141,7 @@ spec:
               - matchExpressions:
                   - key: kubernetes.io/hostname
                     operator: In
-                    values: [talos-cp-1, talos-cp-2]
+                    values: [talos-cp-1, talos-wk-1]
       tolerations:
         - key: node-role.kubernetes.io/control-plane
           operator: Exists
