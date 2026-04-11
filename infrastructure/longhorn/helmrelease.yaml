@@ -98,3 +98,6 @@ spec:
         type: ClusterIP
       tolerations:
         - operator: Exists
+    longhornCSIPlugin:
+      tolerations:
+        - operator: Exists
