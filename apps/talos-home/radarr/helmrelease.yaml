@@ -6,24 +6,20 @@ metadata:
 spec:
   interval: 15m
   timeout: 10m
-
   install:
     remediation:
       retries: 3
-
   upgrade:
     remediation:
       retries: 3
-
   chart:
     spec:
       chart: app-template
-      version: "4.6.2"
+      version: 4.6.2
       sourceRef:
         kind: HelmRepository
         name: bjw-s
         namespace: flux-system
-
   values:
     controllers:
       radarr:
@@ -32,35 +28,22 @@ spec:
             runAsUser: 0
             runAsGroup: 0
             runAsNonRoot: false
-          affinity:
-            nodeAffinity:
-              preferredDuringSchedulingIgnoredDuringExecution:
-                - weight: 100
-                  preference:
-                    matchExpressions:
-                      - key: kubernetes.io/hostname
-                        operator: NotIn
-                        values: [talos-cp-3]
-
         containers:
           app:
             image:
               repository: ghcr.io/linuxserver/radarr
               tag: 6.1.1@sha256:cd70546fc97169788530386b42cf47ba1b16d091b4dc2264cd54099dd13c6f7f
-
             env:
               TZ: Europe/Amsterdam
               PUID: 1000
               PGID: 1000
-              UMASK: 002
-
+              UMASK: 2
             resources:
               requests:
                 cpu: 50m
                 memory: 256Mi
               limits:
                 memory: 1Gi
-
     service:
       app:
         controller: radarr
@@ -68,18 +51,16 @@ spec:
         ports:
           http:
             port: 7878
-
     persistence:
       config:
         enabled: true
         type: persistentVolumeClaim
         existingClaim: radarr-config
         globalMounts:
-          - path: /config
-
+        - path: /config
       media:
         enabled: true
         type: persistentVolumeClaim
         existingClaim: media
         globalMounts:
-          - path: /media
+        - path: /media

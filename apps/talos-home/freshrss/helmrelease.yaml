@@ -6,65 +6,42 @@ metadata:
 spec:
   interval: 15m
   timeout: 10m
-
   install:
     remediation:
       retries: 3
-
   upgrade:
     remediation:
       retries: 3
-
   chart:
     spec:
       chart: app-template
-      version: "4.6.2"
+      version: 4.6.2
       sourceRef:
         kind: HelmRepository
         name: bjw-s
         namespace: flux-system
-
   values:
     controllers:
       freshrss:
         replicas: 1
-
         pod:
           securityContext:
-            # The linuxserver image manages privilege drop internally via s6 + PUID/PGID.
-            # The container still needs to start as root so s6 can chown and drop privileges;
-            # runAsNonRoot: true would break this pattern. This is the correct posture for
-            # linuxserver images and is consistent with the pod-security "baseline" policy.
             runAsUser: 0
             runAsGroup: 0
             runAsNonRoot: false
-          affinity:
-            nodeAffinity:
-              requiredDuringSchedulingIgnoredDuringExecution:
-                nodeSelectorTerms:
-                  - matchExpressions:
-                      - key: kubernetes.io/hostname
-                        operator: In
-                        values: [talos-cp-1, talos-wk-1]
-
         containers:
           app:
             image:
               repository: lscr.io/linuxserver/freshrss
-              tag: "1.28.1-ls297"
-
+              tag: 1.28.1-ls297
             env:
-              PUID: "1000"
-              PGID: "1000"
+              PUID: '1000'
+              PGID: '1000'
               TZ: Europe/Amsterdam
-              # The default admin username used by the init script for OPML import.
-              # Change this if you use a different admin username during first-run setup.
-              FRESHRSS_DEFAULT_USER: "job"
-
+              FRESHRSS_DEFAULT_USER: job
             ports:
-              - name: http
-                containerPort: 80
-
+            - name: http
+              containerPort: 80
             probes:
               liveness:
                 enabled: true
@@ -86,7 +63,6 @@ spec:
                   initialDelaySeconds: 15
                   periodSeconds: 10
                   failureThreshold: 3
-
     service:
       app:
         controller: freshrss
@@ -94,7 +70,6 @@ spec:
         ports:
           http:
             port: 80
-
     persistence:
       config:
         enabled: true
@@ -102,26 +77,21 @@ spec:
         accessMode: ReadWriteOnce
         size: 5Gi
         globalMounts:
-          - path: /config
-
-      # Feeds OPML — mounted read-only; the init script copies/imports it
+        - path: /config
       opml:
         enabled: true
         type: configMap
         name: freshrss-opml
         globalMounts:
-          - path: /config/bootstrap/feeds.opml
-            subPath: feeds.opml
-            readOnly: true
-
-      # Auto-import init script — executed by linuxserver's s6 on every container start
-      # See: https://github.com/linuxserver/docker-mods (custom-cont-init pattern)
+        - path: /config/bootstrap/feeds.opml
+          subPath: feeds.opml
+          readOnly: true
       init-scripts:
         enabled: true
         type: configMap
         name: freshrss-init
-        defaultMode: 0755
+        defaultMode: 493
         globalMounts:
-          - path: /custom-cont-init.d/01-import-opml.sh
-            subPath: 01-import-opml.sh
-            readOnly: true
+        - path: /custom-cont-init.d/01-import-opml.sh
+          subPath: 01-import-opml.sh
+          readOnly: true

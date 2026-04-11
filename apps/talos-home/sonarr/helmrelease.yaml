@@ -6,24 +6,20 @@ metadata:
 spec:
   interval: 15m
   timeout: 10m
-
   install:
     remediation:
       retries: 3
-
   upgrade:
     remediation:
       retries: 3
-
   chart:
     spec:
       chart: app-template
-      version: "4.6.2"
+      version: 4.6.2
       sourceRef:
         kind: HelmRepository
         name: bjw-s
         namespace: flux-system
-
   values:
     controllers:
       sonarr:
@@ -32,35 +28,22 @@ spec:
             runAsUser: 0
             runAsGroup: 0
             runAsNonRoot: false
-          affinity:
-            nodeAffinity:
-              preferredDuringSchedulingIgnoredDuringExecution:
-                - weight: 100
-                  preference:
-                    matchExpressions:
-                      - key: kubernetes.io/hostname
-                        operator: NotIn
-                        values: [talos-cp-3]
-
         containers:
           app:
             image:
               repository: ghcr.io/linuxserver/sonarr
               tag: 4.0.17@sha256:b5670a3adb0f8a8b0f277feeaa69a5fbe3869ba4bb9fa7c0f0764c3b3f0e698f
-
             env:
               TZ: Europe/Amsterdam
               PUID: 1000
               PGID: 1000
-              UMASK: 002
-
+              UMASK: 2
             resources:
               requests:
                 cpu: 50m
                 memory: 256Mi
               limits:
                 memory: 1Gi
-
     service:
       app:
         controller: sonarr
@@ -68,18 +51,16 @@ spec:
         ports:
           http:
             port: 8989
-
     persistence:
       config:
         enabled: true
         type: persistentVolumeClaim
         existingClaim: sonarr-config
         globalMounts:
-          - path: /config
-
+        - path: /config
       media:
         enabled: true
         type: persistentVolumeClaim
         existingClaim: media
         globalMounts:
-          - path: /media
+        - path: /media

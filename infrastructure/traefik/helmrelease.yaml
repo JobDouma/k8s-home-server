@@ -16,7 +16,7 @@ spec:
   chart:
     spec:
       chart: traefik
-      version: "39.0.7"
+      version: 39.0.7
       sourceRef:
         kind: HelmRepository
         name: traefik
@@ -25,45 +25,29 @@ spec:
     deployment:
       replicas: 2
       revisionHistoryLimit: 2
-
-    # Affinity at top level — this is where traefik chart 39.x reads it
     affinity:
-      nodeAffinity:
-        requiredDuringSchedulingIgnoredDuringExecution:
-          nodeSelectorTerms:
-            - matchExpressions:
-                - key: kubernetes.io/hostname
-                  operator: In
-                  values:
-                    - talos-cp-1
-                    - talos-wk-1
       podAntiAffinity:
         requiredDuringSchedulingIgnoredDuringExecution:
-          - labelSelector:
-              matchLabels:
-                app.kubernetes.io/name: traefik
-            topologyKey: kubernetes.io/hostname
-
-    # Only tolerate control-plane taint — do NOT use operator: Exists globally
-    # as it overrides scheduling constraints
+        - labelSelector:
+            matchLabels:
+              app.kubernetes.io/name: traefik
+          topologyKey: kubernetes.io/hostname
     tolerations:
-      - key: node-role.kubernetes.io/control-plane
-        operator: Exists
-        effect: NoSchedule
-      - key: node.kubernetes.io/not-ready
-        operator: Exists
-        effect: NoExecute
-        tolerationSeconds: 60
-      - key: node.kubernetes.io/unreachable
-        operator: Exists
-        effect: NoExecute
-        tolerationSeconds: 60
-
+    - key: node-role.kubernetes.io/control-plane
+      operator: Exists
+      effect: NoSchedule
+    - key: node.kubernetes.io/not-ready
+      operator: Exists
+      effect: NoExecute
+      tolerationSeconds: 60
+    - key: node.kubernetes.io/unreachable
+      operator: Exists
+      effect: NoExecute
+      tolerationSeconds: 60
     ingressClass:
       enabled: true
       isDefaultClass: true
       name: traefik
-
     service:
       enabled: true
       type: LoadBalancer
@@ -73,7 +57,6 @@ spec:
       spec:
         externalTrafficPolicy: Cluster
         allocateLoadBalancerNodePorts: false
-
     ports:
       web:
         port: 80
@@ -94,12 +77,10 @@ spec:
         protocol: TCP
         expose:
           default: true
-
     metrics:
       prometheus:
         enabled: true
         entryPoint: metrics
-
     providers:
       kubernetesIngress:
         enabled: true
@@ -109,26 +90,23 @@ spec:
         allowCrossNamespace: true
         allowExternalNameServices: true
         namespaces: []
-
     rbac:
       enabled: false
-
     additionalArguments:
-      - "--providers.kubernetesingress.ingressclass=traefik"
-      - "--api.dashboard=true"
-      - "--api=true"
-      - "--accesslog=true"
-      - "--accesslog.format=json"
-      - "--entrypoints.web.forwardedHeaders.insecure=true"
-      - "--entrypoints.websecure.forwardedHeaders.insecure=true"
-      - "--entrypoints.web.address=:80"
-      - "--entrypoints.websecure.address=:443"
-      - "--entrypoints.metrics.address=:9100"
-      - "--entrypoints.web.http.redirections.entrypoint.to=websecure"
-      - "--entrypoints.web.http.redirections.entrypoint.scheme=https"
-      - "--entrypoints.web.http.redirections.entrypoint.permanent=true"
-      - "--providers.kubernetescrd.allowCrossNamespace=true"
-
+    - --providers.kubernetesingress.ingressclass=traefik
+    - --api.dashboard=true
+    - --api=true
+    - --accesslog=true
+    - --accesslog.format=json
+    - --entrypoints.web.forwardedHeaders.insecure=true
+    - --entrypoints.websecure.forwardedHeaders.insecure=true
+    - --entrypoints.web.address=:80
+    - --entrypoints.websecure.address=:443
+    - --entrypoints.metrics.address=:9100
+    - --entrypoints.web.http.redirections.entrypoint.to=websecure
+    - --entrypoints.web.http.redirections.entrypoint.scheme=https
+    - --entrypoints.web.http.redirections.entrypoint.permanent=true
+    - --providers.kubernetescrd.allowCrossNamespace=true
     logs:
       general:
         level: INFO

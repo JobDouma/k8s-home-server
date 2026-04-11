@@ -7,59 +7,43 @@ spec:
   interval: 30m
   timeout: 60m
   dependsOn:
-    - name: loki
-      namespace: monitoring
-
+  - name: loki
+    namespace: monitoring
   chart:
     spec:
       chart: victoria-metrics-k8s-stack
-      # renovate: registryUrl=https://victoriametrics.github.io/helm-charts
-      version: "0.72.6"
+      version: 0.72.6
       sourceRef:
         kind: HelmRepository
         name: victoriametrics
         namespace: flux-system
-
   install:
     crds: CreateReplace
     remediation:
       retries: 3
-
   upgrade:
     crds: CreateReplace
     remediation:
       retries: 3
-
   values:
-    fullnameOverride: "vm-stack"
-
+    fullnameOverride: vm-stack
     victoria-metrics-operator:
       enabled: true
-      fullnameOverride: "vm-operator"
+      fullnameOverride: vm-operator
       crds:
         plain: true
       operator:
         disable_prometheus_converter: false
       admissionWebhooks:
         enabled: false
-
-    # ── VMSingle ──────────────────────────────────────────────────────────────
     vmsingle:
-      enabled: true                        # FIXED: was missing
+      enabled: true
       spec:
-        retentionPeriod: "5d"              # FIXED: was dropped
-        affinity:
-          nodeAffinity:
-            requiredDuringSchedulingIgnoredDuringExecution:
-              nodeSelectorTerms:
-                - matchExpressions:
-                    - key: kubernetes.io/hostname
-                      operator: In
-                      values: [talos-wk-1] # 1TB node, away from cp-1
+        retentionPeriod: 5d
         storage:
           accessModes:
-            - ReadWriteOnce
-          storageClassName: longhorn-single # 1 replica, data is regenerable
+          - ReadWriteOnce
+          storageClassName: longhorn-single
           resources:
             requests:
               storage: 20Gi
@@ -71,21 +55,10 @@ spec:
             cpu: 1000m
             memory: 2Gi
         tolerations:
-          - operator: Exists
-
-    # ── VMAgent ───────────────────────────────────────────────────────────────
+        - operator: Exists
     vmagent:
       enabled: true
       spec:
-        affinity:
-          nodeAffinity:
-            preferredDuringSchedulingIgnoredDuringExecution:
-              - weight: 100
-                preference:
-                  matchExpressions:
-                    - key: kubernetes.io/hostname
-                      operator: NotIn
-                      values: [talos-cp-3]
         resources:
           requests:
             cpu: 10m
@@ -94,11 +67,9 @@ spec:
             cpu: 200m
             memory: 256Mi
         tolerations:
-          - operator: Exists
+        - operator: Exists
         extraArgs:
-          promscrape.streamParse: "true"
-
-    # ── VMAlert ───────────────────────────────────────────────────────────────
+          promscrape.streamParse: 'true'
     vmalert:
       enabled: true
       spec:
@@ -110,16 +81,11 @@ spec:
           limits:
             cpu: 100m
             memory: 128Mi
-
-    # ── Alertmanager ──────────────────────────────────────────────────────────
     alertmanager:
       enabled: true
       spec:
         configSecret: alertmanager-gotify-config
         templates: []
-        # FIXED: no nodeAffinity pin — emptyDir has no locality requirement
-        # FIXED: storage key removed entirely rather than set to {}
-        #        Empty map causes VMAlertmanager CRD validation errors
         resources:
           requests:
             cpu: 10m
@@ -128,32 +94,22 @@ spec:
             cpu: 100m
             memory: 256Mi
         tolerations:
-          - operator: Exists
-
-    # ── Grafana ───────────────────────────────────────────────────────────────
+        - operator: Exists
     grafana:
       enabled: true
       revisionHistoryLimit: 2
-      affinity:
-        nodeAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
-            nodeSelectorTerms:
-              - matchExpressions:
-                  - key: kubernetes.io/hostname
-                    operator: In
-                    values: [talos-cp-1, talos-wk-1]
       tolerations:
-        - key: node-role.kubernetes.io/control-plane
-          operator: Exists
-          effect: NoSchedule
-        - key: node.kubernetes.io/not-ready
-          operator: Exists
-          effect: NoExecute
-          tolerationSeconds: 600
-        - key: node.kubernetes.io/unreachable
-          operator: Exists
-          effect: NoExecute
-          tolerationSeconds: 600
+      - key: node-role.kubernetes.io/control-plane
+        operator: Exists
+        effect: NoSchedule
+      - key: node.kubernetes.io/not-ready
+        operator: Exists
+        effect: NoExecute
+        tolerationSeconds: 600
+      - key: node.kubernetes.io/unreachable
+        operator: Exists
+        effect: NoExecute
+        tolerationSeconds: 600
       deploymentStrategy:
         type: Recreate
       grafana.ini:
@@ -172,28 +128,28 @@ spec:
         datasources.yaml:
           apiVersion: 1
           datasources:
-            - name: VictoriaMetrics
-              type: prometheus
-              uid: prometheus
-              url: http://vmsingle-vm-stack.monitoring.svc.cluster.local:8428
-              access: proxy
-              isDefault: true
-              jsonData:
-                timeInterval: 60s
-            - name: Loki
-              type: loki
-              uid: loki
-              url: http://loki-gateway.monitoring.svc.cluster.local
-              access: proxy
-              isDefault: false
-              jsonData:
-                maxLines: 1000
+          - name: VictoriaMetrics
+            type: prometheus
+            uid: prometheus
+            url: http://vmsingle-vm-stack.monitoring.svc.cluster.local:8428
+            access: proxy
+            isDefault: true
+            jsonData:
+              timeInterval: 60s
+          - name: Loki
+            type: loki
+            uid: loki
+            url: http://loki-gateway.monitoring.svc.cluster.local
+            access: proxy
+            isDefault: false
+            jsonData:
+              maxLines: 1000
       sidecar:
         dashboards:
           enabled: true
           searchNamespace: ALL
           label: grafana_dashboard
-          labelValue: "1"
+          labelValue: '1'
           folderAnnotation: grafana_folder
           provider:
             foldersFromFilesStructure: true
@@ -202,9 +158,7 @@ spec:
       admin:
         existingSecret: grafana-admin
       persistence:
-        enabled: false # dashboards from sidecars, no PVC needed
-
-    # ── Node Exporter ─────────────────────────────────────────────────────────
+        enabled: false
     prometheus-node-exporter:
       hostRootFsMount:
         enabled: false
@@ -215,8 +169,6 @@ spec:
         limits:
           cpu: 100m
           memory: 128Mi
-
-    # ── kube-state-metrics ────────────────────────────────────────────────────
     kube-state-metrics:
       resources:
         requests:
@@ -225,9 +177,7 @@ spec:
         limits:
           cpu: 100m
           memory: 128Mi
-
     vmcluster:
       enabled: false
-
     vmauth:
       enabled: false

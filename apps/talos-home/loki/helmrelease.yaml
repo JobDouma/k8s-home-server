@@ -9,7 +9,7 @@ spec:
   chart:
     spec:
       chart: loki
-      version: "6.55.0"
+      version: 6.55.0
       sourceRef:
         kind: HelmRepository
         name: grafana
@@ -30,13 +30,13 @@ spec:
         type: filesystem
       schemaConfig:
         configs:
-          - from: "2024-01-01"
-            store: tsdb
-            object_store: filesystem
-            schema: v13
-            index:
-              prefix: index_
-              period: 24h
+        - from: '2024-01-01'
+          store: tsdb
+          object_store: filesystem
+          schema: v13
+          index:
+            prefix: index_
+            period: 24h
       storage_config:
         tsdb_shipper:
           active_index_directory: /var/loki/tsdb-index
@@ -49,24 +49,15 @@ spec:
         delete_request_store: filesystem
       limits_config:
         retention_period: 168h
-      affinity:
-        nodeAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
-            nodeSelectorTerms:
-              - matchExpressions:
-                  - key: kubernetes.io/hostname
-                    operator: In
-                    values: [talos-cp-1]
-
     singleBinary:
       replicas: 1
       tolerations:
-        - operator: Exists
+      - operator: Exists
       persistence:
         enabled: true
         storageClass: longhorn
         accessModes:
-          - ReadWriteOnce
+        - ReadWriteOnce
         size: 10Gi
       resources:
         requests:
@@ -75,12 +66,11 @@ spec:
         limits:
           cpu: 500m
           memory: 1Gi
-
     gateway:
       enabled: true
       replicas: 1
       tolerations:
-        - operator: Exists
+      - operator: Exists
       resources:
         requests:
           cpu: 20m
@@ -88,8 +78,6 @@ spec:
         limits:
           cpu: 100m
           memory: 128Mi
-
-    # This is where your ~11Gi was being reserved
     chunksCache:
       enabled: true
       resources:
@@ -99,7 +87,6 @@ spec:
         limits:
           cpu: 100m
           memory: 512Mi
-
     resultsCache:
       enabled: true
       resources:

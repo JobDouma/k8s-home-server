@@ -6,24 +6,20 @@ metadata:
 spec:
   interval: 15m
   timeout: 10m
-
   install:
     remediation:
       retries: 3
-
   upgrade:
     remediation:
       retries: 3
-
   chart:
     spec:
       chart: app-template
-      version: "4.6.2"
+      version: 4.6.2
       sourceRef:
         kind: HelmRepository
         name: bjw-s
         namespace: flux-system
-
   values:
     controllers:
       prowlarr:
@@ -32,35 +28,22 @@ spec:
             runAsUser: 0
             runAsGroup: 0
             runAsNonRoot: false
-          affinity:
-            nodeAffinity:
-              preferredDuringSchedulingIgnoredDuringExecution:
-                - weight: 100
-                  preference:
-                    matchExpressions:
-                      - key: kubernetes.io/hostname
-                        operator: NotIn
-                        values: [talos-cp-3]
-
         containers:
           app:
             image:
               repository: ghcr.io/linuxserver/prowlarr
               tag: 2.3.5@sha256:35f48abb3e976fcf077fae756866c582e4a90f8b24810ae4067b3558f7cdbbdf
-
             env:
               TZ: Europe/Amsterdam
               PUID: 1000
               PGID: 1000
-              UMASK: 002
-
+              UMASK: 2
             resources:
               requests:
                 cpu: 50m
                 memory: 128Mi
               limits:
-                 memory: 512Mi
-
+                memory: 512Mi
     service:
       app:
         controller: prowlarr
@@ -68,11 +51,10 @@ spec:
         ports:
           http:
             port: 9696
-
     persistence:
       config:
         enabled: true
         type: persistentVolumeClaim
         existingClaim: prowlarr-config
         globalMounts:
-          - path: /config
+        - path: /config

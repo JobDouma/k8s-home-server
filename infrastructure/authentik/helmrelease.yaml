@@ -6,41 +6,35 @@ metadata:
 spec:
   interval: 15m
   timeout: 30m
-
   install:
     remediation:
       retries: 3
-
   upgrade:
     remediation:
       retries: 3
-
   chart:
     spec:
       chart: authentik
-      version: "2026.2.2"
+      version: 2026.2.2
       sourceRef:
         kind: HelmRepository
         name: authentik
         namespace: flux-system
-
   values:
     blueprints:
       enabled: true
       secrets:
-        - authentik-blueprints
+      - authentik-blueprints
     prometheus:
       rules:
         create: false
-
     authentik:
       existingSecret:
         secretName: authentik-secret
       error_reporting:
         enabled: false
       web:
-        path: "/"
-
+        path: /
     server:
       metrics:
         enabled: true
@@ -49,7 +43,6 @@ spec:
           interval: 120s
           scrapeTimeout: 10s
       replicas: 1
-
       resources:
         requests:
           cpu: 50m
@@ -57,76 +50,60 @@ spec:
         limits:
           cpu: 750m
           memory: 1Gi
-
       tolerations:
-        - key: node-role.kubernetes.io/control-plane
-          operator: Exists
-          effect: NoSchedule
-
+      - key: node-role.kubernetes.io/control-plane
+        operator: Exists
+        effect: NoSchedule
       affinity:
         podAntiAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:
-            - weight: 100
-              podAffinityTerm:
-                labelSelector:
-                  matchLabels:
-                    app.kubernetes.io/name: authentik
-                    app.kubernetes.io/component: server
-                topologyKey: kubernetes.io/hostname
-
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchLabels:
+                  app.kubernetes.io/name: authentik
+                  app.kubernetes.io/component: server
+              topologyKey: kubernetes.io/hostname
       startupProbe:
         failureThreshold: 120
         periodSeconds: 10
         timeoutSeconds: 3
-
       readinessProbe: {}
       livenessProbe: {}
-
     worker:
       replicas: 1
-
       resources:
         requests:
           cpu: 50m
           memory: 256Mi
         limits:
           cpu: 300m
-          # CHANGED: worker was at 456Mi against a 512Mi limit —
-          # too close to the ceiling. Raised to 768Mi to give
-          # blueprint processing and policy evaluation headroom
-          # without triggering OOMKill during busy periods.
           memory: 768Mi
-
       strategy:
         type: RollingUpdate
         rollingUpdate:
           maxUnavailable: 1
           maxSurge: 1
-
       tolerations:
-        - key: node-role.kubernetes.io/control-plane
-          operator: Exists
-          effect: NoSchedule
-
+      - key: node-role.kubernetes.io/control-plane
+        operator: Exists
+        effect: NoSchedule
       affinity:
         podAntiAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:
-            - weight: 100
-              podAffinityTerm:
-                labelSelector:
-                  matchLabels:
-                    app.kubernetes.io/name: authentik
-                    app.kubernetes.io/component: worker
-                topologyKey: kubernetes.io/hostname
-
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchLabels:
+                  app.kubernetes.io/name: authentik
+                  app.kubernetes.io/component: worker
+              topologyKey: kubernetes.io/hostname
       startupProbe:
         failureThreshold: 120
         periodSeconds: 10
         timeoutSeconds: 3
-
       readinessProbe: {}
       livenessProbe: {}
-
     postgresql:
       enabled: true
       auth:
@@ -136,37 +113,30 @@ spec:
       primary:
         persistence:
           enabled: true
-          # KEPT: longhorn with default 2 replicas. Authentik's postgres
-          # holds users, groups, tokens, flows — losing this is an outage.
-          # The redundancy is worth it here unlike metrics or cache.
           storageClass: longhorn
           size: 10Gi
+        extendedConfiguration: 'autovacuum_vacuum_scale_factor = 0.05
 
-        # ADDED: autovacuum tuning to reduce CPU spike frequency.
-        # Default autovacuum is tuned for large prod databases and
-        # runs too aggressively on a small homelab schema. These
-        # settings make it run less often but still keep tables clean.
-        extendedConfiguration: |
-          autovacuum_vacuum_scale_factor = 0.05
           autovacuum_analyze_scale_factor = 0.02
+
           autovacuum_vacuum_cost_delay = 20ms
+
           autovacuum_max_workers = 2
+
           shared_buffers = 128MB
+
           effective_cache_size = 256MB
+
           work_mem = 8MB
 
+          '
         resources:
           requests:
             cpu: 50m
             memory: 256Mi
           limits:
-            # CHANGED: 200m → 500m. At 200m Postgres was hitting the
-            # ceiling constantly due to autovacuum competing with normal
-            # queries. Throttled autovacuum causes table bloat which
-            # makes CPU usage worse over time, not better.
             cpu: 500m
             memory: 512Mi
-
     redis:
       enabled: true
       auth:
@@ -174,9 +144,6 @@ spec:
       master:
         persistence:
           enabled: true
-          # CHANGED: longhorn → longhorn-single. Redis here is a session
-          # cache — data is ephemeral and reconstructed on restart.
-          # 1 replica saves cross-node replication traffic and cp-1 disk.
           storageClass: longhorn-single
           size: 1Gi
         resources:
@@ -187,5 +154,5 @@ spec:
             cpu: 100m
             memory: 256Mi
         args:
-          - --appendonly yes
-          - --appendfsync everysec
+        - --appendonly yes
+        - --appendfsync everysec
