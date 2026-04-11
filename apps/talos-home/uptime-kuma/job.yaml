@@ -5,44 +5,37 @@ metadata:
   namespace: uptime-kuma
   labels:
     app.kubernetes.io/name: uptime-kuma-provisioner
-  annotations:
-    # Workflow for adding/removing monitors:
-    # 1. Edit configmap.yaml (add to monitor list or REMOVED list)
-    # 2. Bump this Job name suffix (v3 -> v4, etc.)
-    # 3. git commit + push — Flux creates a new Job automatically
-    # Clean up old jobs:
-    #   kubectl delete job -n uptime-kuma -l app.kubernetes.io/name=uptime-kuma-provisioner
+  annotations: null
 spec:
   backoffLimit: 5
   template:
     spec:
       restartPolicy: OnFailure
-
       affinity:
         podAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
-            - labelSelector:
-                matchLabels:
-                  app.kubernetes.io/name: uptime-kuma
-              topologyKey: kubernetes.io/hostname
-
+          - labelSelector:
+              matchLabels:
+                app.kubernetes.io/name: uptime-kuma
+            topologyKey: kubernetes.io/hostname
       containers:
-        - name: provisioner
-          image: python:3.14-slim@sha256:71b358f8bff55413f4a6b95af80acb07ab97b5636cd3b869f35c3680d31d1650
-          command: [python3, /scripts/provision.py]
-          volumeMounts:
-            - name: scripts
-              mountPath: /scripts/provision.py
-              subPath: provision.py
-              readOnly: true
-            - name: data
-              mountPath: /app/data
-
-      volumes:
+      - name: provisioner
+        image: python:3.14-slim@sha256:71b358f8bff55413f4a6b95af80acb07ab97b5636cd3b869f35c3680d31d1650
+        command:
+        - python3
+        - /scripts/provision.py
+        volumeMounts:
         - name: scripts
-          configMap:
-            name: uptime-kuma-monitors
-            defaultMode: 0755
+          mountPath: /scripts/provision.py
+          subPath: provision.py
+          readOnly: true
         - name: data
-          persistentVolumeClaim:
-            claimName: uptime-kuma
+          mountPath: /app/data
+      volumes:
+      - name: scripts
+        configMap:
+          name: uptime-kuma-monitors
+          defaultMode: 493
+      - name: data
+        persistentVolumeClaim:
+          claimName: uptime-kuma

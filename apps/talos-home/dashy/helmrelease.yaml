@@ -12,12 +12,10 @@ spec:
   upgrade:
     remediation:
       retries: 3
-
-      
   chart:
     spec:
       chart: app-template
-      version: "4.6.2"
+      version: 4.6.2
       sourceRef:
         kind: HelmRepository
         name: bjw-s
@@ -28,16 +26,7 @@ spec:
         replicas: 1
         pod:
           annotations:
-            configmap.reloader.stakater.com/reload: "dashy-config"
-          affinity:
-            nodeAffinity:
-              preferredDuringSchedulingIgnoredDuringExecution:
-                - weight: 100
-                  preference:
-                    matchExpressions:
-                      - key: kubernetes.io/hostname
-                        operator: NotIn
-                        values: [talos-cp-3]
+            configmap.reloader.stakater.com/reload: dashy-config
         containers:
           main:
             image:
@@ -47,9 +36,9 @@ spec:
               TZ: Europe/Amsterdam
               NODE_ENV: production
             ports:
-              - name: http
-                containerPort: 8080
-                protocol: TCP
+            - name: http
+              containerPort: 8080
+              protocol: TCP
     service:
       main:
         controller: main
@@ -65,6 +54,6 @@ spec:
         type: configMap
         name: dashy-config
         globalMounts:
-          - path: /app/user-data/conf.yml
-            subPath: conf.yml
-            readOnly: true
+        - path: /app/user-data/conf.yml
+          subPath: conf.yml
+          readOnly: true
