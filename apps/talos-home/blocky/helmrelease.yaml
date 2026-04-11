@@ -12,38 +12,33 @@ spec:
   upgrade:
     remediation:
       retries: 3
-
   chart:
     spec:
       chart: app-template
-      version: "4.6.2"
+      version: 4.6.2
       sourceRef:
         kind: HelmRepository
         name: bjw-s
         namespace: flux-system
-
   values:
     controllers:
       main:
         replicas: 2
-
         pod:
           tolerations:
-            - operator: Exists
-
+          - operator: Exists
           affinity:
             podAntiAffinity:
               requiredDuringSchedulingIgnoredDuringExecution:
-                - labelSelector:
-                    matchLabels:
-                      app.kubernetes.io/name: blocky
-                  topologyKey: kubernetes.io/hostname
-
+              - labelSelector:
+                  matchLabels:
+                    app.kubernetes.io/name: blocky
+                topologyKey: kubernetes.io/hostname
           annotations:
-            configmap.reloader.stakater.com/reload: "blocky-config"
-            prometheus.io/scrape: "true"
-            prometheus.io/port: "4000"
-            prometheus.io/path: "/metrics"
+            configmap.reloader.stakater.com/reload: blocky-config
+            prometheus.io/scrape: 'true'
+            prometheus.io/port: '4000'
+            prometheus.io/path: /metrics
           securityContext:
             runAsNonRoot: true
             runAsUser: 1000
@@ -51,33 +46,29 @@ spec:
             fsGroup: 1000
             seccompProfile:
               type: RuntimeDefault
-
         containers:
           main:
             image:
               repository: ghcr.io/0xerr0r/blocky
               tag: v0.26@sha256:b259ada3f943e73283f1fc5e84ac39a791afec7de86515d1aeccc03d2c39e595
             args:
-              - --config
-              - /app/config.yml
-
+            - --config
+            - /app/config.yml
             ports:
-              - name: dns-udp
-                containerPort: 53
-                protocol: UDP
-              - name: dns-tcp
-                containerPort: 53
-                protocol: TCP
-              - name: http
-                containerPort: 4000
-                protocol: TCP
-
+            - name: dns-udp
+              containerPort: 53
+              protocol: UDP
+            - name: dns-tcp
+              containerPort: 53
+              protocol: TCP
+            - name: http
+              containerPort: 4000
+              protocol: TCP
             securityContext:
               allowPrivilegeEscalation: false
               capabilities:
                 add:
-                  - NET_BIND_SERVICE
-
+                - NET_BIND_SERVICE
     service:
       main:
         controller: main
@@ -100,13 +91,12 @@ spec:
             port: 4000
             protocol: TCP
             targetPort: http
-
     persistence:
       config:
         enabled: true
         type: configMap
         name: blocky-config
         globalMounts:
-          - path: /app/config.yml
-            subPath: config.yml
-            readOnly: true
+        - path: /app/config.yml
+          subPath: config.yml
+          readOnly: true

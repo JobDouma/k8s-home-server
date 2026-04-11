@@ -12,18 +12,15 @@ spec:
   upgrade:
     remediation:
       retries: 3
-
   chart:
     spec:
       chart: app-template
-      version: "4.6.2"
+      version: 4.6.2
       sourceRef:
         kind: HelmRepository
         name: bjw-s
         namespace: flux-system
-
   values:
-
     defaultPodOptions:
       securityContext:
         runAsUser: 1000
@@ -32,21 +29,10 @@ spec:
         fsGroupChangePolicy: OnRootMismatch
         seccompProfile:
           type: RuntimeDefault
-      # Pin everything to talos-cp-1 (64GB RAM)
-      affinity:
-        nodeAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
-            nodeSelectorTerms:
-              - matchExpressions:
-                  - key: kubernetes.io/hostname
-                    operator: In
-                    values:
-                      - talos-cp-1
-
     controllers:
       immich-server:
         annotations:
-          reloader.stakater.com/auto: "true"
+          reloader.stakater.com/auto: 'true'
         containers:
           app:
             image:
@@ -54,17 +40,17 @@ spec:
               tag: v2.7.4
             env:
               TZ: Europe/Amsterdam
-              IMMICH_PORT: "2283"
+              IMMICH_PORT: '2283'
               DB_HOSTNAME: immich-immich-postgres
-              DB_PORT: "5432"
+              DB_PORT: '5432'
               REDIS_HOSTNAME: immich-immich-redis
-              REDIS_PORT: "6379"
+              REDIS_PORT: '6379'
             envFrom:
-              - secretRef:
-                  name: immich-secret
+            - secretRef:
+                name: immich-secret
             ports:
-              - name: http
-                containerPort: 2283
+            - name: http
+              containerPort: 2283
             resources:
               requests:
                 cpu: 100m
@@ -93,10 +79,9 @@ spec:
                   initialDelaySeconds: 30
                   periodSeconds: 30
                   failureThreshold: 3
-
       immich-machine-learning:
         annotations:
-          reloader.stakater.com/auto: "true"
+          reloader.stakater.com/auto: 'true'
         containers:
           app:
             image:
@@ -106,11 +91,11 @@ spec:
               TZ: Europe/Amsterdam
               MACHINE_LEARNING_CACHE_FOLDER: /cache
             envFrom:
-              - secretRef:
-                  name: immich-secret
+            - secretRef:
+                name: immich-secret
             ports:
-              - name: http
-                containerPort: 3003
+            - name: http
+              containerPort: 3003
             resources:
               requests:
                 cpu: 50m
@@ -119,9 +104,6 @@ spec:
                 cpu: 2000m
                 memory: 4Gi
             probes:
-              # ADDED: ML takes 30-60s to load models on first start.
-              # Without this the server hammers it immediately and floods
-              # logs with fetch failed errors on every pod restart.
               startup:
                 enabled: true
                 custom: true
@@ -131,7 +113,7 @@ spec:
                     port: 3003
                   initialDelaySeconds: 10
                   periodSeconds: 10
-                  failureThreshold: 12   # 2 min max startup window
+                  failureThreshold: 12
               readiness:
                 enabled: true
                 custom: true
@@ -152,7 +134,6 @@ spec:
                   initialDelaySeconds: 30
                   periodSeconds: 30
                   failureThreshold: 3
-
       immich-postgres:
         strategy: Recreate
         pod:
@@ -183,46 +164,53 @@ spec:
                   secretKeyRef:
                     name: immich-secret
                     key: DB_PASSWORD
-              POSTGRES_INITDB_ARGS: "--data-checksums"
+              POSTGRES_INITDB_ARGS: --data-checksums
               PGDATA: /var/lib/postgresql/data/pgdata
             resources:
               requests:
                 cpu: 50m
                 memory: 256Mi
               limits:
-                cpu: 1000m   # was 500m — tight during vector indexing
+                cpu: 1000m
                 memory: 1Gi
             probes:
               startup:
                 enabled: true
                 spec:
                   exec:
-                    command: [sh, -c, "pg_isready -U $POSTGRES_USER"]
+                    command:
+                    - sh
+                    - -c
+                    - pg_isready -U $POSTGRES_USER
                   failureThreshold: 30
                   periodSeconds: 5
               readiness:
                 enabled: true
                 spec:
                   exec:
-                    command: [sh, -c, "pg_isready -U $POSTGRES_USER"]
+                    command:
+                    - sh
+                    - -c
+                    - pg_isready -U $POSTGRES_USER
               liveness:
                 enabled: true
                 spec:
                   exec:
-                    command: [sh, -c, "pg_isready -U $POSTGRES_USER"]
-
+                    command:
+                    - sh
+                    - -c
+                    - pg_isready -U $POSTGRES_USER
       immich-redis:
         containers:
           app:
             image:
               repository: docker.io/valkey/valkey
-              tag: "9-alpine@sha256:e1095c6c76ee982cb2d1e07edbb7fb2a53606630a1d810d5a47c9f646b708bf5"
-            # FIXED: each flag and value must be a separate list item
+              tag: 9-alpine@sha256:e1095c6c76ee982cb2d1e07edbb7fb2a53606630a1d810d5a47c9f646b708bf5
             args:
-              - --save
-              - ""
-              - --appendonly
-              - "no"
+            - --save
+            - ''
+            - --appendonly
+            - 'no'
             resources:
               requests:
                 cpu: 10m
@@ -236,7 +224,9 @@ spec:
                 custom: true
                 spec:
                   exec:
-                    command: [redis-cli, ping]
+                    command:
+                    - redis-cli
+                    - ping
                   initialDelaySeconds: 5
                   periodSeconds: 5
               liveness:
@@ -244,10 +234,11 @@ spec:
                 custom: true
                 spec:
                   exec:
-                    command: [redis-cli, ping]
+                    command:
+                    - redis-cli
+                    - ping
                   initialDelaySeconds: 10
                   periodSeconds: 10
-
     service:
       immich-server:
         controller: immich-server
@@ -273,7 +264,6 @@ spec:
         ports:
           redis:
             port: 6379
-
     persistence:
       library:
         enabled: true
@@ -284,8 +274,7 @@ spec:
         advancedMounts:
           immich-server:
             app:
-              - path: /usr/src/app/upload
-
+            - path: /usr/src/app/upload
       ml-cache:
         enabled: true
         type: persistentVolumeClaim
@@ -295,8 +284,7 @@ spec:
         advancedMounts:
           immich-machine-learning:
             app:
-              - path: /cache
-
+            - path: /cache
       postgres-data:
         enabled: true
         type: persistentVolumeClaim
@@ -306,8 +294,7 @@ spec:
         advancedMounts:
           immich-postgres:
             app:
-              - path: /var/lib/postgresql/data
-
+            - path: /var/lib/postgresql/data
       postgres-shm:
         enabled: true
         type: emptyDir
@@ -316,4 +303,4 @@ spec:
         advancedMounts:
           immich-postgres:
             app:
-              - path: /dev/shm
+            - path: /dev/shm
