@@ -29,9 +29,16 @@ spec:
       install: true
 
     admissionController:
-      replicas: 1  # bump to 3 for HA if you add nodes
+      replicas: 1
       serviceMonitor:
-        enabled: true  # scrape by your VictoriaMetrics
+        enabled: true
+      resources:
+        limits:
+          cpu: 500m
+          memory: 384Mi
+        requests:
+          cpu: 100m
+          memory: 192Mi
 
     backgroundController:
       enabled: true
@@ -43,10 +50,20 @@ spec:
       resources:
         limits:
           cpu: 150m
+          memory: 256Mi
+        requests:
+          cpu: 50m
           memory: 128Mi
 
     cleanupController:
       enabled: true
+      resources:
+        limits:
+          cpu: 100m
+          memory: 128Mi
+        requests:
+          cpu: 50m
+          memory: 64Mi
 
     reportsController:
       enabled: true
@@ -55,10 +72,11 @@ spec:
       resources:
         limits:
           cpu: 100m
+          memory: 256Mi
+        requests:
+          cpu: 50m
           memory: 128Mi
 
-    # Exclude system namespaces from policy enforcement
-    # Kyverno self-excludes via the namespace label above
     config:
       excludeGroups:
         - system:nodes
