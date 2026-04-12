@@ -1,0 +1,101 @@
+kind: Cluster
+name: homelab-1
+kubernetes:
+  version: v1.35.3
+talos:
+  version: v1.12.6
+---
+kind: ControlPlane
+machines:
+  - 2ee50894-38ff-43ed-8746-b7b2f1d42b13
+  - dfaaeb20-a885-4bcc-b101-fab63602636c
+---
+kind: Workers
+---
+kind: Machine
+name: 2ee50894-38ff-43ed-8746-b7b2f1d42b13
+patches:
+  - idOverride: 10-2ee50894-38ff-43ed-8746-b7b2f1d42b13
+    annotations:
+      description: Config patch imported from existing Talos node
+      name: User defined patch
+    inline:
+      $patch: delete
+      apiVersion: v1alpha1
+      kind: HostnameConfig
+  - idOverride: 20-2ee50894-38ff-43ed-8746-b7b2f1d42b13
+    annotations:
+      description: Config patch imported from existing Talos node
+      name: User defined patch
+    inline:
+      cluster:
+        apiServer:
+          admissionControl:
+            - configuration:
+                apiVersion: pod-security.admission.config.k8s.io/v1alpha1
+                defaults:
+                  audit: restricted
+                  audit-version: latest
+                  enforce: baseline
+                  enforce-version: latest
+                  warn: restricted
+                  warn-version: latest
+                exemptions:
+                  namespaces:
+                    - kube-system
+                    - velero
+                  runtimeClasses: []
+                  usernames: []
+                kind: PodSecurityConfiguration
+              name: PodSecurity
+      version: v1alpha1
+---
+kind: Machine
+name: a07336bc-3e0d-4b50-a9cb-20d71c37d074
+patches:
+  - idOverride: 10-a07336bc-3e0d-4b50-a9cb-20d71c37d074
+    annotations:
+      description: Config patch imported from existing Talos node
+      name: User defined patch
+    inline:
+      $patch: delete
+      apiVersion: v1alpha1
+      kind: HostnameConfig
+---
+kind: Machine
+name: dfaaeb20-a885-4bcc-b101-fab63602636c
+patches:
+  - idOverride: 10-dfaaeb20-a885-4bcc-b101-fab63602636c
+    annotations:
+      description: Config patch imported from existing Talos node
+      name: User defined patch
+    inline:
+      $patch: delete
+      apiVersion: v1alpha1
+      kind: HostnameConfig
+  - idOverride: 20-dfaaeb20-a885-4bcc-b101-fab63602636c
+    annotations:
+      description: Config patch imported from existing Talos node
+      name: User defined patch
+    inline:
+      cluster:
+        apiServer:
+          admissionControl:
+            - configuration:
+                apiVersion: pod-security.admission.config.k8s.io/v1alpha1
+                defaults:
+                  audit: restricted
+                  audit-version: latest
+                  enforce: baseline
+                  enforce-version: latest
+                  warn: restricted
+                  warn-version: latest
+                exemptions:
+                  namespaces:
+                    - kube-system
+                    - velero
+                  runtimeClasses: []
+                  usernames: []
+                kind: PodSecurityConfiguration
+              name: PodSecurity
+      version: v1alpha1
