@@ -28,6 +28,13 @@ spec:
     crds:
       install: true
 
+    features:
+      backgroundScan:
+        enabled: true
+        backgroundScanWorkers: 1
+        backgroundScanInterval: 12h
+        skipResourceFilters: true
+
     admissionController:
       replicas: 1
       serviceMonitor:
@@ -44,9 +51,6 @@ spec:
       enabled: true
       serviceMonitor:
         enabled: true
-      extraArgs:
-        - --backgroundScanWorkers=1
-        - --backgroundScanInterval=12h
       resources:
         limits:
           cpu: 150m
