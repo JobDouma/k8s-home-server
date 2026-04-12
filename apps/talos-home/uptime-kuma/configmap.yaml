@@ -25,10 +25,32 @@ data:
                 con = sqlite3.connect(DB)
                 con.row_factory = sqlite3.Row
                 con.execute("SELECT 1 FROM monitor LIMIT 1")
+                # Create admin user if none exists
+                existing_user = con.execute("SELECT id FROM user LIMIT 1").fetchone()
+                if not existing_user:
+                    import subprocess, json
+                    admin_user = os.environ.get("UPTIME_KUMA_ADMIN_USER", "admin")
+                    admin_pass = os.environ.get("UPTIME_KUMA_ADMIN_PASS", "admin")
+                    node_script = "const b=require('bcryptjs');console.log(b.hashSync(process.argv[1],10));"
+                    result = subprocess.run(
+                        ["node", "-e", node_script, admin_pass],
+                        capture_output=True, text=True, cwd="/app"
+                    )
+                    if result.returncode == 0:
+                        hashed = result.stdout.strip()
+                        con.execute(
+                            "INSERT INTO user (username, password, active, timezone, createdDate) VALUES (?, ?, 1, 'Europe/Amsterdam', datetime('now'))",
+                            (admin_user, hashed)
+                        )
+                        con.commit()
+                        log(f"Created admin user: {admin_user}")
+                    else:
+                        log(f"bcrypt failed: {result.stderr}")
                 if con.execute("SELECT id FROM user LIMIT 1").fetchone():
                     break
                 con.close()
-            except sqlite3.OperationalError:
+            except sqlite3.OperationalError as e:
+                log(f"DB error: {e}")
                 con.close()
         log(f"Waiting for DB ({i+1}/60)...")
         time.sleep(3)
@@ -114,7 +136,6 @@ data:
     # Talos nodes — TCP port check on k8s API (6443)
     add_port("talos-cp-1", "192.168.2.22", 6443)
     add_port("talos-wk-1", "192.168.2.6",  6443)
-    add_port("talos-cp-3", "192.168.2.16", 6443)
 
     con.commit()
     con.close()
