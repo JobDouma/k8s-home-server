@@ -81,7 +81,7 @@ spec:
     persistence:
       data:
         type: persistentVolumeClaim
-        storageClass: longhorn
+        storageClass: local-path
         accessMode: ReadWriteOnce
         size: 1Gi
         globalMounts:

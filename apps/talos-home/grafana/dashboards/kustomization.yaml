@@ -4,7 +4,6 @@ kind: Kustomization
 
 resources:
   - node-exporter.yaml
-  - longhorn.yaml
   - traefik.yaml
   - falco.yaml
   - blocky.yaml

@@ -136,7 +136,6 @@ data:
           - title: Longhorn
             description: Storage UI
             icon: fas fa-hdd
-            url: https://longhorn.lan
 
 
       - name: Networking

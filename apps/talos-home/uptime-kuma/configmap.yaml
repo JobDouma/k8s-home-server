@@ -97,7 +97,6 @@ data:
     add_http("Grafana",     "https://grafana.lan")
     add_http("Prometheus",  "https://prometheus.lan")
     add_http("Falco",       "https://falco.lan")
-    add_http("Longhorn",    "https://longhorn.lan")
     add_http("Uptime Kuma", "https://uptime-kuma.lan")
     # Networking
     add_http("Traefik",     "https://traefik.lan")

@@ -278,7 +278,7 @@ spec:
       ml-cache:
         enabled: true
         type: persistentVolumeClaim
-        storageClass: longhorn
+        storageClass: local-path
         accessMode: ReadWriteOnce
         size: 10Gi
         advancedMounts:
@@ -288,7 +288,7 @@ spec:
       postgres-data:
         enabled: true
         type: persistentVolumeClaim
-        storageClass: longhorn
+        storageClass: local-path
         accessMode: ReadWriteOnce
         size: 10Gi
         advancedMounts:
