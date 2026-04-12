@@ -82,7 +82,8 @@ data:
         <!-- ═══════════════════════════════════════════════════════════ -->
         <outline text="Darknet &amp; Underground">
 
-          <outline text="Darknet Diaries"          type="rss" xmlUrl="http://feeds.feedburner.com/DarknetDiaries"/>
+          <!-- Fixed: moved from dead feedburner URL to current PRX feed -->
+          <outline text="Darknet Diaries"          type="rss" xmlUrl="https://podcast.darknetdiaries.com"/>
           <outline text="ReliaQuest Blog (ex-Digital Shadows)" type="rss" xmlUrl="https://www.reliaquest.com/blog/feed/"/>
           <outline text="Flashpoint Intel Blog"    type="rss" xmlUrl="https://flashpoint.io/blog/feed/"/>
           <outline text="Intel 471 Blog"           type="rss" xmlUrl="https://intel471.com/blog/feed"/>
@@ -141,6 +142,8 @@ data:
           <outline text="arXiv Cryptography"       type="rss" xmlUrl="http://export.arxiv.org/rss/cs.CR"/>
           <outline text="arXiv Distributed Systems" type="rss" xmlUrl="http://export.arxiv.org/rss/cs.DC"/>
           <outline text="arXiv Networking"         type="rss" xmlUrl="http://export.arxiv.org/rss/cs.NI"/>
+          <outline text="arXiv Economics"          type="rss" xmlUrl="http://export.arxiv.org/rss/econ"/>
+          <outline text="arXiv Quantitative Finance" type="rss" xmlUrl="http://export.arxiv.org/rss/q-fin"/>
           <outline text="Nature Technology"        type="rss" xmlUrl="https://www.nature.com/subjects/computer-science.rss"/>
           <outline text="npj Cybersecurity (Nature)" type="rss" xmlUrl="https://www.nature.com/npjcybersecur.rss"/>
           <outline text="USENIX ;login:"           type="rss" xmlUrl="https://www.usenix.org/publications/loginonline/rss.xml"/>
@@ -148,6 +151,26 @@ data:
           <outline text="ScienceDaily Tech"        type="rss" xmlUrl="https://www.sciencedaily.com/rss/computers_math.xml"/>
           <outline text="ACM TechNews"             type="rss" xmlUrl="https://technews.acm.org/rss.cfm"/>
           <outline text="Quanta Magazine"          type="rss" xmlUrl="https://www.quantamagazine.org/feed/"/>
+          <outline text="Nautilus Magazine"        type="rss" xmlUrl="https://nautil.us/feed/"/>
+          <outline text="NBER Working Papers"      type="rss" xmlUrl="https://www.nber.org/rss/new_working_papers.xml"/>
+
+        </outline>
+
+        <!-- ═══════════════════════════════════════════════════════════ -->
+        <!--  ECONOMICS & FINANCE                                        -->
+        <!-- ═══════════════════════════════════════════════════════════ -->
+        <outline text="Economics &amp; Finance">
+
+          <!-- Top academic-practitioner blogs -->
+          <outline text="Marginal Revolution"      type="rss" xmlUrl="https://marginalrevolution.com/marginalrevolution/index.rdf"/>
+          <outline text="VoxEU (CEPR)"             type="rss" xmlUrl="https://cepr.org/rss/voxeu_rss.xml"/>
+          <outline text="Noahpinion"               type="rss" xmlUrl="https://www.noahpinion.blog/feed"/>
+          <outline text="Greg Mankiw's Blog"       type="rss" xmlUrl="https://gregmankiw.blogspot.com/feeds/posts/default"/>
+          <outline text="Tim Harford (Undercover Economist)" type="rss" xmlUrl="https://timharford.com/feed/"/>
+          <outline text="Calculated Risk"          type="rss" xmlUrl="https://www.calculatedriskblog.com/feeds/posts/default"/>
+          <outline text="St. Louis Fed (FRED Blog)" type="rss" xmlUrl="https://fredblog.stlouisfed.org/feed/"/>
+          <outline text="IMF Blog"                 type="rss" xmlUrl="https://www.imf.org/en/Blogs/rss"/>
+          <outline text="Peterson Institute (PIIE)" type="rss" xmlUrl="https://www.piie.com/rss/publications"/>
 
         </outline>
 
@@ -160,16 +183,14 @@ data:
           <outline text="NCSC-NL Advisories"       type="rss" xmlUrl="https://advisories.ncsc.nl/rss/advisories"/>
           <outline text="DNB Supervisory News"     type="rss" xmlUrl="https://www.dnb.nl/en/rss/news/"/>
 
-          <!-- EU regulatory bodies — DORA / NIS2 / GDPR / banking -->
-          <outline text="ENISA News"               type="rss" xmlUrl="https://www.enisa.europa.eu/news/rss"/>
-          <outline text="ENISA Publications"       type="rss" xmlUrl="https://www.enisa.europa.eu/publications/rss"/>
-          <outline text="EBA News (Banking Authority)" type="rss" xmlUrl="https://eba.europa.eu/news-press/news/rss.xml"/>
-          <outline text="ECB Banking Supervision"  type="rss" xmlUrl="https://www.bankingsupervision.europa.eu/home/rss/html/index.en.html"/>
+          <!-- EU regulatory — ENISA RSS discontinued, replaced with CERT-EU -->
+          <outline text="CERT-EU Security Advisories" type="rss" xmlUrl="https://cert.europa.eu/publications/security-advisories/rss"/>
 
           <!-- UK / international -->
           <outline text="NCSC UK Alerts"           type="rss" xmlUrl="https://www.ncsc.gov.uk/feeds/alerts.xml"/>
           <outline text="NCSC UK Guidance"         type="rss" xmlUrl="https://www.ncsc.gov.uk/feeds/guidance.xml"/>
-          <outline text="BSI Cyber Security (DE)"  type="rss" xmlUrl="https://www.bsi.bund.de/SiteGlobals/Functions/RSSFeed/RSSNewsfeed/RSSNewsfeed_CS.xml"/>
+          <!-- Fixed: updated to current CERT-Bund WID feed URL -->
+          <outline text="BSI CERT-Bund (DE)"       type="rss" xmlUrl="https://www.bsi.bund.de/SiteGlobals/Functions/RSSFeed/RSSNewsfeed/RSSNewsfeed_WID.xml"/>
           <outline text="NIST News"                type="rss" xmlUrl="https://www.nist.gov/news-events/news/rss.xml"/>
 
           <!-- Standards & frameworks -->
