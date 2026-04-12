@@ -30,20 +30,20 @@ data:
 
     log "Running FreshRSS install..."
     php "${FRESHRSS_CLI}/do-install.php" \
-      --default_user "${USER}" \
-      --auth_type form \
+      --default-user "${USER}" \
+      --auth-type form \
       --environment production \
-      --base_url "https://freshrss.lan" \
+      --base-url "https://freshrss.lan" \
       --language en \
-      --api_enabled
+      --api-enabled
 
     log "Creating admin user..."
     php "${FRESHRSS_CLI}/create-user.php" \
       --user "${USER}" \
       --password "${FRESHRSS_ADMIN_PASSWORD}" \
-      --api_password "${FRESHRSS_ADMIN_PASSWORD}" \
+      --api-password "${FRESHRSS_ADMIN_PASSWORD}" \
       --language en \
-      --default_user
+      --default-user
 
     touch "${STAMP}"
     log "Install complete."
