@@ -129,7 +129,6 @@ data:
           <outline text="Ars Technica IT"          type="rss" xmlUrl="http://feeds.arstechnica.com/arstechnica/technology-lab"/>
           <outline text="Talos Linux Blog"         type="rss" xmlUrl="https://www.talos.dev/blog/index.xml"/>
           <outline text="Flux CD Blog"             type="rss" xmlUrl="https://fluxcd.io/blog/index.xml"/>
-          <outline text="Longhorn Blog"            type="rss" xmlUrl="https://longhorn.io/blog/index.xml"/>
           <outline text="Traefik Blog"             type="rss" xmlUrl="https://traefik.io/blog/index.xml"/>
 
         </outline>

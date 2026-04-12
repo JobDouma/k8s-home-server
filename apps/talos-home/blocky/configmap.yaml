@@ -111,7 +111,6 @@ data:
         freshrss.lan: 192.168.2.100
         auth.lan: 192.168.2.100
         falco.lan: 192.168.2.100
-        longhorn.lan: 192.168.2.100
         gotify.lan: 192.168.2.100
         immich.lan: 192.168.2.100
         uptime-kuma.lan: 192.168.2.100

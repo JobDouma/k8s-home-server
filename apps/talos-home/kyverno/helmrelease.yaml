@@ -37,6 +37,13 @@ spec:
       enabled: true
       serviceMonitor:
         enabled: true
+      extraArgs:
+        - --backgroundScanWorkers=1
+        - --backgroundScanInterval=12h
+      resources:
+        limits:
+          cpu: 150m
+          memory: 128Mi
 
     cleanupController:
       enabled: true
@@ -45,6 +52,10 @@ spec:
       enabled: true
       serviceMonitor:
         enabled: true
+      resources:
+        limits:
+          cpu: 100m
+          memory: 128Mi
 
     # Exclude system namespaces from policy enforcement
     # Kyverno self-excludes via the namespace label above
@@ -56,4 +67,10 @@ spec:
         - '[*,kube-system,*]'
         - '[*,kube-public,*]'
         - '[*,kube-node-lease,*]'
-        - '[*,flux-system,*]'  # don't block Flux reconciliation
+        - '[*,flux-system,*]'
+        - '[ReplicaSet,*,*]'
+        - '[ReportChangeRequest,*,*]'
+        - '[Node,*,*]'
+        - '[APIService,*,*]'
+        - '[TokenReview,*,*]'
+        - '[SubjectAccessReview,*,*]'

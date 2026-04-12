@@ -221,7 +221,6 @@ resources:
   - uptime-kuma/namespace.yaml
   - uptime-kuma/secret.yaml
   - uptime-kuma/certificate.yaml
-  # - uptime-kuma/job.yaml
   - uptime-kuma/configmap.yaml
   - uptime-kuma/helmrelease.yaml
   - uptime-kuma/ingressroute.yaml
@@ -236,3 +235,6 @@ resources:
   - kyverno/pdb.yaml
   - kyverno/policies/enforce-image-signatures.yaml
   - kyverno/policies/block-latest-tag.yaml
+  
+  
+  - etcd-defrag/cronjob.yaml

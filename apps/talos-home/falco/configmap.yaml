@@ -77,8 +77,6 @@ data:
     # Longhorn instance-manager uses tee to rotate tgtd.log — not actual tampering
     - rule: Clear Log Activities
       exceptions:
-        - name: longhorn_tgtd_log
           fields: [container.image.repository, fd.name]
           values:
-            - [docker.io/longhornio/longhorn-instance-manager, /var/log/tgtd.log]
   

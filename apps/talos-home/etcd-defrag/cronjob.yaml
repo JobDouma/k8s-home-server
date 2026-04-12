@@ -1,0 +1,40 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: etcd-defrag
+  namespace: kube-system
+spec:
+  schedule: "0 4 * * 0"  # Weekly, Sunday 4am
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      ttlSecondsAfterFinished: 3600
+      template:
+        spec:
+          restartPolicy: Never
+          hostNetwork: true
+          tolerations:
+            - operator: Exists
+          nodeSelector:
+            node-role.kubernetes.io/control-plane: ""
+          containers:
+            - name: etcd-defrag
+              image: ghcr.io/siderolabs/etcd:v3.6.8
+              command:
+                - etcdctl
+                - --endpoints=https://127.0.0.1:2379
+                - --cacert=/etc/kubernetes/pki/etcd/ca.crt
+                - --cert=/etc/kubernetes/pki/etcd/peer.crt
+                - --key=/etc/kubernetes/pki/etcd/peer.key
+                - defrag
+                - --cluster
+              volumeMounts:
+                - name: etcd-certs
+                  mountPath: /etc/kubernetes/pki/etcd
+                  readOnly: true
+          volumes:
+            - name: etcd-certs
+              hostPath:
+                path: /etc/kubernetes/pki/etcd

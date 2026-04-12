@@ -113,7 +113,7 @@ spec:
       primary:
         persistence:
           enabled: true
-          storageClass: longhorn
+          storageClass: local-path
           size: 10Gi
         extendedConfiguration: 'autovacuum_vacuum_scale_factor = 0.05
 
@@ -144,7 +144,7 @@ spec:
       master:
         persistence:
           enabled: true
-          storageClass: longhorn-single
+          storageClass: local-path
           size: 1Gi
         resources:
           requests:

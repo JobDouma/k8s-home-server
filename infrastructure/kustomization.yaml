@@ -34,16 +34,7 @@ resources:
   - headlamp/rbac.yaml
   - headlamp/certificate.yaml
 
-  - longhorn/namespace.yaml
   
-  - longhorn/helmrepository.yaml
-  - longhorn/helmrelease.yaml
-  - longhorn/servicemonitor.yaml
-  - longhorn/ingressroute.yaml
-  - longhorn/recurringjob.yaml
-  - longhorn/certificate.yaml
-  - longhorn/pdb.yaml
-  - longhorn/longhorn-single.yaml
 
   - authentik/namespace.yaml
   - authentik/certificate.yaml
@@ -69,3 +60,7 @@ resources:
   - cert-manager/ca-certificate.yaml
   - cert-manager/clusterissuer-ca.yaml
   - cert-manager/clusterissuer-selfsigned.yaml
+
+  - local-path-storage/namespace.yaml
+  - local-path-storage/helmrepository.yaml
+  - local-path-storage/helmrelease.yaml
