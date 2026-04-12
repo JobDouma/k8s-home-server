@@ -61,4 +61,4 @@ resources:
   - cert-manager/clusterissuer-ca.yaml
   - cert-manager/clusterissuer-selfsigned.yaml
 
-  - local-path-storage/namespace.yaml
+  - local-path-storage
