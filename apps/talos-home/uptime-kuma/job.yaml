@@ -1,41 +1,46 @@
+cat > ~/k8s-home-server/apps/talos-home/uptime-kuma/job.yaml << 'EOF'
 apiVersion: batch/v1
-kind: Job
+kind: CronJob
 metadata:
-  name: uptime-kuma-provisioner-v4
+  name: uptime-kuma-provisioner
   namespace: uptime-kuma
-  labels:
-    app.kubernetes.io/name: uptime-kuma-provisioner
-  annotations: null
 spec:
-  backoffLimit: 5
-  template:
+  schedule: "*/5 * * * *"
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 2
+  jobTemplate:
     spec:
-      restartPolicy: OnFailure
-      affinity:
-        podAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
-          - labelSelector:
-              matchLabels:
-                app.kubernetes.io/name: uptime-kuma
-            topologyKey: kubernetes.io/hostname
-      containers:
-      - name: provisioner
-        image: python:3.14-slim@sha256:bc389f7dfcb21413e72a28f491985326994795e34d2b86c8ae2f417b4e7818aa
-        command:
-        - python3
-        - /scripts/provision.py
-        volumeMounts:
-        - name: scripts
-          mountPath: /scripts/provision.py
-          subPath: provision.py
-          readOnly: true
-        - name: data
-          mountPath: /app/data
-      volumes:
-      - name: scripts
-        configMap:
-          name: uptime-kuma-monitors
-          defaultMode: 493
-      - name: data
-        persistentVolumeClaim:
-          claimName: uptime-kuma
+      backoffLimit: 2
+      template:
+        spec:
+          restartPolicy: OnFailure
+          affinity:
+            podAffinity:
+              requiredDuringSchedulingIgnoredDuringExecution:
+              - labelSelector:
+                  matchLabels:
+                    app.kubernetes.io/name: uptime-kuma
+                topologyKey: kubernetes.io/hostname
+          containers:
+          - name: provisioner
+            image: python:3.14-slim@sha256:bc389f7dfcb21413e72a28f491985326994795e34d2b86c8ae2f417b4e7818aa
+            command:
+            - python3
+            - /scripts/provision.py
+            volumeMounts:
+            - name: scripts
+              mountPath: /scripts/provision.py
+              subPath: provision.py
+              readOnly: true
+            - name: data
+              mountPath: /app/data
+          volumes:
+          - name: scripts
+            configMap:
+              name: uptime-kuma-monitors
+              defaultMode: 493
+          - name: data
+            persistentVolumeClaim:
+              claimName: uptime-kuma
+EOF

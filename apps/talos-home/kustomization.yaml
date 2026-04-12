@@ -158,6 +158,7 @@ resources:
   # FreshRSS
   # ──────────────────────────────────────
   - freshrss/namespace.yaml
+  - freshrss/secret.yaml
   - freshrss/opml-configmap.yaml
   - freshrss/init-configmap.yaml
   - freshrss/helmrelease.yaml
@@ -223,6 +224,7 @@ resources:
   - uptime-kuma/certificate.yaml
   - uptime-kuma/configmap.yaml
   - uptime-kuma/helmrelease.yaml
+  - uptime-kuma/job.yaml
   - uptime-kuma/ingressroute.yaml
   
   # ──────────────────────────────────────
