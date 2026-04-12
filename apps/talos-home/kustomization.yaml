@@ -237,6 +237,7 @@ resources:
   - kyverno/pdb.yaml
   - kyverno/policies/enforce-image-signatures.yaml
   - kyverno/policies/block-latest-tag.yaml
+  - kyverno/networkpolicy.yaml
   
   
   - etcd-defrag/cronjob.yaml
