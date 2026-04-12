@@ -39,6 +39,11 @@ spec:
               PGID: '1000'
               TZ: Europe/Amsterdam
               FRESHRSS_DEFAULT_USER: job
+              FRESHRSS_INSTALL: "--api_enabled --environment production --base_url https://freshrss.lan --language en"
+              FRESHRSS_USER: "--user job --language en --default_user job --password $(FRESHRSS_ADMIN_PASSWORD)"
+            envFrom:
+              - secretRef:
+                  name: freshrss-secret
             ports:
             - name: http
               containerPort: 80

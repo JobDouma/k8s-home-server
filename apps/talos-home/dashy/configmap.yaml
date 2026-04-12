@@ -133,10 +133,6 @@ data:
             icon: fas fa-database
             url: https://truenas.lan
 
-          - title: Longhorn
-            description: Storage UI
-            icon: fas fa-hdd
-
 
       - name: Networking
         icon: fas fa-network-wired
