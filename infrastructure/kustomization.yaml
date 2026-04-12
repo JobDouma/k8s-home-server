@@ -62,5 +62,3 @@ resources:
   - cert-manager/clusterissuer-selfsigned.yaml
 
   - local-path-storage/namespace.yaml
-  - local-path-storage/helmrepository.yaml
-  - local-path-storage/helmrelease.yaml
