@@ -97,6 +97,9 @@ spec:
         name: freshrss-init
         defaultMode: 493
         globalMounts:
+        - path: /custom-cont-init.d/00-install-freshrss.sh
+          subPath: 00-install-freshrss.sh
+          readOnly: true
         - path: /custom-cont-init.d/01-import-opml.sh
           subPath: 01-import-opml.sh
           readOnly: true

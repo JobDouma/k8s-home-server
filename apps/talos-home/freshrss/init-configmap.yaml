@@ -7,6 +7,47 @@ data:
   # This script is executed by the linuxserver s6 init system on every container start.
   # It uses the FreshRSS CLI to import the OPML only if feeds have not already been imported,
   # making it fully idempotent — safe to run on every restart.
+  00-install-freshrss.sh: |
+    #!/usr/bin/with-contenv bash
+    set -euo pipefail
+
+    FRESHRSS_CLI="/app/www/cli"
+    FRESHRSS_DATA="/config/www/freshrss/data"
+    STAMP="/config/bootstrap/.installed"
+    USER="${FRESHRSS_DEFAULT_USER:-job}"
+
+    log() { echo "[freshrss-install] $*"; }
+
+    # Wait for app to be ready
+    for i in $(seq 1 30); do
+      [ -d "/app/www/cli" ] && break
+      log "Waiting for app... ($i/30)"; sleep 2
+    done
+
+    if [ -f "${STAMP}" ]; then
+      log "Already installed. Skipping."; exit 0
+    fi
+
+    log "Running FreshRSS install..."
+    php "${FRESHRSS_CLI}/do-install.php" \
+      --default_user "${USER}" \
+      --auth_type form \
+      --environment production \
+      --base_url "https://freshrss.lan" \
+      --language en \
+      --api_enabled
+
+    log "Creating admin user..."
+    php "${FRESHRSS_CLI}/create-user.php" \
+      --user "${USER}" \
+      --password "${FRESHRSS_ADMIN_PASSWORD}" \
+      --api_password "${FRESHRSS_ADMIN_PASSWORD}" \
+      --language en \
+      --default_user
+
+    touch "${STAMP}"
+    log "Install complete."
+
   01-import-opml.sh: |
     #!/usr/bin/with-contenv bash
     set -euo pipefail
