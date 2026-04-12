@@ -1,0 +1,10 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: local-path-provisioner
+  namespace: local-path-storage
+spec:
+  template:
+    spec:
+      nodeSelector:
+        kubernetes.io/hostname: talos-wk-1
