@@ -43,6 +43,14 @@ spec:
               repository: joplin/server
               tag: 3.5.2@sha256:5d9e7f9d31b436cb1b99d1a6a65d8c5bf760829094617e8ad1e956fd925de888
 
+            resources:
+              requests:
+                cpu: 50m
+                memory: 256Mi
+              limits:
+                cpu: 500m
+                memory: 512Mi
+
             ports:
               - name: http
                 containerPort: 22300
