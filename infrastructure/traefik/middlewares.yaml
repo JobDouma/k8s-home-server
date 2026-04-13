@@ -3,6 +3,9 @@ kind: Middleware
 metadata:
   name: traefik-chain
   namespace: networking
+  labels:
+    kustomize.toolkit.fluxcd.io/name: infrastructure
+    kustomize.toolkit.fluxcd.io/namespace: flux-system
 spec:
   chain:
     middlewares:
@@ -16,6 +19,9 @@ kind: Middleware
 metadata:
   name: traefik-chain-noauth
   namespace: networking
+  labels:
+    kustomize.toolkit.fluxcd.io/name: infrastructure
+    kustomize.toolkit.fluxcd.io/namespace: flux-system
 spec:
   chain:
     middlewares:
@@ -26,6 +32,9 @@ kind: Middleware
 metadata:
   name: lan-headers
   namespace: networking
+  labels:
+    kustomize.toolkit.fluxcd.io/name: infrastructure
+    kustomize.toolkit.fluxcd.io/namespace: flux-system
 spec:
   headers:
     browserXssFilter: true
@@ -39,6 +48,9 @@ kind: Middleware
 metadata:
   name: authentik-forwardauth
   namespace: networking
+  labels:
+    kustomize.toolkit.fluxcd.io/name: infrastructure
+    kustomize.toolkit.fluxcd.io/namespace: flux-system
 spec:
   forwardAuth:
     address: http://authentik-server.authentik.svc.cluster.local:80/outpost.goauthentik.io/auth/traefik
