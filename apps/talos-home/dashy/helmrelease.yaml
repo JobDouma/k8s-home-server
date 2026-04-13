@@ -41,11 +41,11 @@ spec:
               protocol: TCP
             resources:
               limits:
-                cpu: 500m
-                memory: 512Mi
+                cpu: 300m
+                memory: 800Mi
               requests:
                 cpu: 50m
-                memory: 256Mi
+                memory: 128Mi  # idles at ~100MB after build completes
     service:
       main:
         controller: main

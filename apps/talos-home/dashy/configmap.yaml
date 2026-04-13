@@ -16,7 +16,6 @@ data:
       iconSize: medium
       language: en
       disableConfiguration: true
-      disableUpdateCheck: true
 
     sections:
 
