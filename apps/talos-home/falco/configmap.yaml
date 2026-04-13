@@ -3,11 +3,13 @@ kind: ConfigMap
 metadata:
   name: falco-custom-rules
   namespace: falco
+  labels:
+    kustomize.toolkit.fluxcd.io/name: apps
+    kustomize.toolkit.fluxcd.io/namespace: flux-system
 data:
   custom-rules.yaml: |
     # ── Silence expected noisy rules ──────────────────────────────
 
-    # linuxserver.io images run as root by design — suppress container drift alerts
     - rule: Launch Privileged Container
       condition: and not (container.image.repository in (
         "ghcr.io/linuxserver/sonarr",
@@ -17,19 +19,32 @@ data:
       override:
         condition: append
 
-    # Jellyfin reads media files — suppress read-sensitive-file for media paths
     - macro: allowed_media_readers
       condition: >
         container.image.repository = "jellyfin/jellyfin" and
         fd.name startswith "/media"
-    
-    # qBittorrent legitimately opens many network connections
+
     - macro: qbittorrent_container
       condition: container.image.repository = "ghcr.io/onedr0p/qbittorrent"
 
-    # ── Custom rules for YOUR environment ─────────────────────────
+    # ── Known legitimate K8s API callers ──────────────────────────
 
-    # Alert if anything in the cluster tries to read Kubernetes secrets from the API
+    - macro: allowed_k8s_api_callers
+      condition: >
+        (k8s.ns.name = "headlamp") or
+        (k8s.ns.name = "monitoring" and container.name in (
+          "loki-sc-rules",
+          "grafana-sc-dashboard",
+          "grafana-sc-datasources"
+        ))
+
+    - rule: Contact K8S API Server From Container
+      condition: and not allowed_k8s_api_callers
+      override:
+        condition: append
+
+    # ── Custom rules ───────────────────────────────────────────────
+
     - rule: Unexpected K8s Secret Access
       desc: A process accessed Kubernetes secrets via the API server
       condition: >
@@ -45,7 +60,6 @@ data:
       priority: WARNING
       source: k8s_audit
 
-    # Alert on any shell in a media container (Jellyfin, qBittorrent etc. should never shell)
     - rule: Shell in Media Container
       desc: Shell spawned inside a media namespace container
       condition: >
@@ -59,7 +73,6 @@ data:
       priority: WARNING
       tags: [media, shell]
 
-    # Alert on any new listening port in the cluster
     - rule: Unexpected Listening Port
       desc: A container started listening on an unexpected port
       condition: >
@@ -71,12 +84,3 @@ data:
         Unexpected listen port (pod=%k8s.pod.name port=%fd.sport image=%container.image.repository)
       priority: NOTICE
       tags: [network]
-
-    # ── False positive suppressions ───────────────────────────────
-
-    # Longhorn instance-manager uses tee to rotate tgtd.log — not actual tampering
-    - rule: Clear Log Activities
-      exceptions:
-          fields: [container.image.repository, fd.name]
-          values:
-  
