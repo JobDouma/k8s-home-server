@@ -11,17 +11,16 @@ metadata:
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: cluster-admin   # or create a read-only role if preferred
+  name: cluster-admin
 subjects:
   - kind: ServiceAccount
     name: headlamp
     namespace: headlamp
 ---
-# infrastructure/headlamp/clusterrolebinding-job.yaml
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  name: headlamp-job-admin
+  name: headlamp-oidc-users
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
@@ -29,4 +28,7 @@ roleRef:
 subjects:
   - kind: User
     name: "jobdouma@hotmail.com"
+    apiGroup: rbac.authorization.k8s.io
+  - kind: User
+    name: "akadmin"
     apiGroup: rbac.authorization.k8s.io
