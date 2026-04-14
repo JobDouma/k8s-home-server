@@ -42,7 +42,7 @@ spec:
             resources:
               limits:
                 cpu: 300m
-                memory: 800Mi
+                memory: 2500Mi
               requests:
                 cpu: 50m
                 memory: 128Mi  # idles at ~100MB after build completes
