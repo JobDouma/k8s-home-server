@@ -1,3 +1,15 @@
 {
-    "remote.autoForwardPortsFallback": 0
+  "vs-kubernetes.kubeconfig": "/home/job/.kube/config",
+  "vs-kubernetes.crd-code-completion": "enabled",
+  "vs-kubernetes.outputFormat": "yaml",
+  "yaml.schemas": {
+    "kubernetes": "*.yaml",
+    "https://json.schemastore.org/kustomization.json": "kustomization.yaml"
+  },
+  "yaml.validate": true,
+  "[python]": {
+    "editor.defaultFormatter": "charliermarsh.ruff",
+    "editor.formatOnSave": true
+  },
+  "ruff.organizeImports": true
 }
