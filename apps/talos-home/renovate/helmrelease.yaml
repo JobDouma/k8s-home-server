@@ -70,7 +70,23 @@ spec:
           "enabledManagers": [
             "flux",
             "helm-values",
-            "kubernetes"
+            "kubernetes",
+            "regex"
+          ],
+          "customManagers": [
+            {
+              "customType": "regex",
+              "description": "code-server version tracking",
+              "managerFilePatterns": [
+                "/(^|/)infrastructure/vs-code/version\\.ya?ml$/"
+              ],
+              "matchStrings": [
+                "code_server_version: \"(?<currentValue>[\\d.]+)\""
+              ],
+              "depNameTemplate": "coder/code-server",
+              "datasourceTemplate": "github-releases",
+              "versioningTemplate": "semver"
+            }
           ],
           "platformAutomerge": true,
           "automergeStrategy": "squash",
