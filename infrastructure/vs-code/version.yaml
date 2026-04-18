@@ -1,0 +1,2 @@
+# renovate: datasource=github-releases depName=coder/code-server
+code_server_version: "4.116.0"
