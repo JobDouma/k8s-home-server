@@ -21,7 +21,7 @@ spec:
             node-role.kubernetes.io/control-plane: ""
           containers:
             - name: etcd-defrag
-              image: ghcr.io/siderolabs/etcd:v3.6.8
+              image: registry.k8s.io/etcd:v3.6.8
               command:
                 - etcdctl
                 - --endpoints=https://127.0.0.1:2379
