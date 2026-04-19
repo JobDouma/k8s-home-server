@@ -13,7 +13,7 @@ data:
     - Handles deletions: removes monitors listed in REMOVED
     - To re-run: bump job name suffix and commit
     """
-    import sqlite3, sys, os, time
+    import sqlite3, sys, os, time, json
 
     DB = "/app/data/kuma.db"
 
@@ -25,10 +25,9 @@ data:
                 con = sqlite3.connect(DB)
                 con.row_factory = sqlite3.Row
                 con.execute("SELECT 1 FROM monitor LIMIT 1")
-                # Create admin user if none exists
                 existing_user = con.execute("SELECT id FROM user LIMIT 1").fetchone()
                 if not existing_user:
-                    import subprocess, json
+                    import subprocess
                     admin_user = os.environ.get("UPTIME_KUMA_ADMIN_USER", "admin")
                     admin_pass = os.environ.get("UPTIME_KUMA_ADMIN_PASS", "admin")
                     node_script = "const b=require('bcryptjs');console.log(b.hashSync(process.argv[1],10));"
@@ -61,13 +60,17 @@ data:
     log(f"Provisioning for user_id={user_id}")
 
     # ── Monitors to remove ───────────────────────────────────────────────────
-    # Add names here when decommissioning a service. Safe to leave old entries.
     REMOVED = [
         "SABnzbd",
         "Router",
         "talos-cp-1 (k8s API)",
         "talos-wk-1 (k8s API)",
         "talos-cp-3 (k8s API)",
+        "Jellyfin", "Jellyseerr", "Sonarr", "Radarr", "Prowlarr",
+        "qBittorrent", "Immich", "Grafana", "Prometheus", "Falco",
+        "Uptime Kuma", "Traefik", "Blocky DNS", "Authentik", "Dashy",
+        "FreshRSS", "Joplin", "Gotify", "Headlamp", "TrueNAS", "Omni",
+        "talos-cp-1", "talos-wk-1",
     ]
     for name in REMOVED:
         row = con.execute("SELECT id FROM monitor WHERE name = ?", (name,)).fetchone()
@@ -78,17 +81,49 @@ data:
     existing = {r["name"] for r in con.execute("SELECT name FROM monitor")}
     log(f"Existing monitors: {len(existing)}")
 
+    # ── Gotify notification ──────────────────────────────────────────────────
+    def add_notification(name, gotify_url, gotify_token):
+        existing_notif = con.execute("SELECT id FROM notification WHERE name = ?", (name,)).fetchone()
+        if existing_notif:
+            log(f"  skip notification: {name}")
+            return existing_notif["id"]
+        config = json.dumps({
+            "type": "gotify",
+            "gotifyserverurl": gotify_url,
+            "gotifyapplicationtoken": gotify_token,
+            "gotifyPriority": 8
+        })
+        cur = con.execute("""
+            INSERT INTO notification (name, config, is_default, user_id, active)
+            VALUES (?, ?, 1, ?, 1)
+        """, (name, config, user_id))
+        log(f"  added notification: {name}")
+        return cur.lastrowid
+
+    gotify_token = os.environ.get("UPTIME_KUMA_GOTIFY_TOKEN", "")
+    notif_id = add_notification(
+        "Gotify",
+        "http://gotify.gotify.svc.cluster.local",
+        gotify_token
+    ) if gotify_token else None
+
+    # ── Monitor helpers ──────────────────────────────────────────────────────
     def add_http(name, url):
         if name in existing:
             log(f"  skip: {name}"); return
         try:
-            con.execute("""
+            cur = con.execute("""
                 INSERT INTO monitor (
                     name, type, url, method, interval, retry_interval, maxretries,
                     ignore_tls, upside_down, accepted_statuscodes_json,
                     conditions, user_id, active
                 ) VALUES (?, 'http', ?, 'GET', 60, 60, 3, 1, 0, '["200-299"]', '[]', ?, 1)
             """, (name, url, user_id))
+            if notif_id:
+                con.execute("""
+                    INSERT INTO monitor_notification (monitor_id, notification_id)
+                    VALUES (?, ?)
+                """, (cur.lastrowid, notif_id))
             log(f"  added: {name}")
         except Exception as e:
             log(f"  WARN {name}: {e}")
@@ -97,16 +132,22 @@ data:
         if name in existing:
             log(f"  skip: {name}"); return
         try:
-            con.execute("""
+            cur = con.execute("""
                 INSERT INTO monitor (
                     name, type, hostname, port, interval, retry_interval, maxretries,
                     conditions, user_id, active
                 ) VALUES (?, 'port', ?, ?, 30, 30, 3, '[]', ?, 1)
             """, (name, hostname, port, user_id))
+            if notif_id:
+                con.execute("""
+                    INSERT INTO monitor_notification (monitor_id, notification_id)
+                    VALUES (?, ?)
+                """, (cur.lastrowid, notif_id))
             log(f"  added: {name}")
         except Exception as e:
             log(f"  WARN {name}: {e}")
 
+    # ── Monitors ─────────────────────────────────────────────────────────────
     # Media
     add_http("Jellyfin",    "https://jellyfin.lan")
     add_http("Jellyseerr",  "https://jellyseerr.lan")

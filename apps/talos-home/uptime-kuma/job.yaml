@@ -27,6 +27,22 @@ spec:
             command:
             - python3
             - /scripts/provision.py
+            env:
+            - name: UPTIME_KUMA_ADMIN_USER
+              valueFrom:
+                secretKeyRef:
+                  name: uptime-kuma-credentials
+                  key: admin-user
+            - name: UPTIME_KUMA_ADMIN_PASS
+              valueFrom:
+                secretKeyRef:
+                  name: uptime-kuma-credentials
+                  key: admin-pass
+            - name: UPTIME_KUMA_GOTIFY_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: uptime-kuma-credentials
+                  key: gotify-token
             volumeMounts:
             - name: scripts
               mountPath: /scripts/provision.py
