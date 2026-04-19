@@ -66,11 +66,6 @@ data:
         "talos-cp-1 (k8s API)",
         "talos-wk-1 (k8s API)",
         "talos-cp-3 (k8s API)",
-        "Jellyfin", "Jellyseerr", "Sonarr", "Radarr", "Prowlarr",
-        "qBittorrent", "Immich", "Grafana", "Prometheus", "Falco",
-        "Uptime Kuma", "Traefik", "Blocky DNS", "Authentik", "Dashy",
-        "FreshRSS", "Joplin", "Gotify", "Headlamp", "TrueNAS", "Omni",
-        "talos-cp-1", "talos-wk-1",
     ]
     for name in REMOVED:
         row = con.execute("SELECT id FROM monitor WHERE name = ?", (name,)).fetchone()
