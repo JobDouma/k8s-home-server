@@ -27,13 +27,13 @@ spec:
             matchLabels:
               kubernetes.io/metadata.name: networking
       ports:
-        - port: 3001
+        - port: 2283
     - from:
         - namespaceSelector:
             matchLabels:
               kubernetes.io/metadata.name: monitoring
       ports:
-        - port: 3001
+        - port: 2283
   egress:
     - to:
         - podSelector:
