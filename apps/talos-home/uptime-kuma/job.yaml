@@ -57,4 +57,4 @@ spec:
               defaultMode: 493
           - name: data
             persistentVolumeClaim:
-              claimName: uptime-kuma
+              claimName: uptime-kuma-data

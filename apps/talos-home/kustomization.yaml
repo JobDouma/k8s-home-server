@@ -177,6 +177,7 @@ resources:
   - falco/servicemonitor.yaml
   - falco/certificate.yaml
   - falco/configmap.yaml
+  - falco/networkpolicy.yaml
 
   # ──────────────────────────────────────
   # gotify
@@ -226,6 +227,7 @@ resources:
   - uptime-kuma/helmrelease.yaml
   - uptime-kuma/job.yaml
   - uptime-kuma/ingressroute.yaml
+  - uptime-kuma/pvc.yaml
   
   # ──────────────────────────────────────
   # Kyverno

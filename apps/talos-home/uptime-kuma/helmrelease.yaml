@@ -80,6 +80,7 @@ spec:
     persistence:
       data:
         type: persistentVolumeClaim
+        existingClaim: uptime-kuma-data
         storageClass: local-path
         accessMode: ReadWriteOnce
         size: 1Gi

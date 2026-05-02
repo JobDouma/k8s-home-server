@@ -34,7 +34,8 @@ resources:
   - headlamp/rbac.yaml
   - headlamp/certificate.yaml
 
-  
+  - omni/cluster-template.yaml
+
 
   - authentik/namespace.yaml
   - authentik/certificate.yaml
