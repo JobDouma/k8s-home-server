@@ -1,0 +1,9 @@
+#!/bin/bash
+# Build ignore-files list from .gitignore
+IGNORE_FILES=$(grep -v '^#' ~/k8s-home-server/.gitignore | grep -v '^$' | grep -v '/' | tr '\n' ' ')
+
+repo2txt -r ~/k8s-home-server -o ~/k8s-home-server/cluster-context.txt \
+  --exclude-dir flux-system .git .github .githooks .vscode dashboards \
+  --ignore-files $IGNORE_FILES \
+  --ignore-types .sops .lock
+echo "✅ ~/k8s-home-server/cluster-context.txt updated"
