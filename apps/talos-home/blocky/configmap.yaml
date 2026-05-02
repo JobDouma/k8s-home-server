@@ -8,9 +8,9 @@ data:
     upstreams:
       groups:
         default:
-          - https://1.1.1.1/dns-query
-          - https://9.9.9.9/dns-query
-          - https://8.8.8.8/dns-query
+          - https://one.one.one.one/dns-query
+          - https://dns.google/dns-query
+          - https://dns.quad9.net/dns-query
       timeout: 2s
       strategy: parallel_best
 
@@ -22,19 +22,21 @@ data:
           - https://adguardteam.github.io/AdGuardSDNSFilter/Filters/filter.txt
           - https://raw.githubusercontent.com/hoshsadiq/adblock-nocoin-list/master/hosts.txt
           - https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts
+          - https://big.oisd.nl
           - https://raw.githubusercontent.com/hagezi/dns-blocklists/main/hosts/pro.txt
-          - https://raw.githubusercontent.com/badmojr/1Hosts/main/Pro/hosts.txt
+          - https://raw.githubusercontent.com/badmojr/1Hosts/master/Pro/hosts.txt
         malware:
           - https://urlhaus.abuse.ch/downloads/hostfile/
+          - https://raw.githubusercontent.com/nicehash/NiceHash-blocklist/master/blocklist.txt
           - https://phishing.army/download/phishing_army_blocklist_extended.txt
           - https://raw.githubusercontent.com/DandelionSprout/adfilt/master/Alternate%20versions%20Anti-Malware%20List/AntiMalwareHosts.txt
           - https://raw.githubusercontent.com/hagezi/dns-blocklists/main/hosts/tif.txt
-          - https://raw.githubusercontent.com/elliotwutingfeng/GlobalAntiScamOrg-blocklist/main/global-anti-scam-org-scam-urls-pihole.txt
+          - https://raw.githubusercontent.com/elliotwutingfeng/GlobalAntiScamOrg-blocklist/main/blocklist.txt
         tracking:
           - https://raw.githubusercontent.com/hagezi/dns-blocklists/main/hosts/native.apple.txt
           - https://raw.githubusercontent.com/hagezi/dns-blocklists/main/hosts/native.samsung.txt
           - https://raw.githubusercontent.com/hagezi/dns-blocklists/main/hosts/native.tiktok.txt
-          - https://raw.githubusercontent.com/hagezi/dns-blocklists/main/hosts/native.winoffice.txt
+          - https://raw.githubusercontent.com/hagezi/dns-blocklists/main/hosts/native.winspy.txt
 
       whiteLists:
         ads:
@@ -95,8 +97,24 @@ data:
     customDNS:
       filterUnmappedTypes: true
       mapping:
-        "*.lan": 192.168.2.100
-
+        dashy.lan: 192.168.2.100
+        jellyfin.lan: 192.168.2.100
+        jellyseerr.lan: 192.168.2.100
+        radarr.lan: 192.168.2.100
+        sonarr.lan: 192.168.2.100
+        qbittorrent.lan: 192.168.2.100
+        prowlarr.lan: 192.168.2.100
+        prometheus.lan: 192.168.2.100
+        grafana.lan: 192.168.2.100
+        joplin.lan: 192.168.2.100
+        traefik.lan: 192.168.2.100
+        blocky.lan: 192.168.2.100
+        headlamp.lan: 192.168.2.100
+        freshrss.lan: 192.168.2.100
+        auth.lan: 192.168.2.100
+        falco.lan: 192.168.2.100
+        gotify.lan: 192.168.2.100
+        immich.lan: 192.168.2.100
         truenas.lan: 192.168.2.5
         router.lan: 192.168.2.254
         omni.lan: 192.168.2.12
