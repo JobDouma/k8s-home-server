@@ -5,6 +5,10 @@ metadata:
   namespace: dns
 data:
   config.yml: |
+    bootstrapDns:
+      - tcp+udp:1.1.1.1
+      - tcp+udp:8.8.8.8
+
     upstreams:
       groups:
         default:
@@ -55,8 +59,11 @@ data:
           - malware
           - tracking
 
-      blockType: zeroIp
-      blockTTL: 10s
+      # nxDomain is more effective than zeroIp:
+      # some ad clients probe 0.0.0.0/:: and retry on "connection refused",
+      # while NXDOMAIN is final and unambiguous.
+      blockType: nxDomain
+      blockTTL: 60s    # raised from 10s — reduces re-query spam for blocked domains
 
       loading:
         refreshPeriod: 4h
