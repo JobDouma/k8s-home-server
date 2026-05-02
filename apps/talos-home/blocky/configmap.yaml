@@ -8,9 +8,9 @@ data:
     upstreams:
       groups:
         default:
-          - https://one.one.one.one/dns-query
-          - https://dns.google/dns-query
-          - https://dns.quad9.net/dns-query
+          - https://1.1.1.1/dns-query
+          - https://9.9.9.9/dns-query
+          - https://8.8.8.8/dns-query
       timeout: 2s
       strategy: parallel_best
 
@@ -95,25 +95,8 @@ data:
     customDNS:
       filterUnmappedTypes: true
       mapping:
-        dashy.lan: 192.168.2.100
-        jellyfin.lan: 192.168.2.100
-        jellyseerr.lan: 192.168.2.100
-        radarr.lan: 192.168.2.100
-        sonarr.lan: 192.168.2.100
-        qbittorrent.lan: 192.168.2.100
-        prowlarr.lan: 192.168.2.100
-        prometheus.lan: 192.168.2.100
-        grafana.lan: 192.168.2.100
-        joplin.lan: 192.168.2.100
-        traefik.lan: 192.168.2.100
-        blocky.lan: 192.168.2.100
-        headlamp.lan: 192.168.2.100
-        freshrss.lan: 192.168.2.100
-        auth.lan: 192.168.2.100
-        falco.lan: 192.168.2.100
-        gotify.lan: 192.168.2.100
-        immich.lan: 192.168.2.100
-        uptime-kuma.lan: 192.168.2.100
+        "*.lan": 192.168.2.100
+
         truenas.lan: 192.168.2.5
         router.lan: 192.168.2.254
         omni.lan: 192.168.2.12
