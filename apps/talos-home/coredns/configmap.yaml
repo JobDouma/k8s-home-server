@@ -9,26 +9,17 @@ data:
         errors
         health
         ready
-
         kubernetes cluster.local in-addr.arpa ip6.arpa {
             pods insecure
             fallthrough in-addr.arpa ip6.arpa
         }
-
-        # .lan MUST go to Blocky
-        forward lan 192.168.2.53 {
-          policy sequential
-          max_fails 2
-          health_check 5s
-        }
-
-        # Primary = Blocky, fallback = public DNS
+        # Consolidated: Blocky VIP first, then Public
         forward . 192.168.2.53 1.1.1.1 8.8.8.8 {
-            policy random
-            max_fails 2
+            policy sequential
+            max_fails 3
+            expire 10s
             health_check 5s
         }
-
         cache 30
         loop
         reload
