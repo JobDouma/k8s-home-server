@@ -43,7 +43,6 @@ patches:
                 exemptions:
                   namespaces:
                     - kube-system
-                    - velero
                   runtimeClasses: []
                   usernames: []
                 kind: PodSecurityConfiguration
