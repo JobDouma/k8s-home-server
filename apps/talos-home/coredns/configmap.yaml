@@ -7,7 +7,9 @@ data:
   Corefile: |
     .:53 {
         errors
-        health
+        health {
+            lameduck 5s
+        }
         ready
 
         kubernetes cluster.local in-addr.arpa ip6.arpa {
@@ -15,18 +17,24 @@ data:
             fallthrough in-addr.arpa ip6.arpa
         }
 
-        # .lan MUST go to Blocky
+        # .lan always goes to Blocky — no fallback needed,
+        # these are your private records only Blocky knows.
         forward lan 192.168.2.53 {
-          policy sequential
-          max_fails 2
-          health_check 5s
+            policy sequential
+            max_fails 3
+            expire 10s
+            health_check 5s
         }
 
-        # Primary = Blocky, fallback = public DNS
+        # ALL other DNS goes to Blocky first.
+        # Public resolvers are emergency fallback only — only
+        # reached when Blocky has exceeded max_fails.
         forward . 192.168.2.53 1.1.1.1 8.8.8.8 {
-            policy random
-            max_fails 2
+            policy sequential
+            max_fails 3
+            expire 10s
             health_check 5s
+            prefer_udp
         }
 
         cache 30
@@ -34,22 +42,3 @@ data:
         reload
         loadbalance
     }
-
-# For in-cluster DNS — it handles DNS for pods inside Kubernetes. 
-# This is completely separate from what Tailscale does.
-
-# Inside cluster (pods):
-# Pod DNS query → CoreDNS → Blocky → upstream
-
-# Your phone on 4G via Tailscale:
-# Phone DNS query → Tailscale → Blocky (192.168.2.53) → upstream
-# Your phone on WiFi with Override local DNS:
-# Phone DNS query → Tailscale → Blocky (192.168.2.53) → upstream
-
-# Query → Blocky
-#       ↓ (if fails)
-#       → 1.1.1.1
-#        (if fails)
-#       → 8.8.8.8
-#       ↓ (if Blocky is back after 5s health check)
-#       → Blocky
