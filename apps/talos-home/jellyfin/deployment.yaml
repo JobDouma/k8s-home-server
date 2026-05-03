@@ -15,22 +15,35 @@ spec:
       labels:
         app: jellyfin
     spec:
+      securityContext:
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+        fsGroupChangePolicy: OnRootMismatch
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
       containers:
       - name: jellyfin
         image: jellyfin/jellyfin:10.11.8@sha256:1694ff069f0c9dafb283c36765175606866769f5d72f2ed56b6a0f1be922fc37
         env:
-        - name: PUID
-          value: '1000'
-        - name: PGID
-          value: '1000'
         - name: TZ
           value: Europe/Amsterdam
+        # PUID/PGID are only consumed by the linuxserver s6 init wrapper.
+        # The official jellyfin/jellyfin image uses the pod securityContext above
+        # instead, so these env vars are removed to avoid confusion.
         ports:
         - containerPort: 8096
           name: http
         - containerPort: 1900
           protocol: UDP
           name: dlna
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: false  # Jellyfin writes transcodes/metadata at runtime
+          capabilities:
+            drop:
+              - ALL
         volumeMounts:
         - name: config
           mountPath: /config
@@ -44,8 +57,8 @@ spec:
             memory: 1Gi
             cpu: 250m
           limits:
-            memory: 2Gi
-            cpu: '1'
+            memory: 4Gi   # raised from 2Gi — transcoding spikes need headroom
+            cpu: "4"      # was missing entirely; transcoding is CPU-heavy
       volumes:
       - name: config
         persistentVolumeClaim:

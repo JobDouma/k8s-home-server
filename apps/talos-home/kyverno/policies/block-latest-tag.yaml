@@ -5,23 +5,82 @@ metadata:
   annotations:
     policies.kyverno.io/title: Block Latest Image Tag
     policies.kyverno.io/severity: medium
+    policies.kyverno.io/description: >
+      Blocks pods that use ':latest' tag or no tag at all (which implicitly pulls latest).
+      Covers containers, initContainers, and ephemeralContainers.
+      The original policy only checked spec.containers.
 spec:
   validationFailureAction: Enforce
   background: true
   rules:
-    - name: block-latest-tag
+    - name: block-latest-tag-containers
       match:
         any:
           - resources:
               kinds:
                 - Pod
       validate:
-        message: "Image tag ':latest' is not allowed. Use a specific tag or digest."
+        message: "Image tag ':latest' (or no tag) is not allowed. Use a specific tag + digest."
         foreach:
           - list: "request.object.spec.containers"
+            deny:
+              conditions:
+                any:
+                  # Explicit :latest tag
+                  - key: "{{ element.image }}"
+                    operator: Equals
+                    value: "*:latest"
+                  # No tag at all — image: nginx (implicitly :latest)
+                  - key: "{{ element.image | contains(@, ':') }}"
+                    operator: Equals
+                    value: "false"
+
+    - name: block-latest-tag-init-containers
+      match:
+        any:
+          - resources:
+              kinds:
+                - Pod
+      preconditions:
+        all:
+          - key: "{{ request.object.spec.initContainers | length(@) }}"
+            operator: GreaterThanOrEquals
+            value: 1
+      validate:
+        message: "initContainer image tag ':latest' (or no tag) is not allowed."
+        foreach:
+          - list: "request.object.spec.initContainers"
             deny:
               conditions:
                 any:
                   - key: "{{ element.image }}"
                     operator: Equals
                     value: "*:latest"
+                  - key: "{{ element.image | contains(@, ':') }}"
+                    operator: Equals
+                    value: "false"
+
+    - name: block-latest-tag-ephemeral-containers
+      match:
+        any:
+          - resources:
+              kinds:
+                - Pod
+      preconditions:
+        all:
+          - key: "{{ request.object.spec.ephemeralContainers | length(@) }}"
+            operator: GreaterThanOrEquals
+            value: 1
+      validate:
+        message: "ephemeralContainer image tag ':latest' (or no tag) is not allowed."
+        foreach:
+          - list: "request.object.spec.ephemeralContainers"
+            deny:
+              conditions:
+                any:
+                  - key: "{{ element.image }}"
+                    operator: Equals
+                    value: "*:latest"
+                  - key: "{{ element.image | contains(@, ':') }}"
+                    operator: Equals
+                    value: "false"

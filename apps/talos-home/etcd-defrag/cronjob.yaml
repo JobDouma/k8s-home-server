@@ -30,6 +30,13 @@ spec:
                 - --key=/etc/kubernetes/pki/etcd/peer.key
                 - defrag
                 - --cluster
+              resources:
+                requests:
+                  cpu: 50m
+                  memory: 64Mi
+                limits:
+                  cpu: 200m
+                  memory: 128Mi
               volumeMounts:
                 - name: etcd-certs
                   mountPath: /etc/kubernetes/pki/etcd
