@@ -12,7 +12,7 @@ metadata:
       apps like Jellyfin and Immich. Memory limits are required because OOM kills
       are safer than unbounded memory growth starving other pods.
 spec:
-  validationFailureAction: Audit    # start Audit; flip to Enforce once all apps pass
+  validationFailureAction: Enforce 
   background: true
   rules:
     - name: require-memory-limits

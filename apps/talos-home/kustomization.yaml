@@ -131,7 +131,6 @@ resources:
   - recyclarr/configmap.yaml
   - recyclarr/secret.yaml
   - recyclarr/cronjob.yaml
-  # - recyclarr/sonarr-language-rescan-job.yaml
 
   # ──────────────────────────────────────
   # Joplin
