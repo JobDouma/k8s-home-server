@@ -12,7 +12,7 @@ metadata:
       Exempts namespaces that legitimately need privilege (tailscale, falco,
       metallb, local-path-storage).
 spec:
-  validationFailureAction: Audit    # start Audit; check reports before enforcing
+  validationFailureAction: Enforce
   background: true
   rules:
     - name: deny-privilege-escalation
