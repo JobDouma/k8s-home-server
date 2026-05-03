@@ -1,0 +1,104 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: actual-budget
+  namespace: actual-budget
+spec:
+  interval: 15m
+  timeout: 10m
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    remediation:
+      retries: 3
+  chart:
+    spec:
+      chart: app-template
+      version: 4.6.2
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s
+        namespace: flux-system
+  values:
+    controllers:
+      actual-budget:
+        replicas: 1
+        pod:
+          securityContext:
+            runAsUser: 1000
+            runAsGroup: 1000
+            fsGroup: 1000
+            fsGroupChangePolicy: OnRootMismatch
+            runAsNonRoot: true
+            seccompProfile:
+              type: RuntimeDefault
+          annotations:
+            # Restart when config changes (if you add a configmap later)
+            reloader.stakater.com/auto: "true"
+        containers:
+          app:
+            image:
+              repository: docker.io/actualbudget/actual-server
+              # renovate: registryUrl=https://index.docker.io/v2/actualbudget/actual-server
+              tag: 26.4.0@sha256:b0e732e2c41b3dc468a71548e88ef76d3f0c157fc43d15fa05d14ec1c5747e1e
+            env:
+              TZ: Europe/Amsterdam
+              # Actual Budget does not require DB credentials — it manages its own
+              # SQLite database inside the data volume. No secrets needed.
+            ports:
+              - name: http
+                containerPort: 5006
+                protocol: TCP
+            securityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: false   # Actual writes to /data at runtime
+              capabilities:
+                drop:
+                  - ALL
+            probes:
+              liveness:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /
+                    port: 5006
+                  initialDelaySeconds: 15
+                  periodSeconds: 30
+                  failureThreshold: 5
+              readiness:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /
+                    port: 5006
+                  initialDelaySeconds: 10
+                  periodSeconds: 10
+                  failureThreshold: 3
+            resources:
+              requests:
+                cpu: 25m
+                memory: 128Mi
+              limits:
+                cpu: 500m
+                memory: 512Mi
+
+    service:
+      app:
+        controller: actual-budget
+        type: ClusterIP
+        ports:
+          http:
+            port: 5006
+            protocol: TCP
+            targetPort: http
+
+    persistence:
+      data:
+        enabled: true
+        type: persistentVolumeClaim
+        existingClaim: actual-budget-data
+        globalMounts:
+          - path: /data
