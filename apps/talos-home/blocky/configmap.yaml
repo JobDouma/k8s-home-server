@@ -59,11 +59,8 @@ data:
           - malware
           - tracking
 
-      # nxDomain is more effective than zeroIp:
-      # some ad clients probe 0.0.0.0/:: and retry on "connection refused",
-      # while NXDOMAIN is final and unambiguous.
       blockType: nxDomain
-      blockTTL: 60s    # raised from 10s — reduces re-query spam for blocked domains
+      blockTTL: 60s
 
       loading:
         refreshPeriod: 4h
@@ -122,7 +119,8 @@ data:
         falco.lan: 192.168.2.100
         gotify.lan: 192.168.2.100
         immich.lan: 192.168.2.100
-        actual.lan: 192.168.2.100
+        uptime-kuma.lan: 192.168.2.100  # was missing — Uptime Kuma monitors itself but couldn't resolve
+        actual.lan: 192.168.2.100       # Actual Budget
         truenas.lan: 192.168.2.5
         router.lan: 192.168.2.254
         omni.lan: 192.168.2.12

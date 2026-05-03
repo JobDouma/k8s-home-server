@@ -10,6 +10,42 @@ spec:
   policyTypes:
     - Egress
   egress:
+    # Kubernetes API server (webhook registration + policy evaluation)
+    - ports:
+        - port: 6443
+          protocol: TCP
+    # DNS
+    - ports:
+        - port: 53
+          protocol: UDP
+        - port: 53
+          protocol: TCP
+    # HTTPS — for pulling policy exceptions / OCI bundles if ever used
+    - ports:
+        - port: 443
+          protocol: TCP
+    # Kyverno internal: admission-controller → reportsController (port 9443)
+    - to:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/instance: kyverno
+      ports:
+        - port: 9443
+          protocol: TCP
+---
+# Background controller needs API server access for background scans
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: kyverno-background-controller-egress
+  namespace: kyverno
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/component: background-controller
+  policyTypes:
+    - Egress
+  egress:
     - ports:
         - port: 6443
           protocol: TCP
@@ -18,6 +54,54 @@ spec:
           protocol: UDP
         - port: 53
           protocol: TCP
-    - ports:
-        - port: 443
+    - to:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/instance: kyverno
+      ports:
+        - port: 9443
           protocol: TCP
+---
+# Reports controller writes PolicyReport CRDs via API server
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: kyverno-reports-controller-egress
+  namespace: kyverno
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/component: reports-controller
+  policyTypes:
+    - Egress
+  egress:
+    - ports:
+        - port: 6443
+          protocol: TCP
+    - ports:
+        - port: 53
+          protocol: UDP
+        - port: 53
+          protocol: TCP
+---
+# Allow Prometheus to scrape metrics from all Kyverno components
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: kyverno-allow-prometheus-scrape
+  namespace: kyverno
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/instance: kyverno
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: monitoring
+      ports:
+        - port: 8000   # admission-controller metrics
+        - port: 9000   # background-controller metrics
+        - port: 9001   # reports-controller metrics

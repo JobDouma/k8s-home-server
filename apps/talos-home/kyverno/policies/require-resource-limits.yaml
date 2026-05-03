@@ -1,0 +1,42 @@
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: require-resource-limits
+  annotations:
+    policies.kyverno.io/title: Require CPU and Memory Limits
+    policies.kyverno.io/severity: medium
+    policies.kyverno.io/description: >
+      Ensures every container declares memory limits.
+      CPU limits are intentionally NOT required — setting CPU limits causes CPU
+      throttling even when node capacity is available, which hurts latency-sensitive
+      apps like Jellyfin and Immich. Memory limits are required because OOM kills
+      are safer than unbounded memory growth starving other pods.
+spec:
+  validationFailureAction: Audit    # start Audit; flip to Enforce once all apps pass
+  background: true
+  rules:
+    - name: require-memory-limits
+      match:
+        any:
+          - resources:
+              kinds:
+                - Pod
+      exclude:
+        any:
+          - resources:
+              namespaces:
+                - kube-system
+                - local-path-storage
+                - flux-system
+                - tailscale
+                - metallb-system
+      validate:
+        message: "Container '{{ element.name }}' must declare resources.limits.memory."
+        foreach:
+          - list: "request.object.spec.containers"
+            deny:
+              conditions:
+                any:
+                  - key: "{{ element.resources.limits.memory || '' }}"
+                    operator: Equals
+                    value: ""

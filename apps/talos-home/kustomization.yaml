@@ -76,6 +76,7 @@ resources:
   - networkpolicies/allow-renovate-egress.yaml
   - networkpolicies/allow-dns-from-lan.yaml
   - networkpolicies/allow-all-metallb.yaml
+  - networkpolicies/media-namespace.yaml
 
   # ──────────────────────────────────────
   # Sonarr
@@ -237,9 +238,11 @@ resources:
   - kyverno/helmrelease.yaml
   - kyverno/cosign-secret.sops.yaml
   - kyverno/pdb.yaml
+  - kyverno/networkpolicy.yaml 
   - kyverno/policies/enforce-image-signatures.yaml
   - kyverno/policies/block-latest-tag.yaml
-  - kyverno/networkpolicy.yaml
+  - kyverno/policies/require-resource-limits.yaml    
+  - kyverno/policies/disallow-privilege-escalation.yaml
   
   # ──────────────────────────────────────
   # Actual Budget

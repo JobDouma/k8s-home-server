@@ -4,6 +4,9 @@ metadata:
   name: pdb-kyverno-admission
   namespace: kyverno
 spec:
+  # minAvailable: 1 means a rolling upgrade can take down 2 of 3 replicas
+  # while still serving admission requests. With 1 replica this was effectively
+  # a no-op because taking down the only pod would violate the budget anyway.
   minAvailable: 1
   selector:
     matchLabels:
