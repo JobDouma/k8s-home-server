@@ -6,3 +6,4 @@ metadata:
     kubernetes.io/metadata.name: actual-budget
     pod-security.kubernetes.io/enforce: baseline
     pod-security.kubernetes.io/warn: restricted
+    
