@@ -1,0 +1,22 @@
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: actual-budget
+  namespace: actual-budget
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: Host(`actual.lan`)
+      kind: Rule
+      middlewares:
+        # actual-budget has its own password protection built in,
+        # so we use noauth (same as Jellyfin, Joplin, FreshRSS).
+        # Switch to traefik-chain if you want Authentik SSO in front of it.
+        - name: traefik-chain-noauth
+          namespace: networking
+      services:
+        - name: actual-budget
+          port: 5006
+  tls:
+    secretName: actual-budget-tls

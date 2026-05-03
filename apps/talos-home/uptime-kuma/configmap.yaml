@@ -65,7 +65,6 @@ data:
         "Router",
         "talos-cp-1 (k8s API)",
         "talos-wk-1 (k8s API)",
-        "talos-cp-3 (k8s API)",
     ]
     for name in REMOVED:
         row = con.execute("SELECT id FROM monitor WHERE name = ?", (name,)).fetchone()
@@ -166,6 +165,7 @@ data:
     add_http("Joplin",      "https://joplin.lan")
     add_http("Gotify",      "https://gotify.lan")
     add_http("Headlamp",    "https://headlamp.lan")
+    add_http("Actual Budget", "https://actual.lan")
     # Infrastructure
     add_http("TrueNAS",     "https://truenas.lan")
     add_http("Omni",        "https://omni.lan")

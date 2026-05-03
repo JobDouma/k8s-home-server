@@ -81,6 +81,11 @@ data:
             description: Push Notifications
             icon: fas fa-bell
             url: https://gotify.lan
+          
+          - title: Actual Budget
+            description: Personal Finance & Budgeting
+            icon: fas fa-piggy-bank
+            url: https://actual.lan
 
 
       - name: Monitoring
