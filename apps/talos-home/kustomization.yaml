@@ -261,6 +261,7 @@ resources:
   - actual-ai/classifier-configmap.yaml
   - actual-ai/classifier-deployment.yaml
   - actual-ai/classifier-service.yaml
+  - actual-ai/classifier-script-configmap.yaml
   - actual-ai/worker-configmap.yaml
   - actual-ai/cronjob.yaml
   - actual-ai/secret.yaml
