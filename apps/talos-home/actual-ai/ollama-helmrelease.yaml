@@ -20,8 +20,8 @@ spec:
         containers:
           app:
             image:
-              repository: ollama/ollama
-              tag: latest
+              repository: ollama/ollama@sha256:722ce8caba5f8b8bd2ee654b2e29466415be3071a704e3f4db1702b83c885f76
+              tag: 0.5.1            
             env:
               - name: OLLAMA_MODELS
                 value: /models
@@ -35,6 +35,12 @@ spec:
               limits:
                 cpu: 4
                 memory: 8Gi
+            securityContext:
+              allowPrivilegeEscalation: false
+              runAsNonRoot: true
+              runAsUser: 1000
+              capabilities:
+                drop: ["ALL"]
     service:
       app:
         controller: ollama
@@ -51,7 +57,11 @@ spec:
           - path: /models
     initContainers:
       pull-model:
-        image: ollama/ollama:latest
+        image: ollama/ollama@sha256:722ce8caba5f8b8bd2ee654b2e29466415be3071a704e3f4db1702b83c885f76
+        securityContext:
+          allowPrivilegeEscalation: false
+          runAsNonRoot: true
+          runAsUser: 1000
         command:
           - /bin/sh
           - -c
@@ -59,3 +69,10 @@ spec:
         volumeMounts:
           - name: models
             mountPath: /models
+        resources:
+          requests:
+            cpu: 500m
+            memory: 1Gi
+          limits:
+            cpu: 1
+            memory: 2Gi
