@@ -8,7 +8,6 @@ metadata:
     policies.kyverno.io/description: >
       Blocks pods that use ':latest' tag or no tag at all (which implicitly pulls latest).
       Covers containers, initContainers, and ephemeralContainers.
-      The original policy only checked spec.containers.
 spec:
   validationFailureAction: Audit
   background: true
@@ -26,11 +25,9 @@ spec:
             deny:
               conditions:
                 any:
-                  # Explicit :latest tag
                   - key: "{{ element.image }}"
                     operator: Equals
                     value: "*:latest"
-                  # No tag at all — image: nginx (implicitly :latest)
                   - key: "{{ element.image | contains(@, ':') }}"
                     operator: Equals
                     value: "false"
@@ -43,7 +40,7 @@ spec:
                 - Pod
       preconditions:
         all:
-          - key: "{{ request.object.spec.initContainers | length(@) }}"
+          - key: "{{ request.object.spec.initContainers || `[]` | length(@) }}"
             operator: GreaterThanOrEquals
             value: 1
       validate:
@@ -68,7 +65,7 @@ spec:
                 - Pod
       preconditions:
         all:
-          - key: "{{ request.object.spec.ephemeralContainers | length(@) }}"
+          - key: "{{ request.object.spec.ephemeralContainers || `[]` | length(@) }}"
             operator: GreaterThanOrEquals
             value: 1
       validate:
