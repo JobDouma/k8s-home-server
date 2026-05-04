@@ -32,11 +32,9 @@ spec:
                 - metallb-system
                 - falco
       validate:
-        message: >
-          Container '{{ element.name }}' must set
-          securityContext.allowPrivilegeEscalation: false.
         foreach:
           - list: "request.object.spec.containers"
+            message: "Container '{{ element.name }}' must set securityContext.allowPrivilegeEscalation: false."
             deny:
               conditions:
                 any:
