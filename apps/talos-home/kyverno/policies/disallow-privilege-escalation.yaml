@@ -9,8 +9,7 @@ metadata:
       Ensures containers set allowPrivilegeEscalation: false.
       This prevents a process inside a container from gaining more privileges
       than its parent process — blocking most setuid-based escalation paths.
-      Exempts namespaces that legitimately need privilege (tailscale, falco,
-      metallb, local-path-storage).
+      Exempts namespaces that legitimately need privilege.
 spec:
   validationFailureAction: Enforce
   background: true
@@ -31,10 +30,11 @@ spec:
                 - tailscale
                 - metallb-system
                 - falco
+                - actual-ai
       validate:
+        message: "Container must set securityContext.allowPrivilegeEscalation: false."
         foreach:
           - list: "request.object.spec.containers"
-            message: "Container '{{ element.name }}' must set securityContext.allowPrivilegeEscalation: false."
             deny:
               conditions:
                 any:
