@@ -1,59 +1,55 @@
-apiVersion: batch/v1
-kind: CronJob
+apiVersion: apps/v1
+kind: Deployment
 metadata:
-  name: actual-auto-categorize
+  name: classifier-api
   namespace: actual-ai
 spec:
-  schedule: "0 * * * *"   # every hour (reduced from 15min)
-  successfulJobsHistoryLimit: 3
-  failedJobsHistoryLimit: 2
-  jobTemplate:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: classifier-api
+  template:
+    metadata:
+      labels:
+        app: classifier-api
     spec:
-      template:
-        spec:
-          restartPolicy: OnFailure
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        fsGroup: 1000
+      containers:
+        - name: api
+          image: python:3.11.9-slim@sha256:8fb099199b9f2d70342674bd9dbccd3ed03a258f26bbd1d556822c6dfc60c317
+          command:
+            - /bin/sh
+            - -c
+            - |
+              pip install --no-cache-dir fastapi uvicorn pyyaml requests && \
+              cp /script/app.py /app.py && \
+              uvicorn app:app --host 0.0.0.0 --port 8080
+          ports:
+            - containerPort: 8080
+          volumeMounts:
+            - name: config
+              mountPath: /config
+            - name: script
+              mountPath: /script
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
           securityContext:
-            runAsNonRoot: true
-            runAsUser: 1000
-          containers:
-            - name: worker
-              image: python:3.11.9-slim@sha256:8fb099199b9f2d70342674bd9dbccd3ed03a258f26bbd1d556822c6dfc60c317
-              command:
-                - /bin/sh
-                - -c
-                - |
-                  pip install requests && \
-                  python /worker/worker.py
-              env:
-                - name: ACTUAL_SERVER
-                  value: "http://actual-budget.actual-budget.svc.cluster.local:5006"
-                - name: ACTUAL_PASSWORD
-                  valueFrom:
-                    secretKeyRef:
-                      name: actual-credentials
-                      key: password
-                - name: BUDGET_ID
-                  valueFrom:
-                    secretKeyRef:
-                      name: actual-credentials
-                      key: budgetId
-                - name: CLASSIFIER_URL
-                  value: "http://classifier-api.actual-ai.svc.cluster.local:8080/classify"
-              volumeMounts:
-                - name: worker-script
-                  mountPath: /worker
-              resources:
-                requests:
-                  cpu: 50m
-                  memory: 128Mi
-                limits:
-                  cpu: 200m
-                  memory: 256Mi
-              securityContext:
-                allowPrivilegeEscalation: false
-                capabilities:
-                  drop: ["ALL"]
-          volumes:
-            - name: worker-script
-              configMap:
-                name: worker-script
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: false   # pip and uvicorn need write to /tmp and /app? better to set temp dir
+            capabilities:
+              drop: ["ALL"]
+      volumes:
+        - name: config
+          configMap:
+            name: classifier-config
+        - name: script
+          configMap:
+            name: classifier-script
