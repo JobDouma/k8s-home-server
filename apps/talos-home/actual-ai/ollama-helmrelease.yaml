@@ -20,8 +20,8 @@ spec:
         containers:
           app:
             image:
-              repository: ollama/ollama@sha256:722ce8caba5f8b8bd2ee654b2e29466415be3071a704e3f4db1702b83c885f76
-              tag: 0.5.1            
+              repository: ollama/ollama
+              tag: "0.5.1@sha256:722ce8caba5f8b8bd2ee654b2e29466415be3071a704e3f4db1702b83c885f76"
             env:
               - name: OLLAMA_MODELS
                 value: /models
@@ -41,6 +41,14 @@ spec:
               runAsUser: 1000
               capabilities:
                 drop: ["ALL"]
+    defaultPodOptions:
+      nodeSelector:
+        kubernetes.io/hostname: talos-cp-1
+      tolerations:
+        - key: node-role.kubernetes.io/control-plane
+          operator: Exists
+          effect: NoSchedule
+
     service:
       app:
         controller: ollama
@@ -57,7 +65,9 @@ spec:
           - path: /models
     initContainers:
       pull-model:
-        image: ollama/ollama@sha256:722ce8caba5f8b8bd2ee654b2e29466415be3071a704e3f4db1702b83c885f76
+        image:
+          repository: ollama/ollama
+          tag: "0.5.1@sha256:722ce8caba5f8b8bd2ee654b2e29466415be3071a704e3f4db1702b83c885f76"
         securityContext:
           allowPrivilegeEscalation: false
           runAsNonRoot: true
@@ -71,7 +81,7 @@ spec:
             mountPath: /models
         resources:
           requests:
-            cpu: 500m
+            cpu: 100m
             memory: 1Gi
           limits:
             cpu: 1
