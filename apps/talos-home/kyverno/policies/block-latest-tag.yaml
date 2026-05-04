@@ -7,14 +7,12 @@ metadata:
     policies.kyverno.io/severity: medium
     policies.kyverno.io/description: >
       Blocks pods that use ':latest' tag or no tag at all.
-      Covers containers, initContainers, and ephemeralContainers.
-      Autogen disabled; explicit rules for Pod, Deployment/StatefulSet/DaemonSet/Job, and CronJob.
+      Uses foreach with || `[]` directly in the list expression so autogen
+      rewrites are safe — no preconditions that crash on null fields.
 spec:
-  autogenControllers: none
   validationFailureAction: Audit
   background: true
   rules:
-    # ── Pod ──────────────────────────────────────────────────────────────────
     - name: block-latest-tag-containers
       match:
         any:
@@ -23,7 +21,7 @@ spec:
       validate:
         message: "Image tag ':latest' (or no tag) is not allowed. Use a specific tag + digest."
         foreach:
-          - list: "request.object.spec.containers"
+          - list: "request.object.spec.containers || `[]`"
             deny:
               conditions:
                 any:
@@ -39,15 +37,10 @@ spec:
         any:
           - resources:
               kinds: [Pod]
-      preconditions:
-        all:
-          - key: "{{ request.object.spec.initContainers || `[]` | length(@) }}"
-            operator: GreaterThanOrEquals
-            value: 1
       validate:
         message: "initContainer image tag ':latest' (or no tag) is not allowed."
         foreach:
-          - list: "request.object.spec.initContainers"
+          - list: "request.object.spec.initContainers || `[]`"
             deny:
               conditions:
                 any:
@@ -63,151 +56,10 @@ spec:
         any:
           - resources:
               kinds: [Pod]
-      preconditions:
-        all:
-          - key: "{{ request.object.spec.ephemeralContainers || `[]` | length(@) }}"
-            operator: GreaterThanOrEquals
-            value: 1
       validate:
         message: "ephemeralContainer image tag ':latest' (or no tag) is not allowed."
         foreach:
-          - list: "request.object.spec.ephemeralContainers"
-            deny:
-              conditions:
-                any:
-                  - key: "{{ element.image }}"
-                    operator: Equals
-                    value: "*:latest"
-                  - key: "{{ element.image | contains(@, ':') }}"
-                    operator: Equals
-                    value: "false"
-
-    # ── Deployment / StatefulSet / DaemonSet / Job (spec.template.spec.*) ───
-    - name: block-latest-tag-deploy-containers
-      match:
-        any:
-          - resources:
-              kinds: [Deployment, StatefulSet, DaemonSet, Job]
-      validate:
-        message: "Image tag ':latest' (or no tag) is not allowed. Use a specific tag + digest."
-        foreach:
-          - list: "request.object.spec.template.spec.containers"
-            deny:
-              conditions:
-                any:
-                  - key: "{{ element.image }}"
-                    operator: Equals
-                    value: "*:latest"
-                  - key: "{{ element.image | contains(@, ':') }}"
-                    operator: Equals
-                    value: "false"
-
-    - name: block-latest-tag-deploy-init-containers
-      match:
-        any:
-          - resources:
-              kinds: [Deployment, StatefulSet, DaemonSet, Job]
-      preconditions:
-        all:
-          - key: "{{ request.object.spec.template.spec.initContainers || `[]` | length(@) }}"
-            operator: GreaterThanOrEquals
-            value: 1
-      validate:
-        message: "initContainer image tag ':latest' (or no tag) is not allowed."
-        foreach:
-          - list: "request.object.spec.template.spec.initContainers"
-            deny:
-              conditions:
-                any:
-                  - key: "{{ element.image }}"
-                    operator: Equals
-                    value: "*:latest"
-                  - key: "{{ element.image | contains(@, ':') }}"
-                    operator: Equals
-                    value: "false"
-
-    - name: block-latest-tag-deploy-ephemeral-containers
-      match:
-        any:
-          - resources:
-              kinds: [Deployment, StatefulSet, DaemonSet, Job]
-      preconditions:
-        all:
-          - key: "{{ request.object.spec.template.spec.ephemeralContainers || `[]` | length(@) }}"
-            operator: GreaterThanOrEquals
-            value: 1
-      validate:
-        message: "ephemeralContainer image tag ':latest' (or no tag) is not allowed."
-        foreach:
-          - list: "request.object.spec.template.spec.ephemeralContainers"
-            deny:
-              conditions:
-                any:
-                  - key: "{{ element.image }}"
-                    operator: Equals
-                    value: "*:latest"
-                  - key: "{{ element.image | contains(@, ':') }}"
-                    operator: Equals
-                    value: "false"
-
-    # ── CronJob (spec.jobTemplate.spec.template.spec.*) ─────────────────────
-    - name: block-latest-tag-cronjob-containers
-      match:
-        any:
-          - resources:
-              kinds: [CronJob]
-      validate:
-        message: "Image tag ':latest' (or no tag) is not allowed. Use a specific tag + digest."
-        foreach:
-          - list: "request.object.spec.jobTemplate.spec.template.spec.containers"
-            deny:
-              conditions:
-                any:
-                  - key: "{{ element.image }}"
-                    operator: Equals
-                    value: "*:latest"
-                  - key: "{{ element.image | contains(@, ':') }}"
-                    operator: Equals
-                    value: "false"
-
-    - name: block-latest-tag-cronjob-init-containers
-      match:
-        any:
-          - resources:
-              kinds: [CronJob]
-      preconditions:
-        all:
-          - key: "{{ request.object.spec.jobTemplate.spec.template.spec.initContainers || `[]` | length(@) }}"
-            operator: GreaterThanOrEquals
-            value: 1
-      validate:
-        message: "initContainer image tag ':latest' (or no tag) is not allowed."
-        foreach:
-          - list: "request.object.spec.jobTemplate.spec.template.spec.initContainers"
-            deny:
-              conditions:
-                any:
-                  - key: "{{ element.image }}"
-                    operator: Equals
-                    value: "*:latest"
-                  - key: "{{ element.image | contains(@, ':') }}"
-                    operator: Equals
-                    value: "false"
-
-    - name: block-latest-tag-cronjob-ephemeral-containers
-      match:
-        any:
-          - resources:
-              kinds: [CronJob]
-      preconditions:
-        all:
-          - key: "{{ request.object.spec.jobTemplate.spec.template.spec.ephemeralContainers || `[]` | length(@) }}"
-            operator: GreaterThanOrEquals
-            value: 1
-      validate:
-        message: "ephemeralContainer image tag ':latest' (or no tag) is not allowed."
-        foreach:
-          - list: "request.object.spec.jobTemplate.spec.template.spec.ephemeralContainers"
+          - list: "request.object.spec.ephemeralContainers || `[]`"
             deny:
               conditions:
                 any:
