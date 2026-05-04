@@ -1,0 +1,29 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: classifier-config
+  namespace: actual-ai
+data:
+  rules.yaml: |
+    rules:
+      - match: "AH|Albert Heijn|Jumbo|Lidl|Aldi|Dirk"
+        category: Groceries
+        tags: ["supermarket"]
+      - match: "Shell|BP|Esso|Total|Tankstation"
+        category: Fuel
+        tags: ["transport","fuel"]
+      - match: "NS|OV-chipkaart|Uber|Taxi|Trein"
+        category: Transport
+        tags: ["commute"]
+      - match: "Thuisbezorgd|UberEats|Domino|Pizza"
+        category: Dining
+        tags: ["takeout"]
+      - match: "Ziggo|KPN|Vattenfall|Eneco|Waternet"
+        category: Utilities
+        tags: ["household"]
+      - match: "Bol.com|Coolblue|Amazon|Wehkamp"
+        category: Shopping
+        tags: ["online"]
+      - match: "Huisarts|Apotheek|Dokter|Ziekenhuis"
+        category: Healthcare
+        tags: ["medical"]
