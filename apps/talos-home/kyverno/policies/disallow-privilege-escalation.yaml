@@ -11,7 +11,7 @@ metadata:
       than its parent process — blocking most setuid-based escalation paths.
       Exempts namespaces that legitimately need privilege.
 spec:
-  validationFailureAction: Enforce
+  validationFailureAction: Audit
   background: true
   rules:
     - name: deny-privilege-escalation

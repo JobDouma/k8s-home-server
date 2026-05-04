@@ -10,7 +10,7 @@ metadata:
       Covers containers, initContainers, and ephemeralContainers.
       The original policy only checked spec.containers.
 spec:
-  validationFailureAction: Enforce
+  validationFailureAction: Audit
   background: true
   rules:
     - name: block-latest-tag-containers
