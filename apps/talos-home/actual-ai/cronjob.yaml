@@ -4,7 +4,7 @@ metadata:
   name: actual-auto-categorize
   namespace: actual-ai
 spec:
-  schedule: "0 0 * * *"
+  schedule: "0 * * * *"   # every hour (reduced from 15min)
   successfulJobsHistoryLimit: 3
   failedJobsHistoryLimit: 2
   jobTemplate:
@@ -12,9 +12,12 @@ spec:
       template:
         spec:
           restartPolicy: OnFailure
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 1000
           containers:
             - name: worker
-              image: python:3.11-slim
+              image: python:3.11.9-slim@sha256:8fb099199b9f2d70342674bd9dbccd3ed03a258f26bbd1d556822c6dfc60c317
               command:
                 - /bin/sh
                 - -c
@@ -39,6 +42,17 @@ spec:
               volumeMounts:
                 - name: worker-script
                   mountPath: /worker
+              resources:
+                requests:
+                  cpu: 50m
+                  memory: 128Mi
+                limits:
+                  cpu: 200m
+                  memory: 256Mi
+              securityContext:
+                allowPrivilegeEscalation: false
+                capabilities:
+                  drop: ["ALL"]
           volumes:
             - name: worker-script
               configMap:

@@ -1,110 +1,59 @@
-apiVersion: apps/v1
-kind: Deployment
+apiVersion: batch/v1
+kind: CronJob
 metadata:
-  name: classifier-api
+  name: actual-auto-categorize
   namespace: actual-ai
 spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: classifier-api
-  template:
-    metadata:
-      labels:
-        app: classifier-api
+  schedule: "0 * * * *"   # every hour (reduced from 15min)
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 2
+  jobTemplate:
     spec:
-      containers:
-        - name: api
-          image: python:3.11-slim
-          command:
-            - /bin/sh
-            - -c
-            - |
-              pip install --no-cache-dir fastapi uvicorn pyyaml requests && \
-              cp /script/app.py /app.py && \
-              uvicorn app:app --host 0.0.0.0 --port 8080
-          ports:
-            - containerPort: 8080
-          volumeMounts:
-            - name: config
-              mountPath: /config
-            - name: script
-              mountPath: /script
-          resources:
-            requests:
-              cpu: 100m
-              memory: 256Mi
-            limits:
-              cpu: 500m
-              memory: 512Mi
-      volumes:
-        - name: config
-          configMap:
-            name: classifier-config
-        - name: script
-          configMap:
-            name: classifier-script
----
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: classifier-script
-  namespace: actual-ai
-data:
-  app.py: |
-    import re, yaml, requests, json
-    from fastapi import FastAPI, HTTPException
-    from pydantic import BaseModel
-    from typing import List
-
-    app = FastAPI()
-
-    with open("/config/rules.yaml") as f:
-        rules = yaml.safe_load(f)["rules"]
-
-    OLLAMA_URL = "http://ollama:11434/api/generate"
-    OLLAMA_MODEL = "mistral"
-
-    class ClassificationResult(BaseModel):
-        category: str
-        tags: List[str]
-
-    def classify_by_rule(text: str):
-        for rule in rules:
-            if re.search(rule["match"], text, re.I):
-                return ClassificationResult(
-                    category=rule.get("category", "Other"),
-                    tags=rule.get("tags", [])
-                )
-        return None
-
-    def classify_by_ai(text: str):
-        prompt = f"""You are a financial transaction classifier.
-        Transaction: "{text}"
-        Return a JSON object: {{"category": one of [Groceries, Dining, Fuel, Utilities, Transport, Shopping, Healthcare, Entertainment, Other], "tags": list of 0-2 keywords}}"""
-        try:
-            resp = requests.post(OLLAMA_URL, json={
-                "model": OLLAMA_MODEL,
-                "prompt": prompt,
-                "stream": False,
-                "format": "json"
-            }, timeout=30)
-            resp.raise_for_status()
-            result = json.loads(resp.json()["response"])
-            return ClassificationResult(
-                category=result.get("category", "Other"),
-                tags=result.get("tags", [])
-            )
-        except Exception:
-            return ClassificationResult(category="Other", tags=["ai-failed"])
-
-    @app.get("/classify", response_model=ClassificationResult)
-    def classify(q: str):
-        if not q:
-            raise HTTPException(400, "Missing 'q'")
-        rule_result = classify_by_rule(q)
-        return rule_result if rule_result else classify_by_ai(q)
-
-    @app.get("/health")
-    def health():
-        return {"status": "ok"}
+      template:
+        spec:
+          restartPolicy: OnFailure
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 1000
+          containers:
+            - name: worker
+              image: python:3.11.9-slim@sha256:8fb099199b9f2d70342674bd9dbccd3ed03a258f26bbd1d556822c6dfc60c317
+              command:
+                - /bin/sh
+                - -c
+                - |
+                  pip install requests && \
+                  python /worker/worker.py
+              env:
+                - name: ACTUAL_SERVER
+                  value: "http://actual-budget.actual-budget.svc.cluster.local:5006"
+                - name: ACTUAL_PASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      name: actual-credentials
+                      key: password
+                - name: BUDGET_ID
+                  valueFrom:
+                    secretKeyRef:
+                      name: actual-credentials
+                      key: budgetId
+                - name: CLASSIFIER_URL
+                  value: "http://classifier-api.actual-ai.svc.cluster.local:8080/classify"
+              volumeMounts:
+                - name: worker-script
+                  mountPath: /worker
+              resources:
+                requests:
+                  cpu: 50m
+                  memory: 128Mi
+                limits:
+                  cpu: 200m
+                  memory: 256Mi
+              securityContext:
+                allowPrivilegeEscalation: false
+                capabilities:
+                  drop: ["ALL"]
+          volumes:
+            - name: worker-script
+              configMap:
+                name: worker-script
