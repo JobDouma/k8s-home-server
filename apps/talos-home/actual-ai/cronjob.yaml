@@ -4,7 +4,7 @@ metadata:
   name: actual-auto-categorize
   namespace: actual-ai
 spec:
-  schedule: "*/15 * * * *"
+  schedule: "0 0 * * *"
   successfulJobsHistoryLimit: 3
   failedJobsHistoryLimit: 2
   jobTemplate:
