@@ -6,6 +6,7 @@ metadata:
 data:
   rules.yaml: |
     rules:
+      # ========== EXISTING RULES (keep) ==========
       - match: "AH|Albert Heijn|Jumbo|Lidl|Aldi|Dirk"
         category: Groceries
         tags: ["supermarket"]
@@ -27,3 +28,152 @@ data:
       - match: "Huisarts|Apotheek|Dokter|Ziekenhuis"
         category: Healthcare
         tags: ["medical"]
+
+      # ========== NEW RULES (based on your list) ==========
+      # --- Hospitality / Dining ---
+      - match: "Hoxton Amsterdam"
+        category: Dining
+        tags: ["hotel","bar"]
+      - match: "Mcd Utrecht"
+        category: Dining
+        tags: ["fastfood"]
+      - match: "Paak Vinyl Bar"
+        category: Dining
+        tags: ["bar","music"]
+      - match: "The Doner Factory"
+        category: Dining
+        tags: ["fastfood"]
+      - match: "Stayokay Utrechtcentrum"
+        category: Transport
+        tags: ["hostel","lodging"]
+
+      # --- Groceries / Shops ---
+      - match: "Lidl 279 Nijmegen"
+        category: Groceries
+        tags: ["supermarket"]
+      - match: "Sphinx Levensmiddelen"
+        category: Groceries
+        tags: ["supermarket"]
+      - match: "Toko Pedis"
+        category: Groceries
+        tags: ["toko","ethnic"]
+      - match: "Toko Rinus"
+        category: Groceries
+        tags: ["toko","ethnic"]
+
+      # --- Shopping (online / retail) ---
+      - match: "Zalando Payments Gmbh"
+        category: Shopping
+        tags: ["clothing","online"]
+      - match: "Vinted via Mangopay Sa"
+        category: Shopping
+        tags: ["secondhand","clothing"]
+      - match: "Zumub via Checkout.Com"
+        category: Shopping
+        tags: ["supplements","health"]
+
+      # --- Utilities & Housing ---
+      - match: "Vitens Nv"
+        category: Utilities
+        tags: ["water"]
+      - match: "Youfone Nederland B.V."
+        category: Utilities
+        tags: ["mobile","internet"]
+      - match: "Ing Hypotheken"
+        category: Utilities
+        tags: ["mortgage","housing"]
+      - match: "Stichting Talis"
+        category: Utilities
+        tags: ["housing","association"]
+      - match: "Talis Woondiensten"
+        category: Utilities
+        tags: ["housing","maintenance"]
+
+      # --- Insurance ---
+      - match: "Inshared Nederland B.V."
+        category: Healthcare
+        tags: ["insurance"]
+      - match: "Onvz Zorgverzekeraar"
+        category: Healthcare
+        tags: ["health","insurance"]
+      - match: "Opgroen Verzekeringen B.V. Veh"
+        category: Transport
+        tags: ["car","insurance"]
+
+      # --- Income / Salary ---
+      - match: "Ing Bank Nv Inzake Salarisbetaling"
+        category: Income
+        tags: ["salary"]
+      - match: "Transfer: Hr J B P Douma"
+        category: Income
+        tags: ["transfer","personal"]
+
+      # --- Bank fees / Credit card ---
+      - match: "Incasso Ing Creditcard"
+        category: Financial
+        tags: ["creditcard","payment"]
+      - match: "Kosten Oranjepakket"
+        category: Financial
+        tags: ["bankfees","package"]
+
+      # --- Personal transfers / internal ---
+      - match: "Hr Mi Douma"
+        category: Transfer
+        tags: ["personal","internal"]
+      - match: "Hr P F E J Douma"
+        category: Transfer
+        tags: ["personal","internal"]
+      - match: "Hr S Lamers"
+        category: Transfer
+        tags: ["personal","internal"]
+      - match: "J B P Douma"
+        category: Transfer
+        tags: ["personal","internal"]
+      - match: "J.B.P. Douma via Asn Bank"
+        category: Transfer
+        tags: ["personal","internal"]
+      - match: "Mw Eej Douma"
+        category: Transfer
+        tags: ["personal","internal"]
+
+      # --- Payment processors / gateways ---
+      - match: "Mangopay"
+        category: Shopping
+        tags: ["payment","processor"]
+      - match: "Ppro Payment Services Sa"
+        category: Shopping
+        tags: ["payment","processor"]
+      - match: "Trustly Group Ab"
+        category: Shopping
+        tags: ["payment","online"]
+      - match: "Ticketingpayments"
+        category: Entertainment
+        tags: ["tickets","events"]
+      - match: "St Paylogic Foundation"
+        category: Entertainment
+        tags: ["tickets","events"]
+
+      # --- Miscellaneous / Unknown ---
+      - match: "Nlovx75pxnm4egy58z"
+        category: Other
+        tags: ["unknown","reference"]
+      - match: "Starting Balance"
+        category: System
+        tags: ["initial","balance"]
+
+      # ========== IMPORTANT FUTURE PAYEES (example – uncomment & adapt) ==========
+      # - match: "Netflix|Spotify|Disney\\+"
+      #   category: Entertainment
+      #   tags: ["subscription"]
+      # - match: "Gemeente|Belastingdienst"
+      #   category: Taxes
+      #   tags: ["municipality","tax"]
+      # - match: "Zilveren Kruis|CZ|Menzis"
+      #   category: Healthcare
+      #   tags: ["health","insurance"]
+      # - match: "KPN|Vodafone|T-Mobile"
+      #   category: Utilities
+      #   tags: ["telecom"]
+      # - match: "Coolblue|Mediamarkt|BCC"
+      #   category: Shopping
+      #   tags: ["electronics"]
