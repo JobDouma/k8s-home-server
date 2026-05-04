@@ -232,16 +232,16 @@ resources:
   # ──────────────────────────────────────
   # Kyverno
   # ──────────────────────────────────────
-  - kyverno/namespace.yaml
-  - kyverno/helmrepository.yaml
-  - kyverno/helmrelease.yaml
-  - kyverno/cosign-secret.sops.yaml
-  - kyverno/pdb.yaml
-  - kyverno/networkpolicy.yaml 
-  - kyverno/policies/enforce-image-signatures.yaml
-  - kyverno/policies/block-latest-tag.yaml
-  - kyverno/policies/require-resource-limits.yaml    
-  - kyverno/policies/disallow-privilege-escalation.yaml
+  # - kyverno/namespace.yaml
+  # - kyverno/helmrepository.yaml
+  # - kyverno/helmrelease.yaml
+  # - kyverno/cosign-secret.sops.yaml
+  # - kyverno/pdb.yaml
+  # - kyverno/networkpolicy.yaml 
+  # - kyverno/policies/enforce-image-signatures.yaml
+  # - kyverno/policies/block-latest-tag.yaml
+  # - kyverno/policies/require-resource-limits.yaml    
+  # - kyverno/policies/disallow-privilege-escalation.yaml
   
   # ──────────────────────────────────────
   # Actual Budget

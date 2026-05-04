@@ -50,6 +50,3 @@ spec:
         - name: config
           configMap:
             name: classifier-config
-        - name: script
-          configMap:
-            name: classifier-script

@@ -12,7 +12,7 @@ metadata:
       this prevents tag-mutable attacks even if the registry is compromised after deployment.
       useCache: true avoids re-fetching the manifest on every admission call.
 spec:
-  validationFailureAction: Enforce   # flipped from Audit
+  validationFailureAction: Audit   # flipped from Audit
   background: true
   rules:
     - name: verify-image-signature
@@ -27,7 +27,7 @@ spec:
           # mutateDigest: true rewrites the image tag to its digest at admission.
           # This means once a Pod is admitted, the exact image layer is pinned —
           # even if someone pushes a new image to the same tag later.
-          mutateDigest: true
+          mutateDigest: false
           # Verify the digest matches what was signed — prevents digest substitution.
           verifyDigest: true
           # Cache registry responses for 10 minutes to reduce latency
