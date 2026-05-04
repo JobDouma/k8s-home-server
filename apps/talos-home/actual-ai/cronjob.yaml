@@ -4,7 +4,7 @@ metadata:
   name: actual-auto-categorize
   namespace: actual-ai
 spec:
-  schedule: "0 * * * *"   # every hour (reduced from 15min)
+  schedule: "0 * * * *"
   successfulJobsHistoryLimit: 3
   failedJobsHistoryLimit: 2
   jobTemplate:
@@ -22,8 +22,8 @@ spec:
                 - /bin/sh
                 - -c
                 - |
-                  pip install requests && \
-                  python /worker/worker.py
+                  pip install --quiet --target /tmp/pypackages requests && \
+                  PYTHONPATH=/tmp/pypackages python /worker/worker.py
               env:
                 - name: ACTUAL_SERVER
                   value: "http://actual-budget.actual-budget.svc.cluster.local:5006"

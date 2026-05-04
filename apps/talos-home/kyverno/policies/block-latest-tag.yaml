@@ -8,16 +8,18 @@ metadata:
     policies.kyverno.io/description: >
       Blocks pods that use ':latest' tag or no tag at all (which implicitly pulls latest).
       Covers containers, initContainers, and ephemeralContainers.
+      Explicitly targets both Pod and Deployment with correct JMESPath paths.
+    pod-policies.kyverno.io/autogen-controllers: none  # disable autogen
 spec:
   validationFailureAction: Audit
   background: true
   rules:
+    # ── Pod rules ────────────────────────────────────────────────────────────
     - name: block-latest-tag-containers
       match:
         any:
           - resources:
-              kinds:
-                - Pod
+              kinds: [Pod]
       validate:
         message: "Image tag ':latest' (or no tag) is not allowed. Use a specific tag + digest."
         foreach:
@@ -36,8 +38,7 @@ spec:
       match:
         any:
           - resources:
-              kinds:
-                - Pod
+              kinds: [Pod]
       preconditions:
         all:
           - key: "{{ request.object.spec.initContainers || `[]` | length(@) }}"
@@ -61,8 +62,7 @@ spec:
       match:
         any:
           - resources:
-              kinds:
-                - Pod
+              kinds: [Pod]
       preconditions:
         all:
           - key: "{{ request.object.spec.ephemeralContainers || `[]` | length(@) }}"
@@ -72,6 +72,74 @@ spec:
         message: "ephemeralContainer image tag ':latest' (or no tag) is not allowed."
         foreach:
           - list: "request.object.spec.ephemeralContainers"
+            deny:
+              conditions:
+                any:
+                  - key: "{{ element.image }}"
+                    operator: Equals
+                    value: "*:latest"
+                  - key: "{{ element.image | contains(@, ':') }}"
+                    operator: Equals
+                    value: "false"
+
+    # ── Deployment / workload rules (spec.template.spec.*) ───────────────────
+    - name: block-latest-tag-deploy-containers
+      match:
+        any:
+          - resources:
+              kinds: [Deployment, StatefulSet, DaemonSet, Job]
+      validate:
+        message: "Image tag ':latest' (or no tag) is not allowed. Use a specific tag + digest."
+        foreach:
+          - list: "request.object.spec.template.spec.containers"
+            deny:
+              conditions:
+                any:
+                  - key: "{{ element.image }}"
+                    operator: Equals
+                    value: "*:latest"
+                  - key: "{{ element.image | contains(@, ':') }}"
+                    operator: Equals
+                    value: "false"
+
+    - name: block-latest-tag-deploy-init-containers
+      match:
+        any:
+          - resources:
+              kinds: [Deployment, StatefulSet, DaemonSet, Job]
+      preconditions:
+        all:
+          - key: "{{ request.object.spec.template.spec.initContainers || `[]` | length(@) }}"
+            operator: GreaterThanOrEquals
+            value: 1
+      validate:
+        message: "initContainer image tag ':latest' (or no tag) is not allowed."
+        foreach:
+          - list: "request.object.spec.template.spec.initContainers"
+            deny:
+              conditions:
+                any:
+                  - key: "{{ element.image }}"
+                    operator: Equals
+                    value: "*:latest"
+                  - key: "{{ element.image | contains(@, ':') }}"
+                    operator: Equals
+                    value: "false"
+
+    - name: block-latest-tag-deploy-ephemeral-containers
+      match:
+        any:
+          - resources:
+              kinds: [Deployment, StatefulSet, DaemonSet, Job]
+      preconditions:
+        all:
+          - key: "{{ request.object.spec.template.spec.ephemeralContainers || `[]` | length(@) }}"
+            operator: GreaterThanOrEquals
+            value: 1
+      validate:
+        message: "ephemeralContainer image tag ':latest' (or no tag) is not allowed."
+        foreach:
+          - list: "request.object.spec.template.spec.ephemeralContainers"
             deny:
               conditions:
                 any:
