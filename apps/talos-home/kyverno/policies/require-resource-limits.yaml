@@ -12,7 +12,7 @@ metadata:
       apps like Jellyfin and Immich. Memory limits are required because OOM kills
       are safer than unbounded memory growth starving other pods.
 spec:
-  validationFailureAction: Enforce 
+  validationFailureAction: Enforce
   background: true
   rules:
     - name: require-memory-limits
@@ -31,7 +31,7 @@ spec:
                 - tailscale
                 - metallb-system
       validate:
-        message: "Container '{{ element.name }}' must declare resources.limits.memory."
+        message: "Containers must declare resources.limits.memory."
         foreach:
           - list: "request.object.spec.containers"
             deny:
