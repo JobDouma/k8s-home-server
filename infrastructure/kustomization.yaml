@@ -5,9 +5,7 @@ resources:
   # Storage
   - storage/namespace.yaml
   - storage/pv-media.yaml
-  - storage/pv-tank-configs.yaml
   - storage/pvc-media.yaml
-  - storage/pvc-tank-configs.yaml
 
   - traefik/namespace.yaml
   - traefik/helmrepository.yaml
