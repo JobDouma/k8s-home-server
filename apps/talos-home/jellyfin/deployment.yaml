@@ -47,7 +47,6 @@ spec:
         volumeMounts:
         - name: config
           mountPath: /config
-          subPath: jellyfin
         - name: media
           mountPath: /media
         - name: cache
@@ -62,7 +61,7 @@ spec:
       volumes:
       - name: config
         persistentVolumeClaim:
-          claimName: tank-configs
+          claimName: jellyfin-config   # was: tank-configs
       - name: media
         persistentVolumeClaim:
           claimName: media

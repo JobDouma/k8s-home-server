@@ -21,6 +21,7 @@ resources:
   - jellyfin/deployment.yaml
   - jellyfin/ingressroute.yaml
   - jellyfin/certificate.yaml
+  - jellyfin/pvc.yaml
 
   # ──────────────────────────────────────
   # qBittorrent
