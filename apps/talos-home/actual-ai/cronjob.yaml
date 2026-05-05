@@ -17,13 +17,16 @@ spec:
             runAsUser: 1000
           containers:
             - name: worker
-              image: python:3.14.4-slim@sha256:c11aee3b3cae066f55d1e9318fc812673aa6557073b0db0d792b59491b262e0c
+              image: node:22.15.0-slim@sha256:557e52a0fcb928ee113df7e1fb5d4f60c1341dbda53f55e3d815ca10807efdce
               command:
                 - /bin/sh
                 - -c
                 - |
-                  pip install --quiet --target /tmp/pypackages requests && \
-                  PYTHONPATH=/tmp/pypackages python /worker/worker.py
+                  mkdir -p /tmp/actual-data /tmp/npm-cache && \
+                  npm install --prefix /tmp/npm-pkgs --cache /tmp/npm-cache \
+                    @actual-app/api node-fetch 2>&1 && \
+                  NODE_PATH=/tmp/npm-pkgs/node_modules \
+                  node --experimental-vm-modules /worker/worker.mjs
               env:
                 - name: ACTUAL_SERVER
                   value: "http://actual-budget.actual-budget.svc.cluster.local:5006"
@@ -44,11 +47,11 @@ spec:
                   mountPath: /worker
               resources:
                 requests:
-                  cpu: 50m
-                  memory: 128Mi
-                limits:
-                  cpu: 200m
+                  cpu: 100m
                   memory: 256Mi
+                limits:
+                  cpu: 500m
+                  memory: 512Mi
               securityContext:
                 allowPrivilegeEscalation: false
                 capabilities:
