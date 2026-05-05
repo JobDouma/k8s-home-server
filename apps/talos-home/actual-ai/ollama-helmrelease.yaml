@@ -21,7 +21,7 @@ spec:
           app:
             image:
               repository: ollama/ollama
-              tag: "0.5.1@sha256:722ce8caba5f8b8bd2ee654b2e29466415be3071a704e3f4db1702b83c885f76"
+              tag: "0.23.0@sha256:5600a652d1081050f398152127c584222546354491f27fe47ccbc6351bc870bd"
             env:
               - name: OLLAMA_MODELS
                 value: /models
@@ -76,7 +76,7 @@ spec:
       pull-model:
         image:
           repository: ollama/ollama
-          tag: "0.5.1@sha256:722ce8caba5f8b8bd2ee654b2e29466415be3071a704e3f4db1702b83c885f76"
+          tag: "0.23.0@sha256:5600a652d1081050f398152127c584222546354491f27fe47ccbc6351bc870bd"
         env:
           - name: OLLAMA_MODELS
             value: /models

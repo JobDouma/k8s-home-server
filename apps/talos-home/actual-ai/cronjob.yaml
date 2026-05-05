@@ -17,7 +17,7 @@ spec:
             runAsUser: 1000
           containers:
             - name: worker
-              image: python:3.11.9-slim@sha256:8fb099199b9f2d70342674bd9dbccd3ed03a258f26bbd1d556822c6dfc60c317
+              image: python:3.14.4-slim@sha256:c11aee3b3cae066f55d1e9318fc812673aa6557073b0db0d792b59491b262e0c
               command:
                 - /bin/sh
                 - -c
