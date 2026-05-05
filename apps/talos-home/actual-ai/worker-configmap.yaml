@@ -4,80 +4,75 @@ metadata:
   name: worker-script
   namespace: actual-ai
 data:
-  worker.py: |
-    import os, requests, logging
-    from typing import List, Dict
+  worker.mjs: |
+    import * as api from '@actual-app/api';
+    import { fetch } from 'node-fetch';
 
-    logging.basicConfig(level=logging.INFO)
-    logger = logging.getLogger(__name__)
+    const ACTUAL_SERVER   = process.env.ACTUAL_SERVER;
+    const ACTUAL_PASSWORD = process.env.ACTUAL_PASSWORD;
+    const BUDGET_ID       = process.env.BUDGET_ID;
+    const CLASSIFIER_URL  = process.env.CLASSIFIER_URL;
 
-    ACTUAL_SERVER = os.getenv("ACTUAL_SERVER")
-    PASSWORD = os.getenv("ACTUAL_PASSWORD")
-    BUDGET_ID = os.getenv("BUDGET_ID")
-    CLASSIFIER_URL = os.getenv("CLASSIFIER_URL")
+    async function classify(text) {
+      const url = new URL(CLASSIFIER_URL);
+      url.searchParams.set('q', text);
+      const resp = await fetch(url.toString(), { signal: AbortSignal.timeout(10000) });
+      if (!resp.ok) throw new Error(`Classifier ${resp.status}`);
+      return resp.json();
+    }
 
-    def get_session():
-        sess = requests.Session()
-        resp = sess.post(f"{ACTUAL_SERVER}/api/login", json={"password": PASSWORD})
-        resp.raise_for_status()
-        return sess
+    async function main() {
+      await api.init({
+        serverURL: ACTUAL_SERVER,
+        password:  ACTUAL_PASSWORD,
+        dataDir:   '/tmp/actual-data',
+      });
 
-    def get_uncategorized(sess):
-        url = f"{ACTUAL_SERVER}/api/budgets/{BUDGET_ID}/transactions"
-        params = {"uncategorized": "true"}
-        resp = sess.get(url, params=params)
-        resp.raise_for_status()
-        return resp.json().get("data", [])
+      await api.downloadBudget(BUDGET_ID);
 
-    def get_category_map(sess):
-        resp = sess.get(f"{ACTUAL_SERVER}/api/budgets/{BUDGET_ID}/categories")
-        resp.raise_for_status()
-        return {c["name"]: c["id"] for c in resp.json()["data"]}
+      const accounts  = await api.getAccounts();
+      const categories = await api.getCategories();
+      const catMap    = Object.fromEntries(categories.map(c => [c.name, c.id]));
+      const fallback  = catMap['Other'];
 
-    def main():
-        if not all([ACTUAL_SERVER, PASSWORD, BUDGET_ID, CLASSIFIER_URL]):
-            logger.error("Missing required env vars")
-            return
+      for (const account of accounts) {
+        const txs = await api.getTransactions(account.id);
+        const uncategorized = txs.filter(tx => !tx.category && !tx.is_parent);
 
-        sess = get_session()
-        txs = get_uncategorized(sess)
-        if not txs:
-            logger.info("No uncategorized transactions")
-            return
+        for (const tx of uncategorized) {
+          const payee   = tx.imported_payee || tx.payee || 'Unknown';
+          const notes   = tx.notes || '';
+          const combined = `${payee} ${notes}`.trim();
 
-        cat_map = get_category_map(sess)
-        fallback_id = cat_map.get("Other")
+          let result;
+          try {
+            result = await classify(combined);
+          } catch (e) {
+            console.error(`Classifier failed for ${payee}:`, e.message);
+            continue;
+          }
 
-        for tx in txs:
-            payee = tx.get("payee_name") or tx.get("description") or "Unknown"
-            notes = tx.get("notes", "")
-            combined = f"{payee} {notes}".strip()
+          const catId = catMap[result.category] ?? fallback;
+          if (!catId) {
+            console.warn(`No category ID for '${result.category}', skipping ${payee}`);
+            continue;
+          }
 
-            try:
-                resp = requests.get(CLASSIFIER_URL, params={"q": combined}, timeout=10)
-                resp.raise_for_status()
-                result = resp.json()
-                cat_name = result["category"]
-                tags = result.get("tags", [])
-            except Exception as e:
-                logger.error(f"Classifier failed for {payee}: {e}")
-                continue
+          const update = { id: tx.id, category: catId };
+          if (result.tags?.length) {
+            update.notes = `${notes}\nAI tags: ${result.tags.join(', ')}`.trim();
+          }
 
-            cat_id = cat_map.get(cat_name, fallback_id)
-            if not cat_id:
-                continue
+          try {
+            await api.updateTransaction(tx.id, update);
+            console.log(`Updated ${payee} → ${result.category}`, result.tags);
+          } catch (e) {
+            console.error(`Update failed for ${tx.id}:`, e.message);
+          }
+        }
+      }
 
-            payload = {"category": cat_id}
-            if tags:
-                new_notes = f"{notes}\nAI tags: {', '.join(tags)}".strip()
-                payload["notes"] = new_notes
+      await api.shutdown();
+    }
 
-            try:
-                patch_url = f"{ACTUAL_SERVER}/api/transactions/{tx['id']}"
-                sess.patch(patch_url, json=payload).raise_for_status()
-                logger.info(f"Updated {payee} → {cat_name} {tags}")
-            except Exception as e:
-                logger.error(f"Update failed for {tx['id']}: {e}")
-
-    if __name__ == "__main__":
-        main()
+    main().catch(e => { console.error(e); process.exit(1); });
