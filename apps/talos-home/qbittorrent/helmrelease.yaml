@@ -99,10 +99,9 @@ spec:
       config:
         enabled: true
         type: persistentVolumeClaim
-        existingClaim: tank-configs
+        existingClaim: qbittorrent-config
         globalMounts:
         - path: /config
-          subPath: qbittorrent
       downloads:
         enabled: true
         type: persistentVolumeClaim

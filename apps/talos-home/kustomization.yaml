@@ -30,6 +30,7 @@ resources:
   - qbittorrent/secret.yaml
   - qbittorrent/ingressroute.yaml
   - qbittorrent/certificate.yaml
+  - qbittorrent/pvc.yaml
 
   # ──────────────────────────────────────
   # monitoring / VictoriaMetrics (lightweight Prometheus)
