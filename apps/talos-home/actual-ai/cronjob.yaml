@@ -17,7 +17,7 @@ spec:
             runAsUser: 1000
           containers:
             - name: worker
-              image: node:22.22.2-slim@sha256:d415caac2f1f77b98caaf9415c5f807e14bc8d7bdea62561ea2fef4fbd08a73c
+              image: node:25.9.0-slim@sha256:e49fd70491eb042270f974167c874d6245287263ffc16422fcf93b3c150409d8
               command:
                 - /bin/sh
                 - -c
