@@ -4,18 +4,16 @@ metadata:
   name: allow-intra-namespace
   namespace: actual-ai
 spec:
-  # Allow all pods in actual-ai to talk to each other freely.
-  # This covers: worker → classifier-api, classifier-api → ollama.
   podSelector: {}
   policyTypes:
     - Ingress
     - Egress
   ingress:
     - from:
-        - podSelector: {}   # any pod in the same namespace
+        - podSelector: {}
   egress:
     - to:
-        - podSelector: {}   # any pod in the same namespace
+        - podSelector: {}
 ---
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
@@ -41,7 +39,6 @@ metadata:
   name: allow-egress-dns
   namespace: actual-ai
 spec:
-  # Without this, DNS lookups (for .svc.cluster.local) fail and nothing connects.
   podSelector: {}
   policyTypes:
     - Egress
