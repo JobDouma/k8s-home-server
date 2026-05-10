@@ -13,12 +13,50 @@ data:
     const BUDGET_ID       = process.env.BUDGET_ID;
     const CLASSIFIER_URL  = process.env.CLASSIFIER_URL;
 
+    // Must match classifier output exactly. Worker auto-creates any missing ones.
+    const CATEGORY_GROUPS = {
+      "Usual Expenses": [
+        "Groceries", "Dining Out", "Transport",
+        "Rent", "Mortgage",
+        "Bills", "Shopping", "Healthcare", "Entertainment",
+        "Personal Care", "Personal Transfer", "Taxes & Fees", "General",
+      ],
+      "Investments and Savings": [
+        "Savings",
+      ],
+      "Income": [
+        "Income", "Starting Balances",
+      ],
+    };
+
     async function classify(text) {
       const url = new URL(CLASSIFIER_URL);
       url.searchParams.set('q', text);
       const resp = await fetch(url.toString(), { signal: AbortSignal.timeout(15000) });
       if (!resp.ok) throw new Error(`Classifier HTTP ${resp.status}`);
       return resp.json();
+    }
+
+    async function ensureCategories(existingCats, existingGroups) {
+      const catMap   = Object.fromEntries(existingCats.map(c => [c.name, c.id]));
+      const groupMap = Object.fromEntries(existingGroups.map(g => [g.name, g.id]));
+
+      for (const [groupName, categoryNames] of Object.entries(CATEGORY_GROUPS)) {
+        if (!groupMap[groupName]) {
+          console.log(`Creating missing group: ${groupName}`);
+          groupMap[groupName] = await api.createCategoryGroup({ name: groupName });
+        }
+        for (const catName of categoryNames) {
+          if (!catMap[catName]) {
+            console.log(`Creating missing category: ${catName} in ${groupName}`);
+            catMap[catName] = await api.createCategory({
+              name: catName,
+              group_id: groupMap[groupName],
+            });
+          }
+        }
+      }
+      return catMap;
     }
 
     async function main() {
@@ -32,12 +70,13 @@ data:
       await api.downloadBudget(BUDGET_ID);
       console.log('Budget downloaded');
 
-      const accounts   = await api.getAccounts();
-      const categories = await api.getCategories();
-      const catMap     = Object.fromEntries(categories.map(c => [c.name, c.id]));
-      const fallback   = catMap['Other'];
+      const accounts       = await api.getAccounts();
+      const existingCats   = await api.getCategories();
+      const existingGroups = await api.getCategoryGroups();
+      const catMap         = await ensureCategories(existingCats, existingGroups);
+      const fallback       = catMap['General'];
 
-      console.log(`Found ${accounts.length} accounts, ${categories.length} categories`);
+      console.log(`Found ${accounts.length} accounts, ${Object.keys(catMap).length} categories`);
 
       let updated = 0, skipped = 0, failed = 0;
 
@@ -62,7 +101,7 @@ data:
 
           const catId = catMap[result.category] ?? fallback;
           if (!catId) {
-            console.warn(`  x Unknown category "${result.category}" for "${payee}", skipping`);
+            console.warn(`  x No category ID for "${result.category}", payee: "${payee}"`);
             skipped++;
             continue;
           }

@@ -18,8 +18,6 @@ spec:
       ollama:
         replicas: 1
 
-        # initContainers nested under the controller (correct app-template v5 placement).
-        # Mistral is pulled once and stored on the PVC — not re-downloaded each restart.
         initContainers:
           pull-model:
             image:
@@ -35,9 +33,12 @@ spec:
               - -c
               - |
                 ollama serve &
+                OLLAMA_PID=$!
                 sleep 5
                 ollama pull mistral
-                kill %1
+                # Kill gracefully; ignore error if process already exited
+                kill $OLLAMA_PID 2>/dev/null || true
+                wait $OLLAMA_PID 2>/dev/null || true
             resources:
               requests:
                 cpu: 100m
