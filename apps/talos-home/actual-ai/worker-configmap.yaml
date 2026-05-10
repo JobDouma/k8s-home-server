@@ -6,14 +6,15 @@ metadata:
 data:
   worker.mjs: |
     import * as api from '@actual-app/api';
-    // Node 22 has fetch built-in globally — no node-fetch import needed.
 
     const ACTUAL_SERVER   = process.env.ACTUAL_SERVER;
     const ACTUAL_PASSWORD = process.env.ACTUAL_PASSWORD;
     const BUDGET_ID       = process.env.BUDGET_ID;
     const CLASSIFIER_URL  = process.env.CLASSIFIER_URL;
+    // Set RESET_CATEGORIES=true to clear all AI-set categories and reprocess from scratch.
+    // Use once after rule changes; leave unset for normal daily runs.
+    const RESET_MODE      = process.env.RESET_CATEGORIES === 'true';
 
-    // Must match classifier output exactly. Worker auto-creates any missing ones.
     const CATEGORY_GROUPS = {
       "Usual Expenses": [
         "Groceries", "Dining Out", "Transport",
@@ -21,18 +22,14 @@ data:
         "Bills", "Shopping", "Healthcare", "Entertainment",
         "Personal Care", "Personal Transfer", "Taxes & Fees", "General",
       ],
-      "Investments and Savings": [
-        "Savings",
-      ],
-      "Income": [
-        "Income", "Starting Balances",
-      ],
+      "Investments and Savings": ["Savings"],
+      "Income": ["Income", "Starting Balances"],
     };
 
     async function classify(text) {
       const url = new URL(CLASSIFIER_URL);
       url.searchParams.set('q', text);
-      const resp = await fetch(url.toString(), { signal: AbortSignal.timeout(15000) });
+      const resp = await fetch(url.toString(), { signal: AbortSignal.timeout(90000) });
       if (!resp.ok) throw new Error(`Classifier HTTP ${resp.status}`);
       return resp.json();
     }
@@ -40,7 +37,6 @@ data:
     async function ensureCategories(existingCats, existingGroups) {
       const catMap   = Object.fromEntries(existingCats.map(c => [c.name, c.id]));
       const groupMap = Object.fromEntries(existingGroups.map(g => [g.name, g.id]));
-
       for (const [groupName, categoryNames] of Object.entries(CATEGORY_GROUPS)) {
         if (!groupMap[groupName]) {
           console.log(`Creating missing group: ${groupName}`);
@@ -60,7 +56,9 @@ data:
     }
 
     async function main() {
+      console.log(`Mode: ${RESET_MODE ? 'RESET + reprocess all' : 'normal (uncategorized only)'}`);
       console.log('Connecting to Actual Budget at', ACTUAL_SERVER);
+
       await api.init({
         serverURL: ACTUAL_SERVER,
         password:  ACTUAL_PASSWORD,
@@ -82,13 +80,31 @@ data:
 
       for (const account of accounts) {
         const txs = await api.getTransactions(account.id);
-        const uncategorized = txs.filter(tx => !tx.category && !tx.is_parent);
-        console.log(`Account "${account.name}": ${uncategorized.length} uncategorized transactions`);
 
-        for (const tx of uncategorized) {
+        let toProcess;
+        if (RESET_MODE) {
+          // Reset mode: clear category and notes on ALL non-parent transactions,
+          // then reprocess everything from scratch.
+          toProcess = txs.filter(tx => !tx.is_parent);
+          console.log(`RESET: clearing ${toProcess.length} transactions in "${account.name}"`);
+          for (const tx of toProcess) {
+            await api.updateTransaction(tx.id, {
+              id: tx.id,
+              category: null,
+              notes: '',
+            });
+          }
+        } else {
+          // Normal mode: only process uncategorized transactions
+          toProcess = txs.filter(tx => !tx.category && !tx.is_parent);
+        }
+
+        console.log(`Account "${account.name}": processing ${toProcess.length} transactions`);
+
+        for (const tx of toProcess) {
           const payee    = tx.imported_payee || tx.payee || 'Unknown';
-          const notes    = tx.notes || '';
-          const combined = `${payee} ${notes}`.trim();
+          const notes    = '';  // always start from clean notes
+          const combined = payee.trim();
 
           let result;
           try {
@@ -106,14 +122,12 @@ data:
             continue;
           }
 
+          // Write only the category — no tag noise in notes
           const update = { id: tx.id, category: catId };
-          if (result.tags?.length) {
-            update.notes = `${notes}\nAI: ${result.tags.join(', ')}`.trim();
-          }
 
           try {
             await api.updateTransaction(tx.id, update);
-            console.log(`  ok [${result.source}] "${payee}" -> ${result.category}`, result.tags ?? []);
+            console.log(`  ok [${result.source}] "${payee}" -> ${result.category}`);
             updated++;
           } catch (e) {
             console.error(`  x Update failed for "${payee}" (${tx.id}):`, e.message);
@@ -122,7 +136,7 @@ data:
         }
       }
 
-      console.log(`Done. Updated: ${updated}, Skipped: ${skipped}, Failed: ${failed}`);
+      console.log(`\nDone. Updated: ${updated}, Skipped: ${skipped}, Failed: ${failed}`);
       await api.shutdown();
     }
 

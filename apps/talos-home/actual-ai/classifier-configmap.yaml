@@ -41,12 +41,8 @@ data:
       - match: "Shell|BP|Esso|Total|Tankstation"
         category: Transport
         tags: ["fuel"]
-      - match: "Breeze|D\\. Top B\\.V\\."
-        category: Transport
-        tags: ["rideshare"]
 
       # ========== HOUSING: RENT ==========
-      # Talis is a Dutch social housing corporation — this is rent, not transport
       - match: "Stichting Talis|Talis Woondiensten"
         category: Rent
         tags: ["rent","housing"]
@@ -56,7 +52,7 @@ data:
         category: Mortgage
         tags: ["mortgage","housing"]
 
-      # ========== BILLS: FIXED ==========
+      # ========== BILLS ==========
       - match: "Vitens Nv"
         category: Bills
         tags: ["water"]
@@ -123,12 +119,16 @@ data:
       - match: "Stayokay Utrechtcentrum"
         category: Entertainment
         tags: ["travel","hostel"]
-      - match: "Booking\\.Com|Booking Holdings|Bleep"
+      # Match "Booking", "Booking.com", "Booking Holdings" — all variants
+      - match: "Booking"
         category: Entertainment
         tags: ["travel"]
-      - match: "Trustly Group Ab"
+      - match: "Bleep"
         category: Entertainment
         tags: ["travel"]
+      - match: "Breeze|D\\. Top B\\.V\\."
+        category: Entertainment
+        tags: ["Dating"]
 
       # ========== INCOME ==========
       - match: "Ing Bank Nv Inzake Salarisbetaling"
@@ -142,7 +142,21 @@ data:
       - match: "Hr Mi Douma|Hr P F E J Douma|Hr S Lamers|J B P Douma|J\\.B\\.P\\. Douma|Mw Eej Douma"
         category: Personal Transfer
         tags: ["internal"]
-
+      - match: "Trustly Group Ab"
+        category: Personal Transfer
+        tags: ["payment"]
+      # E.P. Vergeer-Koppe — recurring personal transfer (family)
+      - match: "Vergeer|Vergeer-Koppe"
+        category: Personal Transfer
+        tags: ["family"]
+      # A. Azaad — small personal payment
+      - match: "Azaad"
+        category: Personal Transfer
+        tags: ["personal"]
+      # Cetin via Tikkie
+      - match: "Cetin via Tikkie|Tikkie"
+        category: Personal Transfer
+        tags: ["tikkie"]
 
       # ========== TAXES / GOVERNMENT ==========
       - match: "Belastingsamenwerking|Belastingdienst|Gemeente"
@@ -159,13 +173,11 @@ data:
         category: Personal Care
         tags: ["grooming"]
 
-      # ========== GENERAL / UNKNOWN ==========
+      # ========== SYSTEM / GENERAL ==========
       - match: "Nlovx75pxnm4egy58z"
         category: General
         tags: ["unknown"]
-      - match: "Cetin via Tikkie|Tikkie"
-        category: General
-        tags: ["tikkie","peer"]
-      - match: "Starting Balance"
+      # Starting Balance — match both singular and plural variants
+      - match: "Starting Balanc"
         category: Starting Balances
         tags: ["initial"]

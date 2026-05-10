@@ -74,7 +74,7 @@ data:
             resp = requests.post(
                 OLLAMA_URL,
                 json={"model": OLLAMA_MODEL, "prompt": prompt, "stream": False},
-                timeout=30,
+                timeout=60,
             )
             resp.raise_for_status()
             result = json.loads(resp.json()["response"])
