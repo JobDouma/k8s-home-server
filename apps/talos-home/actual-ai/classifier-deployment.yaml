@@ -51,8 +51,6 @@ spec:
               type: RuntimeDefault
             capabilities:
               drop: ["ALL"]
-          # Readiness probe so k8s only routes traffic once the API is up.
-          # This prevents the "Unauthorized" race you saw when port-forwarding.
           readinessProbe:
             httpGet:
               path: /docs

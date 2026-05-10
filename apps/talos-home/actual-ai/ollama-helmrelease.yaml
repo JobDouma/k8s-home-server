@@ -18,8 +18,8 @@ spec:
       ollama:
         replicas: 1
 
-        # initContainers must be nested under the controller, not at values root.
-        # This is what ensures Mistral is pulled before the main container starts.
+        # initContainers nested under the controller (correct app-template v5 placement).
+        # Mistral is pulled once and stored on the PVC — not re-downloaded each restart.
         initContainers:
           pull-model:
             image:
@@ -38,11 +38,6 @@ spec:
                 sleep 5
                 ollama pull mistral
                 kill %1
-            volumeMounts:
-              - name: models
-                mountPath: /models
-              - name: ollama-home
-                mountPath: /.ollama
             resources:
               requests:
                 cpu: 100m
