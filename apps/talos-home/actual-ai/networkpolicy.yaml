@@ -1,6 +1,25 @@
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
+  name: allow-intra-namespace
+  namespace: actual-ai
+spec:
+  # Allow all pods in actual-ai to talk to each other freely.
+  # This covers: worker → classifier-api, classifier-api → ollama.
+  podSelector: {}
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    - from:
+        - podSelector: {}   # any pod in the same namespace
+  egress:
+    - to:
+        - podSelector: {}   # any pod in the same namespace
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
   name: allow-egress-to-actual-budget
   namespace: actual-ai
 spec:
@@ -14,4 +33,21 @@ spec:
               kubernetes.io/metadata.name: actual-budget
       ports:
         - port: 5006
+          protocol: TCP
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-egress-dns
+  namespace: actual-ai
+spec:
+  # Without this, DNS lookups (for .svc.cluster.local) fail and nothing connects.
+  podSelector: {}
+  policyTypes:
+    - Egress
+  egress:
+    - ports:
+        - port: 53
+          protocol: UDP
+        - port: 53
           protocol: TCP

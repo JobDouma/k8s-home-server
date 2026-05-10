@@ -6,7 +6,7 @@ metadata:
 data:
   worker.mjs: |
     import * as api from '@actual-app/api';
-    import { fetch } from 'node-fetch';
+    // Node 22 has fetch built-in globally — no node-fetch needed.
 
     const ACTUAL_SERVER   = process.env.ACTUAL_SERVER;
     const ACTUAL_PASSWORD = process.env.ACTUAL_PASSWORD;
@@ -16,12 +16,13 @@ data:
     async function classify(text) {
       const url = new URL(CLASSIFIER_URL);
       url.searchParams.set('q', text);
-      const resp = await fetch(url.toString(), { signal: AbortSignal.timeout(10000) });
-      if (!resp.ok) throw new Error(`Classifier ${resp.status}`);
+      const resp = await fetch(url.toString(), { signal: AbortSignal.timeout(15000) });
+      if (!resp.ok) throw new Error(`Classifier HTTP ${resp.status}`);
       return resp.json();
     }
 
     async function main() {
+      console.log('Connecting to Actual Budget at', ACTUAL_SERVER);
       await api.init({
         serverURL: ACTUAL_SERVER,
         password:  ACTUAL_PASSWORD,
@@ -29,49 +30,60 @@ data:
       });
 
       await api.downloadBudget(BUDGET_ID);
+      console.log('Budget downloaded');
 
-      const accounts  = await api.getAccounts();
+      const accounts   = await api.getAccounts();
       const categories = await api.getCategories();
-      const catMap    = Object.fromEntries(categories.map(c => [c.name, c.id]));
-      const fallback  = catMap['Other'];
+      const catMap     = Object.fromEntries(categories.map(c => [c.name, c.id]));
+      const fallback   = catMap['Other'];
+
+      console.log(`Found ${accounts.length} accounts, ${categories.length} categories`);
+
+      let updated = 0, skipped = 0, failed = 0;
 
       for (const account of accounts) {
         const txs = await api.getTransactions(account.id);
         const uncategorized = txs.filter(tx => !tx.category && !tx.is_parent);
+        console.log(`Account "${account.name}": ${uncategorized.length} uncategorized transactions`);
 
         for (const tx of uncategorized) {
-          const payee   = tx.imported_payee || tx.payee || 'Unknown';
-          const notes   = tx.notes || '';
+          const payee    = tx.imported_payee || tx.payee || 'Unknown';
+          const notes    = tx.notes || '';
           const combined = `${payee} ${notes}`.trim();
 
           let result;
           try {
             result = await classify(combined);
           } catch (e) {
-            console.error(`Classifier failed for ${payee}:`, e.message);
+            console.error(`  ✗ Classifier failed for "${payee}":`, e.message);
+            failed++;
             continue;
           }
 
           const catId = catMap[result.category] ?? fallback;
           if (!catId) {
-            console.warn(`No category ID for '${result.category}', skipping ${payee}`);
+            console.warn(`  ✗ Unknown category "${result.category}" for "${payee}", skipping`);
+            skipped++;
             continue;
           }
 
           const update = { id: tx.id, category: catId };
           if (result.tags?.length) {
-            update.notes = `${notes}\nAI tags: ${result.tags.join(', ')}`.trim();
+            update.notes = `${notes}\nAI: ${result.tags.join(', ')}`.trim();
           }
 
           try {
             await api.updateTransaction(tx.id, update);
-            console.log(`Updated ${payee} → ${result.category}`, result.tags);
+            console.log(`  ✓ [${result.source}] "${payee}" → ${result.category}`, result.tags ?? []);
+            updated++;
           } catch (e) {
-            console.error(`Update failed for ${tx.id}:`, e.message);
+            console.error(`  ✗ Update failed for "${payee}" (${tx.id}):`, e.message);
+            failed++;
           }
         }
       }
 
+      console.log(`\nDone. Updated: ${updated}, Skipped: ${skipped}, Failed: ${failed}`);
       await api.shutdown();
     }
 
