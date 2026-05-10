@@ -13,7 +13,7 @@ data:
     const CLASSIFIER_URL  = process.env.CLASSIFIER_URL;
     // Set RESET_CATEGORIES=true to clear all AI-set categories and reprocess from scratch.
     // Use once after rule changes; leave unset for normal daily runs.
-    const RESET_MODE      = process.env.RESET_CATEGORIES === 'true';
+    const RESET_MODE      = process.env.RESET_CATEGORIES === 'false';
 
     const CATEGORY_GROUPS = {
       "Usual Expenses": [
