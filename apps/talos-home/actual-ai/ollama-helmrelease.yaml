@@ -17,6 +17,40 @@ spec:
     controllers:
       ollama:
         replicas: 1
+
+        # initContainers must be nested under the controller, not at values root.
+        # This is what ensures Mistral is pulled before the main container starts.
+        initContainers:
+          pull-model:
+            image:
+              repository: ollama/ollama
+              tag: "0.23.2@sha256:d00473cb58f0082c07cd6ed0d326a8a86f443ab69c51f8fc2b1a41687d45c661"
+            env:
+              - name: OLLAMA_HOST
+                value: "0.0.0.0"
+              - name: OLLAMA_MODELS
+                value: /models
+            command:
+              - /bin/sh
+              - -c
+              - |
+                ollama serve &
+                sleep 5
+                ollama pull mistral
+                kill %1
+            volumeMounts:
+              - name: models
+                mountPath: /models
+              - name: ollama-home
+                mountPath: /.ollama
+            resources:
+              requests:
+                cpu: 100m
+                memory: 1Gi
+              limits:
+                cpu: 1
+                memory: 2Gi
+
         containers:
           app:
             image:
@@ -30,7 +64,7 @@ spec:
                 containerPort: 11434
             resources:
               requests:
-                cpu: 1
+                cpu: 500m
                 memory: 2Gi
               limits:
                 cpu: 4
@@ -47,9 +81,6 @@ spec:
         - key: node-role.kubernetes.io/control-plane
           operator: Exists
           effect: NoSchedule
-      volumes:
-        - name: ollama-home
-          emptyDir: {}
 
     service:
       app:
@@ -71,28 +102,3 @@ spec:
         type: emptyDir
         globalMounts:
           - path: /.ollama
-
-    initContainers:
-      pull-model:
-        image:
-          repository: ollama/ollama
-          tag: "0.23.2@sha256:d00473cb58f0082c07cd6ed0d326a8a86f443ab69c51f8fc2b1a41687d45c661"
-        env:
-          - name: OLLAMA_MODELS
-            value: /models
-        command:
-          - /bin/sh
-          - -c
-          - "ollama pull mistral"
-        volumeMounts:
-          - name: models
-            mountPath: /models
-          - name: ollama-home
-            mountPath: /.ollama
-        resources:
-          requests:
-            cpu: 100m
-            memory: 1Gi
-          limits:
-            cpu: 1
-            memory: 2Gi

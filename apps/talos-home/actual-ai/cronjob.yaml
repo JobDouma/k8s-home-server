@@ -4,7 +4,7 @@ metadata:
   name: actual-auto-categorize
   namespace: actual-ai
 spec:
-  schedule: "0 * * * *"
+  schedule: "0 3 * * *"          # 03:00 every night, once per day
   successfulJobsHistoryLimit: 3
   failedJobsHistoryLimit: 2
   jobTemplate:
@@ -15,16 +15,36 @@ spec:
           securityContext:
             runAsNonRoot: true
             runAsUser: 1000
+            seccompProfile:
+              type: RuntimeDefault
           containers:
             - name: worker
-              image: node:26.1.0-slim@sha256:424cafd2a035ed2b2d74acc3142b68b426fb62a47742c80a75e7117db02d6b30
+              # Node 22 is the current Active LTS ("Jod") — correct security choice.
+              # Node 26 is "Current" (unstable/bleeding-edge) and better-sqlite3
+              # does not yet ship prebuilt binaries for it, causing the gyp/Python
+              # compile failure seen during testing.
+              # Node 24 is the next LTS but also lacks better-sqlite3 prebuilds as of May 2026.
+              # Node 22 LTS has full prebuilt support and security patches until Apr 2027.
+              #
+              # Tag drift fix: node:22-slim was resolving to Node 26 from cluster cache.
+              # We pin to the exact patch release to guarantee the version we get.
+              # Use `docker buildx imagetools inspect node:22.15.0-slim` to refresh digest.
+              image: node:22.22.2-bookworm@sha256:03746f6aafd73f2da621094d5e27426225820e93bc202daea0cf1fa388c1ce09
+              imagePullPolicy: Always
               command:
                 - /bin/sh
                 - -c
                 - |
-                  mkdir -p /tmp/actual-data /tmp/npm-cache && \
-                  npm install --prefix /tmp/npm-pkgs --cache /tmp/npm-cache \
-                    @actual-app/api node-fetch 2>&1 && \
+                  set -e
+                  echo "Node version: $(node --version)"
+                  apt-get update -qq && \
+                  apt-get install -y --no-install-recommends python3 make g++ && \
+                  rm -rf /var/lib/apt/lists/*
+                  mkdir -p /tmp/actual-data /tmp/npm-cache /tmp/npm-pkgs
+                  npm install \
+                    --prefix /tmp/npm-pkgs \
+                    --cache /tmp/npm-cache \
+                    @actual-app/api 2>&1
                   NODE_PATH=/tmp/npm-pkgs/node_modules \
                   node --experimental-vm-modules /worker/worker.mjs
               env:
@@ -47,13 +67,17 @@ spec:
                   mountPath: /worker
               resources:
                 requests:
-                  cpu: 100m
-                  memory: 256Mi
-                limits:
-                  cpu: 500m
+                  cpu: 200m
                   memory: 512Mi
+                limits:
+                  cpu: 1000m
+                  memory: 1Gi
               securityContext:
                 allowPrivilegeEscalation: false
+                runAsNonRoot: true
+                runAsUser: 1000
+                seccompProfile:
+                  type: RuntimeDefault
                 capabilities:
                   drop: ["ALL"]
           volumes:
