@@ -5,7 +5,7 @@ metadata:
   namespace: actual-ai
 data:
   app.py: |
-    import re, yaml, requests, logging
+    import re, yaml, requests, logging, json
     from fastapi import FastAPI, Query
     from pathlib import Path
 
@@ -18,11 +18,22 @@ data:
     OLLAMA_URL = "http://ollama.actual-ai.svc.cluster.local:11434/api/generate"
     OLLAMA_MODEL = "mistral"
 
+    # Must exactly match category names in Actual Budget.
+    VALID_CATEGORIES = [
+        # Usual Expenses
+        "Groceries", "Dining Out", "Transport",
+        "Rent", "Mortgage",
+        "Bills", "Shopping", "Healthcare", "Entertainment",
+        "Personal Care", "Personal Transfer", "Taxes & Fees", "General",
+        # Investments and Savings
+        "Savings",
+        # Income
+        "Income", "Starting Balances",
+    ]
 
     def load_rules():
         with open(RULES_PATH) as f:
             return yaml.safe_load(f)["rules"]
-
 
     @app.get("/classify")
     def classify(q: str = Query(...)):
@@ -35,13 +46,29 @@ data:
                 return {"category": rule["category"], "tags": rule.get("tags", []), "source": "rules"}
 
         # 2. Fallback: Ollama / Mistral
+        categories_str = ", ".join(VALID_CATEGORIES)
         prompt = (
-            f"Classify this bank transaction into a category and provide relevant tags.\n"
+            f"Classify this Dutch bank transaction into exactly one of these categories.\n"
             f"Transaction: {q}\n"
-            f"Respond ONLY with valid JSON in this exact format:\n"
-            f'{{ "category": "CategoryName", "tags": ["tag1", "tag2"] }}\n'
-            f"Categories: Groceries, Dining, Transport, Utilities, Shopping, Healthcare, "
-            f"Entertainment, Income, Financial, Transfer, Other"
+            f"Available categories: {categories_str}\n"
+            f"Guidelines:\n"
+            f"- Groceries: supermarkets, food shops, toko\n"
+            f"- Dining Out: restaurants, cafes, bars, takeaway, fastfood\n"
+            f"- Transport: public transport, fuel, taxi, rideshare, parking\n"
+            f"- Rent: rent payments to housing corporation (huur, woningcorporatie)\n"
+            f"- Mortgage: mortgage payments (hypotheek)\n"
+            f"- Bills: utilities, insurance, phone, internet, bank fees, energy, water\n"
+            f"- Shopping: online shops, clothing, electronics, retail\n"
+            f"- Healthcare: doctors, pharmacy, medical, dentist\n"
+            f"- Entertainment: events, tickets, streaming, travel, hotels, hobbies\n"
+            f"- Personal Care: barber, hair salon, beauty, gym\n"
+            f"- Personal Transfer: transfers between own accounts or to family\n"
+            f"- Taxes & Fees: government, tax authority, municipality (gemeente)\n"
+            f"- Savings: savings transfers, investments\n"
+            f"- Income: salary, wages, freelance income\n"
+            f"- General: anything that does not fit the above\n"
+            f"Respond ONLY with valid JSON, no explanation:\n"
+            f'{{ "category": "CategoryName", "tags": ["tag1", "tag2"] }}'
         )
         try:
             resp = requests.post(
@@ -50,11 +77,13 @@ data:
                 timeout=30,
             )
             resp.raise_for_status()
-            import json
             result = json.loads(resp.json()["response"])
+            if result.get("category") not in VALID_CATEGORIES:
+                logger.warning(f"Ollama returned unknown category '{result.get('category')}', using General")
+                result["category"] = "General"
             logger.info(f"Ollama classified '{q}' → {result}")
             result["source"] = "ollama"
             return result
         except Exception as e:
             logger.error(f"Ollama failed for '{q}': {e}")
-            return {"category": "Other", "tags": ["unclassified"], "source": "fallback"}
+            return {"category": "General", "tags": ["unclassified"], "source": "fallback"}
