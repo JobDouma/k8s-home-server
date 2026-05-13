@@ -9,7 +9,7 @@ spec:
   chart:
     spec:
       chart: renovate
-      version: "46.146.0"
+      version: "46.150.4"
       sourceRef:
         kind: HelmRepository
         name: renovate
@@ -49,7 +49,7 @@ spec:
     renovate:
       image:
         repository: ghcr.io/renovatebot/renovate
-        tag: "43.170.20@sha256:04a60fea88f50d31158902c24553fae748e97d5e1d7524ad7d6c69b874650065"
+        tag: "43.176.4@sha256:9177e00d570901ab35efe04ef81d38394015e1740c75f47ef8eaeb49df245361"
       config: |
         {
           "$schema": "https://docs.renovatebot.com/renovate-schema.json",
