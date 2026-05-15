@@ -248,26 +248,26 @@ resources:
   # ──────────────────────────────────────
   # Actual Budget
   # ──────────────────────────────────────
-  - actual-budget/namespace.yaml
-  - actual-budget/certificate.yaml
-  - actual-budget/pvc.yaml
-  - actual-budget/helmrelease.yaml
-  - actual-budget/ingressroute.yaml
-  - actual-budget/networkpolicy.yaml
+  # - actual-budget/namespace.yaml
+  # - actual-budget/certificate.yaml
+  # - actual-budget/pvc.yaml
+  # - actual-budget/helmrelease.yaml
+  # - actual-budget/ingressroute.yaml
+  # - actual-budget/networkpolicy.yaml
 
   # ──────────────────────────────────────
   # Actual Budget AI
   # ──────────────────────────────────────
-  - actual-ai/namespace.yaml
-  - actual-ai/ollama-helmrelease.yaml
-  - actual-ai/classifier-configmap.yaml
-  - actual-ai/classifier-deployment.yaml
-  - actual-ai/classifier-service.yaml
-  - actual-ai/classifier-script-configmap.yaml
-  - actual-ai/worker-configmap.yaml
-  - actual-ai/cronjob.yaml
-  - actual-ai/secret.yaml
-  - actual-ai/networkpolicy.yaml
-  - actual-ai/pvc.yaml
+  # - actual-ai/namespace.yaml
+  # - actual-ai/ollama-helmrelease.yaml
+  # - actual-ai/classifier-configmap.yaml
+  # - actual-ai/classifier-deployment.yaml
+  # - actual-ai/classifier-service.yaml
+  # - actual-ai/classifier-script-configmap.yaml
+  # - actual-ai/worker-configmap.yaml
+  # - actual-ai/cronjob.yaml
+  # - actual-ai/secret.yaml
+  # - actual-ai/networkpolicy.yaml
+  # - actual-ai/pvc.yaml
 
-  - etcd-defrag/cronjob.yaml
+  # - etcd-defrag/cronjob.yaml
