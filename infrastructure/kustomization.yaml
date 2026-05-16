@@ -15,7 +15,6 @@ resources:
   - traefik/servicemonitor.yaml
   - traefik/certificate.yaml
   - traefik/clusterrole.yaml
-  - traefik/pdb.yaml
 
   - metallb/namespace.yaml
   - metallb/helmrelease.yaml
@@ -40,8 +39,6 @@ resources:
   - authentik/secret.yaml
   - authentik/postgresql-secret.yaml
   - authentik/networkpolicy.yaml
-  - authentik/pdb-server.yaml
-  - authentik/pdb-worker.yaml
   - authentik/blueprints-secret.yaml
 
   # ──────────────────────────────────────

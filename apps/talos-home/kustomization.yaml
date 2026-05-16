@@ -12,7 +12,6 @@ resources:
   - blocky/servicemonitor.yaml
   - blocky/ingressroute.yaml
   - blocky/certificate.yaml
-  - blocky/pdb.yaml
   - blocky/redis.yaml
 
   # ──────────────────────────────────────
@@ -39,7 +38,6 @@ resources:
   - victoria-metrics/helmrepository.yaml
   - victoria-metrics/helmrelease.yaml
   - victoria-metrics/ingressroute.yaml
-  - victoria-metrics/pdb.yaml
   - victoria-metrics/alertmanager-secret.yaml
 
   # ──────────────────────────────────────
@@ -61,7 +59,6 @@ resources:
   - loki/helmrepository.yaml
   - loki/helmrelease.yaml
   - loki/servicemonitor.yaml
-  - loki/pdb.yaml
 
   # ──────────────────────────────────────
   # Jellyseerr
@@ -238,7 +235,6 @@ resources:
   - kyverno/helmrepository.yaml
   - kyverno/helmrelease.yaml
   - kyverno/cosign-secret.sops.yaml
-  - kyverno/pdb.yaml
   - kyverno/networkpolicy.yaml 
   - kyverno/policies/enforce-image-signatures.yaml
   - kyverno/policies/block-latest-tag.yaml
