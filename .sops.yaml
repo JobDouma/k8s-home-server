@@ -1,6 +1,18 @@
 creation_rules:
+  # 1. Match Cosign private keys specifically
   - path_regex: 'cosign\.key(\.sops)?$'
     age: 'age18zx3u4cnpe3y55rruzp5v4uregm0kxe2ge6wzle54nu9vlxlndmqweckld'
+
+  # 2. Match standard Kubernetes Secrets (Encrypts only data/stringData payloads)
   - path_regex: '.*secret(\.yaml|\.yml)$'
     encrypted_regex: '^(data|stringData)$'
+    age: 'age18zx3u4cnpe3y55rruzp5v4uregm0kxe2ge6wzle54nu9vlxlndmqweckld'
+
+  # 3. Match raw configuration backups (Encrypts the entire file)
+  - path_regex: '.*config\.sops\.yaml$'
+    age: 'age18zx3u4cnpe3y55rruzp5v4uregm0kxe2ge6wzle54nu9vlxlndmqweckld'
+
+  # 4. NEW RULE: Match sensitive infrastructure patches (Encrypts the entire file)
+  # This explicitly targets any yaml files inside your runbooks directory
+  - path_regex: 'runbooks/.*\.yaml$'
     age: 'age18zx3u4cnpe3y55rruzp5v4uregm0kxe2ge6wzle54nu9vlxlndmqweckld'
