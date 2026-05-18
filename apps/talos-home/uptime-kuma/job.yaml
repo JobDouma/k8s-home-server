@@ -1,7 +1,7 @@
 apiVersion: batch/v1
 kind: CronJob
 metadata:
-  name: uptime-kuma-provisioner
+  name: uptime-kuma-provisioner-v2
   namespace: uptime-kuma
 spec:
   schedule: "0 3 * * *"
