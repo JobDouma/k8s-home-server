@@ -78,6 +78,8 @@ spec:
         limits:
           cpu: 100m
           memory: 128Mi
+      nginxConfig:
+        resolver: 10.96.0.10
     chunksCache:
       enabled: true
       resources:
