@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: uptime-kuma-monitors-v2
+  name: uptime-kuma-monitors
   namespace: uptime-kuma
 data:
   provision.py: |
