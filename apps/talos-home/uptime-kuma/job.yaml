@@ -4,7 +4,8 @@ metadata:
   name: uptime-kuma-provisioner
   namespace: uptime-kuma
 spec:
-  schedule: "*/5 * * * *"
+  schedule: "0 3 * * *"
+  startingDeadlineSeconds: 300
   concurrencyPolicy: Forbid
   successfulJobsHistoryLimit: 1
   failedJobsHistoryLimit: 2
@@ -43,6 +44,13 @@ spec:
                 secretKeyRef:
                   name: uptime-kuma-credentials
                   key: gotify-token
+            resources:
+              requests:
+                cpu: "50m"
+                memory: "64Mi"
+              limits:
+                cpu: "200m"
+                memory: "128Mi"
             volumeMounts:
             - name: scripts
               mountPath: /scripts/provision.py
