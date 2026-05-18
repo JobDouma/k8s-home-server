@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: uptime-kuma-monitors
+  name: uptime-kuma-monitors-v2
   namespace: uptime-kuma
 data:
   provision.py: |
@@ -11,80 +11,118 @@ data:
     - No external libraries needed
     - Idempotent: skips monitors that already exist by name
     - Handles deletions: removes monitors listed in REMOVED
-    - To re-run: bump job name suffix and commit
+    - Sentinel file: skips entire run if already provisioned today
+    - To force re-run: delete /app/data/.provisioned or bump job name suffix
     """
-    import sqlite3, sys, os, time, json
+    import sqlite3, sys, os, time, json, datetime
 
-    DB = "/app/data/kuma.db"
+    DB      = "/app/data/kuma.db"
+    SENTINEL = "/app/data/.provisioned"
 
     def log(msg): print(f"[provision] {msg}", flush=True)
 
-    for i in range(60):
-        if os.path.exists(DB):
+    # ── Sentinel check ───────────────────────────────────────────────────────────
+    if os.path.exists(SENTINEL):
+        try:
+            stamp = open(SENTINEL).read().strip()
+            today = datetime.date.today().isoformat()
+            if stamp == today:
+                log(f"Already provisioned today ({today}), exiting.")
+                sys.exit(0)
+            else:
+                log(f"Sentinel is from {stamp}, re-provisioning for {today}.")
+        except Exception as e:
+            log(f"Could not read sentinel ({e}), continuing.")
+
+    # ── Wait for DB ──────────────────────────────────────────────────────────────
+    con = None
+    for i in range(40):
+        if os.path.exists(DB) and os.path.getsize(DB) > 0:
             try:
+                c = sqlite3.connect(f"file:{DB}?mode=ro", uri=True)
+                c.execute("SELECT id FROM monitor LIMIT 1")
+                c.close()
                 con = sqlite3.connect(DB)
                 con.row_factory = sqlite3.Row
-                con.execute("SELECT 1 FROM monitor LIMIT 1")
-                existing_user = con.execute("SELECT id FROM user LIMIT 1").fetchone()
-                if not existing_user:
-                    import subprocess
-                    admin_user = os.environ.get("UPTIME_KUMA_ADMIN_USER", "admin")
-                    admin_pass = os.environ.get("UPTIME_KUMA_ADMIN_PASS", "admin")
-                    node_script = "const b=require('bcryptjs');console.log(b.hashSync(process.argv[1],10));"
-                    result = subprocess.run(
-                        ["node", "-e", node_script, admin_pass],
-                        capture_output=True, text=True, cwd="/app"
-                    )
-                    if result.returncode == 0:
-                        hashed = result.stdout.strip()
-                        con.execute(
-                            "INSERT INTO user (username, password, active, timezone, createdDate) VALUES (?, ?, 1, 'Europe/Amsterdam', datetime('now'))",
-                            (admin_user, hashed)
-                        )
-                        con.commit()
-                        log(f"Created admin user: {admin_user}")
-                    else:
-                        log(f"bcrypt failed: {result.stderr}")
-                if con.execute("SELECT id FROM user LIMIT 1").fetchone():
-                    break
-                con.close()
+                log(f"DB ready after {i * 5}s")
+                break
             except sqlite3.OperationalError as e:
-                log(f"DB error: {e}")
-                con.close()
-        log(f"Waiting for DB ({i+1}/60)...")
-        time.sleep(3)
+                log(f"DB exists but not ready yet ({e})")
+                if con:
+                    con.close()
+                    con = None
+        else:
+            if i == 0:
+                log("Waiting for DB to appear...")
+            elif i % 4 == 0:
+                log(f"  still waiting... ({i * 5}s elapsed)")
+        time.sleep(5)
     else:
-        log("ERROR: DB not ready after 3 minutes"); sys.exit(1)
+        log("ERROR: DB not ready after 200s"); sys.exit(1)
+
+    # ── Ensure admin user exists ─────────────────────────────────────────────────
+    existing_user = con.execute("SELECT id FROM user LIMIT 1").fetchone()
+    if not existing_user:
+        import subprocess
+        admin_user = os.environ.get("UPTIME_KUMA_ADMIN_USER", "admin")
+        admin_pass = os.environ.get("UPTIME_KUMA_ADMIN_PASS", "admin")
+        node_script = "const b=require('bcryptjs');console.log(b.hashSync(process.argv[1],10));"
+        result = subprocess.run(
+            ["node", "-e", node_script, admin_pass],
+            capture_output=True, text=True, cwd="/app"
+        )
+        if result.returncode != 0:
+            log(f"ERROR: bcrypt failed: {result.stderr}"); sys.exit(1)
+        hashed = result.stdout.strip()
+        con.execute(
+            "INSERT INTO user (username, password, active, timezone, createdDate) VALUES (?, ?, 1, 'Europe/Amsterdam', datetime('now'))",
+            (admin_user, hashed)
+        )
+        con.commit()
+        log(f"Created admin user: {admin_user}")
 
     user_id = con.execute("SELECT id FROM user LIMIT 1").fetchone()["id"]
     log(f"Provisioning for user_id={user_id}")
 
-    # ── Monitors to remove ───────────────────────────────────────────────────
+    # ── Monitors to remove ───────────────────────────────────────────────────────
     REMOVED = [
         "SABnzbd",
         "Router",
         "talos-cp-1 (k8s API)",
         "talos-wk-1 (k8s API)",
     ]
+    removed_count = 0
     for name in REMOVED:
         row = con.execute("SELECT id FROM monitor WHERE name = ?", (name,)).fetchone()
         if row:
             con.execute("DELETE FROM monitor WHERE id = ?", (row["id"],))
             log(f"  removed: {name}")
+            removed_count += 1
 
     existing = {r["name"] for r in con.execute("SELECT name FROM monitor")}
-    log(f"Existing monitors: {len(existing)}")
+    log(f"Existing monitors: {len(existing)}, removed: {removed_count}")
 
-    # ── Gotify notification ──────────────────────────────────────────────────
+    # ── Gotify notification ──────────────────────────────────────────────────────
     def add_notification(name, gotify_url, gotify_token):
         existing_notif = con.execute("SELECT id FROM notification WHERE name = ?", (name,)).fetchone()
         if existing_notif:
-            log(f"  skip notification: {name}")
+            # Update token in case it changed in the secret
+            config = json.dumps({
+                "type": "gotify",
+                "gotifyserverurl": gotify_url,
+                "gotifyapplicationToken": gotify_token,  # capital T — matches Uptime Kuma source
+                "gotifyPriority": 8
+            })
+            con.execute(
+                "UPDATE notification SET config = ? WHERE id = ?",
+                (config, existing_notif["id"])
+            )
+            log(f"  updated notification config: {name}")
             return existing_notif["id"]
         config = json.dumps({
             "type": "gotify",
             "gotifyserverurl": gotify_url,
-            "gotifyapplicationtoken": gotify_token,
+            "gotifyapplicationToken": gotify_token,  # capital T — matches Uptime Kuma source
             "gotifyPriority": 8
         })
         cur = con.execute("""
@@ -101,10 +139,14 @@ data:
         gotify_token
     ) if gotify_token else None
 
-    # ── Monitor helpers ──────────────────────────────────────────────────────
+    # ── Monitor helpers ──────────────────────────────────────────────────────────
+    added_count = 0
+    skipped_count = 0
+
     def add_http(name, url):
+        global added_count, skipped_count
         if name in existing:
-            log(f"  skip: {name}"); return
+            skipped_count += 1; return
         try:
             cur = con.execute("""
                 INSERT INTO monitor (
@@ -114,17 +156,19 @@ data:
                 ) VALUES (?, 'http', ?, 'GET', 60, 60, 3, 1, 0, '["200-299"]', '[]', ?, 1)
             """, (name, url, user_id))
             if notif_id:
-                con.execute("""
-                    INSERT INTO monitor_notification (monitor_id, notification_id)
-                    VALUES (?, ?)
-                """, (cur.lastrowid, notif_id))
-            log(f"  added: {name}")
+                con.execute(
+                    "INSERT INTO monitor_notification (monitor_id, notification_id) VALUES (?, ?)",
+                    (cur.lastrowid, notif_id)
+                )
+            log(f"  added http: {name}")
+            added_count += 1
         except Exception as e:
             log(f"  WARN {name}: {e}")
 
     def add_port(name, hostname, port):
+        global added_count, skipped_count
         if name in existing:
-            log(f"  skip: {name}"); return
+            skipped_count += 1; return
         try:
             cur = con.execute("""
                 INSERT INTO monitor (
@@ -133,46 +177,53 @@ data:
                 ) VALUES (?, 'port', ?, ?, 30, 30, 3, '[]', ?, 1)
             """, (name, hostname, port, user_id))
             if notif_id:
-                con.execute("""
-                    INSERT INTO monitor_notification (monitor_id, notification_id)
-                    VALUES (?, ?)
-                """, (cur.lastrowid, notif_id))
-            log(f"  added: {name}")
+                con.execute(
+                    "INSERT INTO monitor_notification (monitor_id, notification_id) VALUES (?, ?)",
+                    (cur.lastrowid, notif_id)
+                )
+            log(f"  added port: {name}")
+            added_count += 1
         except Exception as e:
             log(f"  WARN {name}: {e}")
 
-    # ── Monitors ─────────────────────────────────────────────────────────────
+    # ── Monitors ─────────────────────────────────────────────────────────────────
     # Media
-    add_http("Jellyfin",    "https://jellyfin.lan")
-    add_http("Jellyseerr",  "https://jellyseerr.lan")
-    add_http("Sonarr",      "https://sonarr.lan")
-    add_http("Radarr",      "https://radarr.lan")
-    add_http("Prowlarr",    "https://prowlarr.lan")
-    add_http("qBittorrent", "https://qbittorrent.lan")
-    add_http("Immich",      "https://immich.lan")
+    add_http("Jellyfin",      "https://jellyfin.lan")
+    add_http("Jellyseerr",    "https://jellyseerr.lan")
+    add_http("Sonarr",        "https://sonarr.lan")
+    add_http("Radarr",        "https://radarr.lan")
+    add_http("Prowlarr",      "https://prowlarr.lan")
+    add_http("qBittorrent",   "https://qbittorrent.lan")
+    add_http("Immich",        "https://immich.lan")
     # Monitoring
-    add_http("Grafana",     "https://grafana.lan")
-    add_http("Prometheus",  "https://prometheus.lan")
-    add_http("Falco",       "https://falco.lan")
-    add_http("Uptime Kuma", "https://uptime-kuma.lan")
+    add_http("Grafana",       "https://grafana.lan")
+    add_http("Prometheus",    "https://prometheus.lan")
+    add_http("Falco",         "https://falco.lan")
+    add_http("Uptime Kuma",   "https://uptime-kuma.lan")
     # Networking
-    add_http("Traefik",     "https://traefik.lan")
-    add_http("Blocky DNS",  "https://blocky.lan")
-    add_http("Authentik",   "https://auth.lan")
+    add_http("Traefik",       "https://traefik.lan")
+    add_http("Blocky DNS",    "https://blocky.lan")
+    add_http("Authentik",     "https://auth.lan")
     # Apps
-    add_http("Dashy",       "https://dashy.lan")
-    add_http("FreshRSS",    "https://freshrss.lan")
-    add_http("Joplin",      "https://joplin.lan")
-    add_http("Gotify",      "https://gotify.lan")
-    add_http("Headlamp",    "https://headlamp.lan")
+    add_http("Dashy",         "https://dashy.lan")
+    add_http("FreshRSS",      "https://freshrss.lan")
+    add_http("Joplin",        "https://joplin.lan")
+    add_http("Gotify",        "https://gotify.lan")
+    add_http("Headlamp",      "https://headlamp.lan")
     add_http("Actual Budget", "https://actual.lan")
     # Infrastructure
-    add_http("TrueNAS",     "https://truenas.lan")
-    add_http("Omni",        "https://omni.lan")
+    add_http("TrueNAS",       "https://truenas.lan")
+    add_http("Omni",          "https://omni.lan")
     # Talos nodes — TCP port check on k8s API (6443)
-    add_port("talos-cp-1", "192.168.2.22", 6443)
-    add_port("talos-wk-1", "192.168.2.6",  6443)
+    add_port("talos-cp-1",    "192.168.2.22", 6443)
+    add_port("talos-wk-1",    "192.168.2.6",  6443)
 
     con.commit()
     con.close()
-    log("Done.")
+
+    log(f"Done. added={added_count}, skipped={skipped_count}, removed={removed_count}")
+
+    # ── Write sentinel ───────────────────────────────────────────────────────────
+    with open(SENTINEL, "w") as f:
+        f.write(datetime.date.today().isoformat())
+    log(f"Sentinel written for {datetime.date.today().isoformat()}")
