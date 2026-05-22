@@ -31,7 +31,7 @@ spec:
           main:
             image:
               repository: ghcr.io/lissy93/dashy
-              tag: 4.1.5@sha256:573d77014e327cbe4be43e21fe4d115ef7c621babf419e5a8183cec455abe246
+              tag: 4.1.9@sha256:11c68dbd850a9b4e2fdd604ea5f2b3fe77a1538550cc8d8cfdb56b13fbce10a8
             env:
               TZ: Europe/Amsterdam
               NODE_ENV: production
