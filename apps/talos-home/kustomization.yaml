@@ -215,6 +215,7 @@ resources:
   - immich/ingressroute.yaml
   - immich/networkpolicy.yaml
   - immich/servicemonitor.yaml
+  - immich/serverstransport.yaml
 
   # ──────────────────────────────────────
   # Uptime Kuma

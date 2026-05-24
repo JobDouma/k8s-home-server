@@ -95,22 +95,27 @@ spec:
     rbac:
       enabled: false
     additionalArguments:
-    - --providers.kubernetesingress.ingressclass=traefik
+    # Dashboard & API
     - --api.dashboard=true
     - --api=true
-    - --accesslog=true
-    - --accesslog.format=json
+    # Trust forwarded headers from LAN (homelab only — remove if ever internet-exposed)
     - --entrypoints.web.forwardedHeaders.insecure=true
     - --entrypoints.websecure.forwardedHeaders.insecure=true
-    - --entrypoints.web.address=:80
-    - --entrypoints.websecure.address=:443
-    - --entrypoints.metrics.address=:9100
+    # HTTP → HTTPS redirect
     - --entrypoints.web.http.redirections.entrypoint.to=websecure
     - --entrypoints.web.http.redirections.entrypoint.scheme=https
     - --entrypoints.web.http.redirections.entrypoint.permanent=true
-    - --providers.kubernetescrd.allowCrossNamespace=true
+    # Websecure timeouts — 0 = unlimited (required for large Immich uploads)
+    # web (port 80) excluded: it only handles redirects, never carries upload traffic
+    - --entrypoints.websecure.transport.respondingTimeouts.readTimeout=0
+    - --entrypoints.websecure.transport.respondingTimeouts.writeTimeout=0
+    - --entrypoints.websecure.transport.respondingTimeouts.idleTimeout=300s
+    # Global backend timeout — responseHeaderTimeout=0 prevents 502 during slow
+    # Immich processing; idleConnTimeout left at default 90s (fine for light use)
+    - --serversTransport.forwardingTimeouts.responseHeaderTimeout=0
     logs:
       general:
         level: INFO
       access:
         enabled: true
+        format: json          # moved here from additionalArguments
