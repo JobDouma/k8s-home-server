@@ -1,0 +1,10 @@
+apiVersion: traefik.io/v1alpha1
+kind: ServersTransport
+metadata:
+  name: immich-transport
+  namespace: immich             # must match the IngressRoute namespace
+spec:
+  forwardingTimeouts:
+    dialTimeout: 30s
+    responseHeaderTimeout: 0s  # wait indefinitely for Immich to start responding
+    idleConnTimeout: 120s      # short — you're a light user, no need to hold connections
