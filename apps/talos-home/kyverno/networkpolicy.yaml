@@ -105,3 +105,20 @@ spec:
         - port: 8000   # admission-controller metrics
         - port: 9000   # background-controller metrics
         - port: 9001   # reports-controller metrics
+---
+# Allow kube-apiserver to call Kyverno admission webhook on port 9443
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: kyverno-admission-controller-ingress
+  namespace: kyverno
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/component: admission-controller
+  policyTypes:
+    - Ingress
+  ingress:
+    - ports:
+        - port: 9443
+          protocol: TCP
