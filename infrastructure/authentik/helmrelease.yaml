@@ -50,10 +50,7 @@ spec:
         limits:
           cpu: 750m
           memory: 1Gi
-      tolerations:
-      - key: node-role.kubernetes.io/control-plane
-        operator: Exists
-        effect: NoSchedule
+      tolerations: []   # remove the control-plane toleration
       affinity:
         podAntiAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:
@@ -84,10 +81,7 @@ spec:
         rollingUpdate:
           maxUnavailable: 1
           maxSurge: 1
-      tolerations:
-      - key: node-role.kubernetes.io/control-plane
-        operator: Exists
-        effect: NoSchedule
+      tolerations: []   # remove the control-plane toleration
       affinity:
         podAntiAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:
