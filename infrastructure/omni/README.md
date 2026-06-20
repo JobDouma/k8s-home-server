@@ -6,7 +6,7 @@ manages. That's intentional: the tool that bootstraps and manages your Talos/
 k8s cluster shouldn't itself depend on that cluster being up.
 
 This directory is the git source of truth for that service. The actual running
-copy lives at `/opt/omni` on the host and is synced from here by `deploy.sh`.
+copy lives at `/opt/omni` on the host and is synced from here by `upgrade.sh`.
 
 ## Step 0 — Rotate the OIDC client secret (do this first)
 
@@ -24,15 +24,50 @@ troubleshooting and should be treated as compromised:
 |---|---|---|
 | `docker-compose.yml` | Yes | Service definition |
 | `secret.yaml` | Yes (SOPS-encrypted) | Only the OIDC client secret |
-| `deploy.sh` | Yes | Sync + restart script |
+| `upgrade.sh` | Yes | Idempotent sync + upgrade script |
 | `/opt/omni/omni.asc` | **No** | Omni's PGP identity key. This is what every enrolled Talos machine trusts. Losing it means re-enrolling every node. |
 | `/opt/omni/tls.crt` / `tls.key` | **No** | TLS serving cert/key for `omni.lan` |
 | `/opt/omni/etcd/`, `/opt/omni/sqlite/` | **No** | Live cluster state/database |
 
 The four host-only items above should already be covered by whatever you're
 using under `~/secure-backups`. If they're not backed up yet, do that before
-relying on this repo for disaster recovery — `deploy.sh` will refuse to start
+relying on this repo for disaster recovery — `upgrade.sh` will refuse to start
 if they're missing, on purpose.
+
+## Versioning: how this differs from the code-server pattern
+
+If you're used to the `version.yaml` + `upgrade.sh` pattern from `infrastructure/vs-code/` for code-server, note that Omni is set up differently on purpose:
+
+code-server is a downloaded `.deb`, installed via `dpkg`, with no registry or
+manifest to pin a version against — so `version.yaml` exists purely to give
+Renovate *something* to bump, and `upgrade.sh` does the heavy lifting
+(checksum, download, install).
+
+Omni is a container. The version pin already has a natural home — the
+`image:` tag in `docker-compose.yml` — and Renovate's `docker-compose`
+manager (enabled by default in standard presets) watches `image:` lines
+directly and opens PRs bumping them, the same way it would for any other
+Docker Compose service in this repo. So there's no `version.yaml` for Omni;
+the tag in `docker-compose.yml` *is* the version source of truth. One fewer
+file to keep in sync, and Docker's image digests already give you integrity
+verification for free (no separate checksum step needed, unlike the raw
+`.deb`).
+
+`upgrade.sh` mirrors the *spirit* of code-server's script though: it compares
+the image tag already running to the tag pinned in `docker-compose.yml` and
+skips the pull/restart if they already match, so it's safe to re-run after
+every Renovate merge, or for unrelated reasons (e.g. just rotating the OIDC
+secret) without forcing an unnecessary container restart.
+
+## EULA acceptance (added in v1.7.1)
+
+Omni added a mandatory EULA acceptance step in v1.7.1, with `--eula-accept-name`
+and `--eula-accept-email` flags as the way to accept it non-interactively.
+Without them, an unattended container start can get stuck. These are already
+in `docker-compose.yml` — **just replace `CHANGE_ME` with your actual name
+before running `upgrade.sh` for the first time on this config.**
+
+
 
 ## First-time deploy on a host that already has the key material
 
@@ -52,11 +87,11 @@ git push
 
 # 3. Deploy
 cd infrastructure/omni
-chmod +x deploy.sh
-./deploy.sh
+chmod +x upgrade.sh
+./upgrade.sh
 ```
 
-`deploy.sh` decrypts the secret, writes `/opt/omni/.env` (git-ignored, host-only),
+`upgrade.sh` decrypts the secret, writes `/opt/omni/.env` (git-ignored, host-only),
 copies `docker-compose.yml` into `/opt/omni`, and runs `docker compose up -d`.
 
 Verify:
@@ -71,16 +106,17 @@ Then log into Omni and confirm the Authentik flow completes without the
 
 ## Day-2: updating the config
 
-Any time you change `docker-compose.yml` (new flags, image tag, ports, etc.):
+Any time you change `docker-compose.yml` — most commonly, merging a Renovate
+PR that bumped the `image:` tag, but also any flag/port/volume change:
 
 ```bash
 git pull
 cd infrastructure/omni
-./deploy.sh
+./upgrade.sh
 ```
 
-This is idempotent — safe to re-run any time, including just to pick up a new
-`:latest` image.
+Idempotent — safe to re-run any time. It skips the image pull entirely if
+the tag hasn't changed since the last run.
 
 ## Rotating the secret later
 
@@ -89,7 +125,7 @@ sops infrastructure/omni/secret.yaml   # edit the value, save
 git add infrastructure/omni/secret.yaml
 git commit -m "Rotate Omni OIDC client secret"
 git push
-./deploy.sh
+./upgrade.sh
 ```
 
 Don't forget to regenerate the matching secret in Authentik first, same as
@@ -103,7 +139,7 @@ Step 0.
    `secure-backups` into `/opt/omni/`.
 3. Restore `/usr/local/share/ca-certificates/homelab-ca.crt` and run
    `update-ca-certificates` if needed.
-4. Clone this repo, `cd infrastructure/omni && ./deploy.sh`.
+4. Clone this repo, `cd infrastructure/omni && ./upgrade.sh`.
 
 ## Why the `extra_hosts` line exists
 
