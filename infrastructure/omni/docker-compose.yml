@@ -2,7 +2,19 @@ name: omni-on-prem
 services:
   omni:
     container_name: omni
-    image: ghcr.io/siderolabs/omni:latest
+    # TEMPORARILY pinned to this exact digest, NOT a clean tag. Explanation:
+    # an earlier unpinned `:latest` pull (before this file existed) silently
+    # landed on a v1.9.0-beta.0 build, which migrated the SQLite DB forward
+    # to schema 62. v1.8.2 (the latest STABLE release) cannot read schema 62
+    # - DB migrations only go forward. This digest is the exact image that
+    # already wrote schema 62, so it's the only verified-safe choice right
+    # now. Switch this back to a clean `vX.Y.Z` tag once Sidero Labs ships an
+    # official stable release built on schema 62 or later - check the
+    # release notes at https://github.com/siderolabs/omni/releases before
+    # doing so, since a tag alone doesn't guarantee schema compatibility.
+    # Until then, leave Renovate's docker-compose tracking on hold for this
+    # service (it can't safely bump a digest pin like a semver tag).
+    image: ghcr.io/siderolabs/omni@sha256:b7e606d9c5a69ce9a799897c4623ce02f8e5b2831e51c96ec5e45d1b00088d1b
     restart: unless-stopped
     network_mode: host
 
@@ -33,6 +45,8 @@ services:
       - /opt/omni/tls.key:/tls.key
       - /usr/local/share/ca-certificates/homelab-ca.crt:/etc/ssl/certs/homelab-ca.crt:ro
 
+    # REQUIRED since v1.7.1 - omni accepts a EULA via flags or it will not
+    # start unattended. Replace CHANGE_ME with your actual name below.
     command: >
       --account-id=400d4180-9f90-479f-b0cd-aa3643f53765
       --name=homelab-omni
@@ -57,3 +71,5 @@ services:
       --auth-oidc-provider-url=https://auth.lan/application/o/omni/
       --auth-oidc-client-id=omni-homelab
       --auth-oidc-client-secret=${OMNI_OIDC_CLIENT_SECRET}
+      --eula-accept-name=job
+      --eula-accept-email=jobdouma@hotmail.com
