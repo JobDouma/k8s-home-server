@@ -1,0 +1,59 @@
+name: omni-on-prem
+services:
+  omni:
+    container_name: omni
+    image: ghcr.io/siderolabs/omni:latest
+    restart: unless-stopped
+    network_mode: host
+
+    # Fix: with network_mode: host, the container still gets its OWN /etc/hosts,
+    # it does NOT inherit the host's. auth.lan only resolves via DNS (Blocky,
+    # 192.168.2.53) which is not guaranteed to be up, and the OIDC token exchange
+    # is done server-side by this process, not by the browser. Pin it statically
+    # so login doesn't depend on Blocky being healthy.
+    extra_hosts:
+      - "auth.lan:192.168.2.100"
+
+    devices:
+      - /dev/net/tun
+    cap_add:
+      - NET_ADMIN
+
+    environment:
+      - SSL_CERT_FILE=/etc/ssl/certs/homelab-ca.crt
+
+    # NOTE: omni.asc, tls.crt, tls.key and the etcd/sqlite data dirs are NOT
+    # managed by this repo. They are sensitive, long-lived, host-local state.
+    # See README.md for what they are and where they're backed up.
+    volumes:
+      - /opt/omni/etcd:/_out/etcd
+      - /opt/omni/sqlite:/_out/sqlite
+      - /opt/omni/omni.asc:/omni.asc
+      - /opt/omni/tls.crt:/tls.crt
+      - /opt/omni/tls.key:/tls.key
+      - /usr/local/share/ca-certificates/homelab-ca.crt:/etc/ssl/certs/homelab-ca.crt:ro
+
+    command: >
+      --account-id=400d4180-9f90-479f-b0cd-aa3643f53765
+      --name=homelab-omni
+      --sqlite-storage-path=/_out/sqlite/omni.db
+      --cert=/tls.crt
+      --key=/tls.key
+      --machine-api-cert=/tls.crt
+      --machine-api-key=/tls.key
+      --private-key-source=file:///omni.asc
+      --event-sink-port=8091
+      --bind-addr=0.0.0.0:443
+      --machine-api-bind-addr=0.0.0.0:8090
+      --k8s-proxy-bind-addr=0.0.0.0:8100
+      --advertised-api-url=https://omni.lan/
+      --advertised-kubernetes-proxy-url=https://omni.lan:8100/
+      --siderolink-api-advertised-url=https://omni.lan:8090/
+      --siderolink-wireguard-advertised-addr=192.168.2.12:50180
+      --initial-users=jobdouma@hotmail.com
+      --auth-auth0-enabled=false
+      --auth-saml-enabled=false
+      --auth-oidc-enabled=true
+      --auth-oidc-provider-url=https://auth.lan/application/o/omni/
+      --auth-oidc-client-id=omni-homelab
+      --auth-oidc-client-secret=${OMNI_OIDC_CLIENT_SECRET}
