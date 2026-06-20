@@ -80,4 +80,5 @@ docker compose up -d
 
 echo "==> Done. Now running: $(docker inspect --format '{{.Config.Image}}' omni)"
 echo "    Logs:   docker logs -f omni"
-echo "    Verify: docker exec omni cat /etc/hosts | grep auth.lan"
+echo "    Verify: sudo cat \"\$(docker inspect --format '{{.HostsPath}}' omni)\" | grep auth.lan"
+echo "            (the omni image has no shell/cat - docker exec won't work)"
