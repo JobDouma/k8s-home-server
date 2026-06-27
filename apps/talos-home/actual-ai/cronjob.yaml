@@ -22,7 +22,7 @@ spec:
               # so better-sqlite3 can compile without apt-get.
               # Pinned to amd64 digest to prevent tag drift (node:22-slim was serving Node 26).
               # Node 22 is Active LTS until April 2027; better-sqlite3 has no Node 26 prebuilds yet.
-              image: node:26.3.1-bookworm@sha256:4c24932e78be3289c187f89564ab103441da04bb5f55d35727c855d9be25f056
+              image: node:26.4.0-bookworm@sha256:8d3442d5f074940723be6eece34e992eb147ba1f59c73888e8f257918dea2e78
               imagePullPolicy: IfNotPresent
               command:
                 - /bin/sh
