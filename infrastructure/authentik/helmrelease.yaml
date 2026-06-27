@@ -64,7 +64,7 @@ spec:
       startupProbe:
         failureThreshold: 120
         periodSeconds: 10
-        timeoutSeconds: 3
+        timeoutSeconds: 10
       readinessProbe: {}
       livenessProbe: {}
     worker:
@@ -95,7 +95,7 @@ spec:
       startupProbe:
         failureThreshold: 120
         periodSeconds: 10
-        timeoutSeconds: 3
+        timeoutSeconds: 10
       readinessProbe: {}
       livenessProbe: {}
     postgresql:
