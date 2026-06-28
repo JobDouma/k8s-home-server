@@ -17,15 +17,3 @@ spec:
     crds:
       enabled: true
     replicaCount: 1
-    webhook:
-      config:
-        apiVersion: webhook.config.cert-manager.io/v1alpha1
-        kind: WebhookConfiguration
-        timeoutSeconds: 30
-      extraArgs:
-        - --feature-gates=AdditionalCertificateOutputFormats=true
-    # Prevent webhook failures from blocking Flux during bootstrap
-    # when cert-manager itself is still starting up
-    global:
-      webhook:
-        timeoutSeconds: 30
