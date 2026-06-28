@@ -50,7 +50,7 @@ spec:
         limits:
           cpu: 750m
           memory: 1Gi
-      tolerations: []   # remove the control-plane toleration
+      tolerations: []
       affinity:
         podAntiAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:
@@ -81,7 +81,7 @@ spec:
         rollingUpdate:
           maxUnavailable: 1
           maxSurge: 1
-      tolerations: []   # remove the control-plane toleration
+      tolerations: []
       affinity:
         podAntiAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:
@@ -109,21 +109,31 @@ spec:
           enabled: true
           storageClass: local-path
           size: 10Gi
-        extendedConfiguration: 'autovacuum_vacuum_scale_factor = 0.05
-
+        # Fix permissions on node-local storage after node wipe/reprovision
+        initContainers:
+          - name: fix-permissions
+            image: busybox:latest
+            command:
+              - sh
+              - -c
+              - |
+                mkdir -p /bitnami/postgresql/data
+                chown -R 1001:1001 /bitnami/postgresql
+                chmod 700 /bitnami/postgresql/data
+            securityContext:
+              runAsUser: 0
+              runAsNonRoot: false
+            volumeMounts:
+              - name: data
+                mountPath: /bitnami/postgresql
+        extendedConfiguration: |
+          autovacuum_vacuum_scale_factor = 0.05
           autovacuum_analyze_scale_factor = 0.02
-
           autovacuum_vacuum_cost_delay = 20ms
-
           autovacuum_max_workers = 2
-
           shared_buffers = 128MB
-
           effective_cache_size = 256MB
-
           work_mem = 8MB
-
-          '
         resources:
           requests:
             cpu: 50m
