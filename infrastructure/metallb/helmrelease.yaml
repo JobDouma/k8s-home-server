@@ -20,11 +20,12 @@ spec:
         kind: HelmRepository
         name: metallb
         namespace: flux-system
-
   values:
     controller:
       enabled: true
-
     speaker:
       enabled: true
       hostNetwork: true
+    # Prevent webhook from blocking Flux when controller is starting
+    crds:
+      validationFailurePolicy: Ignore
