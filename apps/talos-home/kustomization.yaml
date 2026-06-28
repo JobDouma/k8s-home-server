@@ -34,31 +34,31 @@ resources:
   # ──────────────────────────────────────
   # monitoring / VictoriaMetrics (lightweight Prometheus)
   # ──────────────────────────────────────
-  - victoria-metrics/namespace.yaml
-  - victoria-metrics/helmrepository.yaml
-  - victoria-metrics/helmrelease.yaml
-  - victoria-metrics/ingressroute.yaml
-  - victoria-metrics/alertmanager-secret.yaml
+  # - victoria-metrics/namespace.yaml
+  # - victoria-metrics/helmrepository.yaml
+  # - victoria-metrics/helmrelease.yaml
+  # - victoria-metrics/ingressroute.yaml
+  # - victoria-metrics/alertmanager-secret.yaml
 
   # ──────────────────────────────────────
   # Grafana
   # ──────────────────────────────────────
-  - grafana/ingressroute.yaml
-  - grafana/admin-secret.yaml
-  - grafana/certificate.yaml
-  - grafana/dashboards/
+  # - grafana/ingressroute.yaml
+  # - grafana/admin-secret.yaml
+  # - grafana/certificate.yaml
+  # - grafana/dashboards/
 
   # ──────────────────────────────────────
   # Promtail
   # ──────────────────────────────────────
-  - promtail/helmrelease.yaml
+  # - promtail/helmrelease.yaml
 
   # ──────────────────────────────────────
   # Loki
   # ──────────────────────────────────────
-  - loki/helmrepository.yaml
-  - loki/helmrelease.yaml
-  - loki/servicemonitor.yaml
+  # - loki/helmrepository.yaml
+  # - loki/helmrelease.yaml
+  # - loki/servicemonitor.yaml
 
   # ──────────────────────────────────────
   # Jellyseerr
@@ -167,16 +167,16 @@ resources:
   # ──────────────────────────────────────
   # Falco
   # ──────────────────────────────────────
-  - falco/namespace.yaml
-  - falco/helmrepository.yaml
-  - falco/helmrelease.yaml
-  - falco/falcosidekick-helmrelease.yaml
-  - falco/falcosidekick-secret.yaml
-  - falco/ingressroute.yaml
-  - falco/servicemonitor.yaml
-  - falco/certificate.yaml
-  - falco/configmap.yaml
-  - falco/networkpolicy.yaml
+  # - falco/namespace.yaml
+  # - falco/helmrepository.yaml
+  # - falco/helmrelease.yaml
+  # - falco/falcosidekick-helmrelease.yaml
+  # - falco/falcosidekick-secret.yaml
+  # - falco/ingressroute.yaml
+  # - falco/servicemonitor.yaml
+  # - falco/certificate.yaml
+  # - falco/configmap.yaml
+  # - falco/networkpolicy.yaml
 
   # ──────────────────────────────────────
   # gotify
@@ -220,14 +220,14 @@ resources:
   # ──────────────────────────────────────
   # Uptime Kuma
   # ──────────────────────────────────────
-  - uptime-kuma/namespace.yaml
-  - uptime-kuma/secret.yaml
-  - uptime-kuma/certificate.yaml
-  - uptime-kuma/configmap.yaml
-  - uptime-kuma/helmrelease.yaml
-  - uptime-kuma/job.yaml
-  - uptime-kuma/ingressroute.yaml
-  - uptime-kuma/pvc.yaml
+  # - uptime-kuma/namespace.yaml
+  # - uptime-kuma/secret.yaml
+  # - uptime-kuma/certificate.yaml
+  # - uptime-kuma/configmap.yaml
+  # - uptime-kuma/helmrelease.yaml
+  # - uptime-kuma/job.yaml
+  # - uptime-kuma/ingressroute.yaml
+  # - uptime-kuma/pvc.yaml
   
   # ──────────────────────────────────────
   # Kyverno
@@ -266,5 +266,3 @@ resources:
   # - actual-ai/secret.yaml
   # - actual-ai/networkpolicy.yaml
   # - actual-ai/pvc.yaml
-
-  # - etcd-defrag/cronjob.yaml
