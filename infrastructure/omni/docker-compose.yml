@@ -14,7 +14,7 @@ services:
     # doing so, since a tag alone doesn't guarantee schema compatibility.
     # Until then, leave Renovate's docker-compose tracking on hold for this
     # service (it can't safely bump a digest pin like a semver tag).
-    image: ghcr.io/siderolabs/omni@sha256:1814735e0334d438e06b51eb1a6a92b71b0d52dccc6b11fe130309d49675e481
+    image: ghcr.io/siderolabs/omni@sha256:300e6e9465d63bb9270250eeb3c59de903a20daef49762fef088f9d46b74f4e1
     restart: unless-stopped
     network_mode: host
 
