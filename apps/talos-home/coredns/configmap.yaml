@@ -22,7 +22,7 @@ data:
         forward lan 192.168.2.53 {
             policy sequential
             max_fails 3
-            expire 10s
+            expire 30s
             health_check 5s
         }
 
@@ -32,12 +32,12 @@ data:
         forward . 192.168.2.53 1.1.1.1 8.8.8.8 {
             policy sequential
             max_fails 3
-            expire 10s
+            expire 30s
             health_check 5s
             prefer_udp
         }
 
-        cache 30
+        cache 300
         loop
         reload
         loadbalance
