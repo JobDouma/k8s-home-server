@@ -1,6 +1,19 @@
 #!/bin/bash
-docker run --rm -v $(pwd):/path zricethezav/gitleaks:latest protect --source /path --staged -v
-if [ $? -ne 0 ]; then
-  echo "gitleaks: secrets detected, commit blocked"
+set -euo pipefail
+
+REPO_ROOT="$(git rev-parse --show-toplevel)"
+# renovate: datasource=docker depName=zricethezav/gitleaks
+GITLEAKS_IMAGE="zricethezav/gitleaks:v8.30.1"
+
+if ! command -v docker >/dev/null 2>&1; then
+  echo "❌ docker not found — cannot run gitleaks, blocking commit for safety" >&2
+  echo "   (use 'git commit --no-verify' only if you're certain no secrets are staged)" >&2
   exit 1
 fi
+
+docker run --rm \
+  -v "$REPO_ROOT:/path:ro" \
+  "$GITLEAKS_IMAGE" \
+  protect --source /path --staged --redact -v
+
+echo "✅ gitleaks: no secrets detected"

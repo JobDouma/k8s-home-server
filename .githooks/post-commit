@@ -1,9 +1,22 @@
 #!/bin/bash
-# Build ignore-files list from .gitignore
-IGNORE_FILES=$(grep -v '^#' ~/k8s-home-server/.gitignore | grep -v '^$' | grep -v '/' | tr '\n' ' ')
+set -euo pipefail
 
-repo2txt -r ~/k8s-home-server -o ~/k8s-home-server/cluster-context.txt \
+# Ensure user-local tools are on PATH (git hooks don't source .bashrc)
+export PATH="$HOME/.local/bin:$PATH"
+
+REPO_DIR="$HOME/k8s-home-server"
+
+if ! command -v repo2txt >/dev/null 2>&1; then
+  echo "❌ repo2txt not found on PATH — cluster-context.txt NOT updated" >&2
+  exit 0   # don't block the commit, just warn loudly
+fi
+
+# Build ignore-files list from .gitignore (only bare filenames, no dir patterns)
+mapfile -t IGNORE_FILES < <(grep -v '^#' "$REPO_DIR/.gitignore" | grep -v '^$' | grep -v '/')
+
+repo2txt -r "$REPO_DIR" -o "$REPO_DIR/cluster-context.txt" \
   --exclude-dir flux-system .git .github .githooks .vscode dashboards \
-  --ignore-files $IGNORE_FILES \
+  --ignore-files "${IGNORE_FILES[@]}" \
   --ignore-types .sops .lock
-echo "✅ ~/k8s-home-server/cluster-context.txt updated"
+
+echo "✅ $REPO_DIR/cluster-context.txt updated"
