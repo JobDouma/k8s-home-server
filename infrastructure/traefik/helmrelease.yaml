@@ -113,9 +113,3 @@ spec:
     # Global backend timeout — responseHeaderTimeout=0 prevents 502 during slow
     # Immich processing; idleConnTimeout left at default 90s (fine for light use)
     - --serversTransport.forwardingTimeouts.responseHeaderTimeout=0
-    logs:
-      general:
-        level: INFO
-      access:
-        enabled: true
-        format: json          # moved here from additionalArguments
