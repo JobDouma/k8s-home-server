@@ -27,8 +27,11 @@ spec:
         runAsGroup: 1000
         fsGroup: 1000
         fsGroupChangePolicy: OnRootMismatch
+
         seccompProfile:
           type: RuntimeDefault
+
+      terminationGracePeriodSeconds: 60
     controllers:
       immich-server:
         annotations:
@@ -98,8 +101,8 @@ spec:
               containerPort: 3003
             resources:
               requests:
-                cpu: 50m
-                memory: 512Mi
+                cpu: 250m
+                memory: 1Gi
               limits:
                 cpu: 2000m
                 memory: 4Gi
@@ -136,88 +139,84 @@ spec:
                   failureThreshold: 3
       immich-postgres:
         strategy: Recreate
+
         pod:
           securityContext:
             runAsUser: 999
             runAsGroup: 999
             fsGroup: 999
+            fsGroupChangePolicy: OnRootMismatch
             runAsNonRoot: true
-            fsGroupChangePolicy: Always
-        initContainers:
-          fix-permissions:
-            image:
-              repository: busybox
-              tag: latest
-            command:
-              - sh
-              - -c
-              - |
-                mkdir -p /var/lib/postgresql/data/pgdata
-                chown -R 999:999 /var/lib/postgresql/data
-                chmod 700 /var/lib/postgresql/data/pgdata
-            securityContext:
-              runAsUser: 0
-              runAsNonRoot: false
-            volumeMounts:
-              - name: postgres-data
-                mountPath: /var/lib/postgresql/data
+
         containers:
           app:
             image:
               repository: ghcr.io/immich-app/postgres
               tag: 16-vectorchord0.4.3-pgvectors0.2.0@sha256:1a078b237c1d9b420b0ee59147386b4aa60d3a07a8e6a402fc84a57e41b043a4
+
             env:
               POSTGRES_DB:
                 valueFrom:
                   secretKeyRef:
                     name: immich-secret
                     key: DB_DATABASE_NAME
+
               POSTGRES_USER:
                 valueFrom:
                   secretKeyRef:
                     name: immich-secret
                     key: DB_USERNAME
+
               POSTGRES_PASSWORD:
                 valueFrom:
                   secretKeyRef:
                     name: immich-secret
                     key: DB_PASSWORD
-              POSTGRES_INITDB_ARGS: --data-checksums
+
               PGDATA: /var/lib/postgresql/data/pgdata
+              POSTGRES_INITDB_ARGS: --data-checksums
+
+            securityContext:
+              allowPrivilegeEscalation: false
+
             resources:
               requests:
-                cpu: 50m
-                memory: 256Mi
+                cpu: 100m
+                memory: 512Mi
+
               limits:
                 cpu: 1000m
                 memory: 1Gi
+
             probes:
               startup:
                 enabled: true
                 spec:
                   exec:
                     command:
-                    - sh
-                    - -c
-                    - pg_isready -U $POSTGRES_USER
+                      - sh
+                      - -c
+                      - pg_isready -U $POSTGRES_USER
                   failureThreshold: 30
                   periodSeconds: 5
+
               readiness:
                 enabled: true
                 spec:
                   exec:
                     command:
-                    - sh
-                    - -c
-                    - pg_isready -U $POSTGRES_USER
+                      - sh
+                      - -c
+                      - pg_isready -U $POSTGRES_USER
+
               liveness:
                 enabled: true
                 spec:
                   exec:
                     command:
-                    - sh
-                    - -c
-                    - pg_isready -U $POSTGRES_USER
+                      - sh
+                      - -c
+                      - pg_isready -U $POSTGRES_USER
       immich-redis:
         containers:
           app:
@@ -225,10 +224,12 @@ spec:
               repository: docker.io/valkey/valkey
               tag: 9-alpine@sha256:a35428eba9043cc0b79dbe54100f0c92784f2de00ad09b01182bfb1c5c83d1bd
             args:
-            - --save
-            - ''
-            - --appendonly
-            - 'no'
+              - --save
+              - ""
+              - --appendonly
+              - "no"
+              - --maxmemory-policy
+              - allkeys-lru
             resources:
               requests:
                 cpu: 10m
@@ -317,7 +318,7 @@ spec:
         enabled: true
         type: emptyDir
         medium: Memory
-        sizeLimit: 128Mi
+        sizeLimit: 1Gi
         advancedMounts:
           immich-postgres:
             app:
