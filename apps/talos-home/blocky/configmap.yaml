@@ -120,7 +120,6 @@ data:
         gotify.lan: 192.168.2.100
         immich.lan: 192.168.2.100
         uptime-kuma.lan: 192.168.2.100  # was missing — Uptime Kuma monitors itself but couldn't resolve
-        actual.lan: 192.168.2.100       # Actual Budget
         truenas.lan: 192.168.2.5
         router.lan: 192.168.2.254
         omni.lan: 192.168.2.12
