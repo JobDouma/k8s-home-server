@@ -86,6 +86,19 @@ spec:
               "depNameTemplate": "coder/code-server",
               "datasourceTemplate": "github-releases",
               "versioningTemplate": "semver"
+            },
+            {
+              "customType": "regex",
+              "description": "gitleaks docker image version tracking for pre-commit hook",
+              "managerFilePatterns": [
+                "/(^|/)\\.githooks/pre-commit$/"
+              ],
+              "matchStrings": [
+                "GITLEAKS_IMAGE=\"zricethezav/gitleaks:(?<currentValue>v[0-9.]+)\""
+              ],
+              "depNameTemplate": "zricethezav/gitleaks",
+              "datasourceTemplate": "docker",
+              "versioningTemplate": "docker"
             }
           ],
           "platformAutomerge": true,
