@@ -21,26 +21,26 @@ spec:
       successfulJobsHistoryLimit: 0
       failedJobsHistoryLimit: 1
       ttlSecondsAfterFinished: 300
-      commandOverride:
-        - /bin/bash
-        - -c
-        - |
-          renovate; EXIT=$?
-          if [ $EXIT -eq 0 ]; then
-            STATUS="✅ Renovate finished successfully"
-            PRIORITY=3
-          else
-            STATUS="❌ Renovate failed (exit: $EXIT)"
-            PRIORITY=8
-          fi
-          if [ -z "${RENOVATE_GOTIFY_TOKEN}" ]; then
-            echo "WARNING: RENOVATE_GOTIFY_TOKEN is unset, skipping notification"
-          else
-            curl -s -X POST "http://gotify.gotify.svc.cluster.local/message?token=${RENOVATE_GOTIFY_TOKEN}" \
-              -H "Content-Type: application/json" \
-              -d "{\"title\": \"Renovate\", \"message\": \"${STATUS}\", \"priority\": ${PRIORITY}}"
-          fi
-          exit $EXIT
+      # commandOverride:
+      #   - /bin/bash
+      #   - -c
+      #   - |
+      #     renovate; EXIT=$?
+      #     if [ $EXIT -eq 0 ]; then
+      #       STATUS="✅ Renovate finished successfully"
+      #       PRIORITY=3
+      #     else
+      #       STATUS="❌ Renovate failed (exit: $EXIT)"
+      #       PRIORITY=8
+      #     fi
+      #     if [ -z "${RENOVATE_GOTIFY_TOKEN}" ]; then
+      #       echo "WARNING: RENOVATE_GOTIFY_TOKEN is unset, skipping notification"
+      #     else
+      #       curl -s -X POST "http://gotify.gotify.svc.cluster.local/message?token=${RENOVATE_GOTIFY_TOKEN}" \
+      #         -H "Content-Type: application/json" \
+      #         -d "{\"title\": \"Renovate\", \"message\": \"${STATUS}\", \"priority\": ${PRIORITY}}"
+      #     fi
+      #     exit $EXIT
     envFrom:
       - secretRef:
           name: renovate-secret
