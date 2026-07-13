@@ -15,4 +15,4 @@ homelab-ca.crt
 
 # Explicitly whitelist safely encrypted configurations
 !*.sops.yaml
-!**/*.sops.yaml
+!**/*.sops.yamlinfrastructure/omni/cluster-template.yaml
