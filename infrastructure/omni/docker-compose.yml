@@ -2,19 +2,7 @@ name: omni-on-prem
 services:
   omni:
     container_name: omni
-    # TEMPORARILY pinned to this exact digest, NOT a clean tag. Explanation:
-    # an earlier unpinned `:latest` pull (before this file existed) silently
-    # landed on a v1.9.0-beta.0 build, which migrated the SQLite DB forward
-    # to schema 62. v1.8.2 (the latest STABLE release) cannot read schema 62
-    # - DB migrations only go forward. This digest is the exact image that
-    # already wrote schema 62, so it's the only verified-safe choice right
-    # now. Switch this back to a clean `vX.Y.Z` tag once Sidero Labs ships an
-    # official stable release built on schema 62 or later - check the
-    # release notes at https://github.com/siderolabs/omni/releases before
-    # doing so, since a tag alone doesn't guarantee schema compatibility.
-    # Until then, leave Renovate's docker-compose tracking on hold for this
-    # service (it can't safely bump a digest pin like a semver tag).
-    image: ghcr.io/siderolabs/omni@sha256:0a5480eeb68a9caa9ddb92f8006d4b62b70d5bdd23d2639b574d8cbf5202f73b
+    image: ghcr.io/siderolabs/omni:v1.9.1
     restart: unless-stopped
     network_mode: host
 
@@ -70,6 +58,31 @@ services:
       --auth-oidc-enabled=true
       --auth-oidc-provider-url=https://auth.lan/application/o/omni/
       --auth-oidc-client-id=omni-homelab
+      --auth-oidc-allow-unverified-email=true
       --auth-oidc-client-secret=${OMNI_OIDC_CLIENT_SECRET}
       --eula-accept-name=job
       --eula-accept-email=jobdouma@hotmail.com
+      --etcd-backup-s3
+      --log-level=info
+
+  # Garage — S3-compatible object store, used ONLY as the backend for Omni's
+  # built-in etcd backup feature. Chosen over MinIO because MinIO's official
+  # image was archived/frozen in April 2026; Garage is actively maintained and
+  # purpose-built for exactly this (small, single-node self-hosted storage).
+  #
+  # Data lives on the NFS backups share, NOT on local disk and NOT in git —
+  # see README.md for why. garage.toml's data_dir/metadata_dir paths are the
+  # CONTAINER-side paths (/var/lib/garage/...) — the host-side NFS paths are
+  # only ever referenced in the volumes: mapping below, never inside the TOML.
+  garage:
+    image: dxflrs/garage:v2.3.0
+    container_name: omni-backup-garage
+    restart: unless-stopped
+    stop_grace_period: 30s
+    ports:
+      - "3900:3900"   # S3 API — Omni's --etcd-backup-s3-endpoint points here
+      - "3903:3903"   # Admin API — used only for one-time layout/bucket/key setup
+    volumes:
+      - ./garage-config/garage.toml:/etc/garage.toml:ro
+      - /mnt/truenas-backups/ubuntu-server/omni/garage-meta:/var/lib/garage/meta
+      - /mnt/truenas-backups/ubuntu-server/omni/garage-data:/var/lib/garage/data

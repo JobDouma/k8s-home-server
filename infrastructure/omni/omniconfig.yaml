@@ -1,0 +1,7 @@
+contexts:
+    default:
+        url: https://omni.lan/
+        auth:
+            siderov1:
+                identity: jobdouma@hotmail.com
+context: default
