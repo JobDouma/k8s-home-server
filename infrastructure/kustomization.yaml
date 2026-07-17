@@ -22,15 +22,6 @@ resources:
   - metallb/config/ipaddress-pools.yaml
   - metallb/config/l2-advertisements.yaml
 
-  - headlamp/namespace.yaml
-  - headlamp/helmrepository.yaml
-  - headlamp/helmrelease.yaml
-  - headlamp/ingressroute.yaml
-  - headlamp/oidc-secret.yaml
-  - headlamp/networkpolicy.yaml
-  - headlamp/rbac.yaml
-  - headlamp/certificate.yaml
-
   - authentik/namespace.yaml
   - authentik/certificate.yaml
   - authentik/helmrepository.yaml
