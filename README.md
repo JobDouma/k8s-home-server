@@ -1,5 +1,5 @@
 # k8s-home-server
-Personal Kubernetes homelab running on [Talos Linux](https://www.talos.dev/), managed with [Flux](https://fluxcd.io/) GitOps.
+3-node Talos Linux Kubernetes homelab managed with Flux GitOps.
 
 ## Stack
 | Layer | Tool |
@@ -12,14 +12,14 @@ Personal Kubernetes homelab running on [Talos Linux](https://www.talos.dev/), ma
 | Auth | Authentik (SSO) |
 | DNS | Blocky |
 | Secrets | SOPS + age |
-| Networking | MetalLB, Tailscale |
+| Networking | MetalLB, Tailscale, Cilium |
 | Notifications | Gotify |
 | Dependency updates | Renovate |
 
 ## Structure
 ```
 clusters/        # Flux bootstrap and cluster config
-infrastructure/  # Core platform (cert-manager, traefik, longhorn, authentik, metallb, ...)
+infrastructure/  # Core platform (cert-manager, traefik, authentik, metallb, cilium, ...)
 apps/            # Applications (jellyfin, sonarr, radarr, immich, ...)
 ```
 
