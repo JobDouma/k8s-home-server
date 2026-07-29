@@ -1,0 +1,34 @@
+# infrastructure/cilium/helmrelease.yaml
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: cilium
+  namespace: kube-system
+spec:
+  interval: 30m
+  chart:
+    spec:
+      chart: cilium
+      version: "1.16.x"   # pin to current stable
+      sourceRef:
+        kind: HelmRepository
+        name: cilium
+        namespace: kube-system
+  values:
+    kubeProxyReplacement: true
+    k8sServiceHost: <control-plane-vip-or-ip>
+    k8sServicePort: 6443
+    ipam:
+      mode: kubernetes
+    l2announcements:
+      enabled: true
+    externalIPs:
+      enabled: true
+    hubble:
+      enabled: true
+      relay:
+        enabled: true
+      ui:
+        enabled: true
+    operator:
+      replicas: 1   # you have 3 nodes but keep this light for homelab
