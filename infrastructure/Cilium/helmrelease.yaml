@@ -9,7 +9,7 @@ spec:
   chart:
     spec:
       chart: cilium
-      version: "1.16.x"   # pin to current stable
+      version: "1.20.x"   # pin to current stable
       sourceRef:
         kind: HelmRepository
         name: cilium
