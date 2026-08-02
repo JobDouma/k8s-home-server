@@ -12,16 +12,24 @@ data:
       name: truenas
       addr: 192.168.2.5
       portmap:
-        443:
-          name: TrueNAS Web UI
-          port: 443
-          state: false
-          watch: true
-        22:
-          name: SSH
-          port: 22
-          state: false
-          watch: true
+        # Web & Admin
+        443:   { name: TrueNAS Web UI (HTTPS), port: 443, state: false, watch: true }
+        80:    { name: TrueNAS Web UI (HTTP), port: 80, state: false, watch: true }
+        # Remote Access
+        22:    { name: SSH, port: 22, state: false, watch: true }
+        # File Sharing
+        445:   { name: SMB (Windows Shares), port: 445, state: false, watch: true }
+        139:   { name: NetBIOS, port: 139, state: false, watch: true }
+        2049:  { name: NFSv4, port: 2049, state: false, watch: true }
+        111:   { name: NFS RPC Portmapper, port: 111, state: false, watch: true }
+        # iSCSI (if you use it)
+        3260:  { name: iSCSI, port: 3260, state: false, watch: true }
+        # FTP
+        21:    { name: FTP, port: 21, state: false, watch: true }
+        # rsync
+        873:   { name: rsync, port: 873, state: false, watch: true }
+        # TrueNAS API (same as 443 already)
+        # 8080: { name: WebDAV, port: 8080, state: false, watch: true } # if enabled
 
     # ──────────────────────────────────────
     # Router / Gateway (192.168.2.254)
@@ -30,64 +38,86 @@ data:
       name: router
       addr: 192.168.2.254
       portmap:
-        443:
-          name: Router Web UI
-          port: 443
-          state: false
-          watch: true
-        53:
-          name: DNS
-          port: 53
-          state: false
-          watch: true
+        443:   { name: Router Web UI (HTTPS), port: 443, state: false, watch: true }
+        80:    { name: Router Web UI (HTTP), port: 80, state: false, watch: true }
+        53:    { name: DNS, port: 53, state: false, watch: true }
+        # 22:  { name: SSH (if enabled), port: 22, state: false, watch: true }
 
     # ──────────────────────────────────────
-    # Omni (192.168.2.12)
+    # Ubuntu Server (Omni + Garage + etc.) – 192.168.2.12
     # ──────────────────────────────────────
     192.168.2.12:
-      name: omni
+      name: ubuntu-server
       addr: 192.168.2.12
       portmap:
-        443:
-          name: Omni Web UI
-          port: 443
-          state: false
-          watch: true
-        8090:
-          name: Omni API
-          port: 8090
-          state: false
-          watch: true
+        # SSH
+        22:    { name: SSH, port: 22, state: false, watch: true }
+        # Omni
+        443:   { name: Omni Web UI (HTTPS), port: 443, state: false, watch: true }
+        8090:  { name: Omni API (SideroLink), port: 8090, state: false, watch: true }
+        50180: { name: Omni WireGuard (SideroLink), port: 50180, state: false, watch: true }
+        8091:  { name: Omni Event Sink, port: 8091, state: false, watch: true }
+        8092:  { name: Omni KMSG Log, port: 8092, state: false, watch: true }
+        # Garage
+        3900:  { name: Garage S3 API, port: 3900, state: false, watch: true }
+        3903:  { name: Garage Admin API, port: 3903, state: false, watch: true }
+        # Docker (if exposed)
+        2375:  { name: Docker API (insecure), port: 2375, state: false, watch: true }
+        # General
+        80:    { name: HTTP, port: 80, state: false, watch: true }
 
     # ──────────────────────────────────────
-    # Kubernetes Nodes
+    # Proxmox Host 1 (192.168.2.10)
+    # ──────────────────────────────────────
+    192.168.2.10:
+      name: proxmox-1
+      addr: 192.168.2.10
+      portmap:
+        8006:  { name: Proxmox Web UI, port: 8006, state: false, watch: true }
+        22:    { name: SSH, port: 22, state: false, watch: true }
+
+    # ──────────────────────────────────────
+    # Proxmox Host 2 (192.168.2.11)
+    # ──────────────────────────────────────
+    192.168.2.11:
+      name: proxmox-2
+      addr: 192.168.2.11
+      portmap:
+        8006:  { name: Proxmox Web UI, port: 8006, state: false, watch: true }
+        22:    { name: SSH, port: 22, state: false, watch: true }
+
+    # ──────────────────────────────────────
+    # Windows Workstation (192.168.2.18)
+    # ──────────────────────────────────────
+    192.168.2.18:
+      name: windows-workstation
+      addr: 192.168.2.18
+      portmap:
+        3389:  { name: Remote Desktop (RDP), port: 3389, state: false, watch: true }
+        445:   { name: SMB File Sharing, port: 445, state: false, watch: true }
+        139:   { name: NetBIOS, port: 139, state: false, watch: true }
+        22:    { name: SSH (if installed), port: 22, state: false, watch: true }
+        80:    { name: HTTP, port: 80, state: false, watch: true }
+
+    # ──────────────────────────────────────
+    # Kubernetes Nodes (Talos)
     # ──────────────────────────────────────
     192.168.2.22:
       name: talos-cp-1
       addr: 192.168.2.22
       portmap:
-        6443:
-          name: Kubernetes API
-          port: 6443
-          state: false
-          watch: true
-        50000:
-          name: Talos API
-          port: 50000
-          state: false
-          watch: true
+        6443:  { name: Kubernetes API, port: 6443, state: false, watch: true }
+        50000: { name: Talos API, port: 50000, state: false, watch: true }
+        # etcd internal (rarely exposed)
+        4242:  { name: etcd (internal), port: 4242, state: false, watch: true }
+        # WireGuard if used
+        51820: { name: WireGuard, port: 51820, state: false, watch: true }
 
     192.168.2.6:
       name: talos-wk-1
       addr: 192.168.2.6
       portmap:
-        6443:
-          name: Kubernetes API
-          port: 6443
-          state: false
-          watch: true
-        50000:
-          name: Talos API
-          port: 50000
-          state: false
-          watch: true
+        6443:  { name: Kubernetes API, port: 6443, state: false, watch: true }
+        50000: { name: Talos API, port: 50000, state: false, watch: true }
+        4242:  { name: etcd (internal), port: 4242, state: false, watch: true }
+        51820: { name: WireGuard, port: 51820, state: false, watch: true }
