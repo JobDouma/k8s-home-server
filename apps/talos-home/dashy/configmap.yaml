@@ -169,5 +169,5 @@ data:
 
           - title: Argus
             description: Network Port Scanner
-            icon: fas fa-shield-halved   # or fa-network-wired
+            icon: fas fa-network-wired
             url: https://argus.lan
