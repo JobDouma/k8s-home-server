@@ -259,3 +259,4 @@ resources:
   - argus/helmrelease.yaml
   - argus/ingressroute.yaml
   - argus/certificate.yaml
+  - argus/configmap.yaml

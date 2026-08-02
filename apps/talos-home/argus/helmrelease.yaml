@@ -82,3 +82,11 @@ spec:
         size: 1Gi
         globalMounts:
           - path: /data/WatchYourPorts
+      hosts:
+        enabled: true
+        type: configMap
+        name: argus-hosts
+        globalMounts:
+          - path: /data/WatchYourPorts/hosts.yaml
+            subPath: hosts.yaml
+            readOnly: true
