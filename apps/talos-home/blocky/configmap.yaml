@@ -113,13 +113,12 @@ data:
         joplin.lan: 192.168.2.100
         traefik.lan: 192.168.2.100
         blocky.lan: 192.168.2.100
-        headlamp.lan: 192.168.2.100
         freshrss.lan: 192.168.2.100
         auth.lan: 192.168.2.100
         falco.lan: 192.168.2.100
         gotify.lan: 192.168.2.100
         immich.lan: 192.168.2.100
-        uptime-kuma.lan: 192.168.2.100  # was missing — Uptime Kuma monitors itself but couldn't resolve
+        uptime-kuma.lan: 192.168.2.100 
         truenas.lan: 192.168.2.5
         router.lan: 192.168.2.254
         omni.lan: 192.168.2.12
