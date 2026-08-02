@@ -46,6 +46,8 @@ spec:
           interval: 120s
           scrapeTimeout: 10s
       replicas: 1
+      podAnnotations:                               # <-- ADDED
+        configmap.reloader.stakater.com/reload: authentik-blueprints
       resources:
         requests:
           cpu: 50m
@@ -75,6 +77,8 @@ spec:
         type: Recreate
       revisionHistoryLimit: 2
       replicas: 1
+      podAnnotations:                               # <-- ADDED
+        configmap.reloader.stakater.com/reload: authentik-blueprints
       resources:
         requests:
           cpu: 100m
@@ -110,7 +114,6 @@ spec:
           enabled: true
           storageClass: local-path
           size: 10Gi
-        # Fix permissions on node-local storage after node wipe/reprovision
         initContainers:
           - name: fix-permissions
             image: busybox:latest
