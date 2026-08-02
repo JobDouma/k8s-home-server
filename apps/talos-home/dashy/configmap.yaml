@@ -82,6 +82,11 @@ data:
             icon: fas fa-bell
             url: https://gotify.lan
 
+          - title: n8n
+            description: Workflow Automation
+            icon: fas fa-robot
+            url: https://n8n.lan
+
 
       - name: Monitoring
         icon: fas fa-chart-line
@@ -161,3 +166,8 @@ data:
             description: Runtime Security & Threat Detection
             icon: fas fa-shield-alt
             url: https://falco.lan
+
+          - title: Argus
+            description: Network Port Scanner
+            icon: fas fa-shield-halved   # or fa-network-wired
+            url: https://argus.lan
