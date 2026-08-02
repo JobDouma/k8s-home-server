@@ -52,6 +52,7 @@ data:
       portmap:
         # SSH
         22:    { name: SSH, port: 22, state: false, watch: true }
+        2222:  { name: SSH, port: 2222, state: false, watch: true }
         # Omni
         443:   { name: Omni Web UI (HTTPS), port: 443, state: false, watch: true }
         8090:  { name: Omni API (SideroLink), port: 8090, state: false, watch: true }
