@@ -243,19 +243,19 @@ resources:
   # - kyverno/policies/disallow-privilege-escalation.yaml
 
 
-# ──────────────────────────────────────
-# n8n
-# ──────────────────────────────────────
-- n8n/namespace.yaml
-- n8n/secret.yaml
-- n8n/helmrelease.yaml
-- n8n/ingressroute.yaml
-- n8n/certificate.yaml
+  # ──────────────────────────────────────
+  # n8n
+  # ──────────────────────────────────────
+  - n8n/namespace.yaml
+  - n8n/secret.yaml
+  - n8n/helmrelease.yaml
+  - n8n/ingressroute.yaml
+  - n8n/certificate.yaml
 
-# ──────────────────────────────────────
-# Argus (WatchYourPorts)
-# ──────────────────────────────────────
-- argus/namespace.yaml
-- argus/helmrelease.yaml
-- argus/ingressroute.yaml
-- argus/certificate.yaml
+  # ──────────────────────────────────────
+  # Argus (WatchYourPorts)
+  # ──────────────────────────────────────
+  - argus/namespace.yaml
+  - argus/helmrelease.yaml
+  - argus/ingressroute.yaml
+  - argus/certificate.yaml
