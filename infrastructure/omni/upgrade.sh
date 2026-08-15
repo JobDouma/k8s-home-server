@@ -17,10 +17,14 @@ set -euo pipefail
 # it, then hands file ownership back to you so `docker compose` (running as
 # your user, via the docker group) can still read what it needs.
 #
-# Garage's data lives on the NFS backups share, not under /opt/omni - see
-# README.md. This script does not create that path; it must already exist
-# (it's shared, persistent infrastructure, not something to recreate blindly
-# on every deploy).
+# Garage's metadata dir (garage-meta) lives LOCALLY under /opt/omni, not on
+# NFS - LMDB (Garage's metadata engine) memory-maps its database and needs
+# reliable file locking + coherent page cache, which NFS doesn't reliably
+# provide. Only Garage's object DATA lives on the NFS backups share - see
+# README.md. This script does not create the NFS data path; it must already
+# exist and be an ACTUAL mount (it's shared, persistent infrastructure, not
+# something to recreate blindly on every deploy - see the mountpoint check
+# below).
 #
 # Run on ubuntu-server, as a user with access to the sops age key
 # (~/.config/sops/age/keys.txt) and sudo rights.
@@ -33,8 +37,8 @@ DEPLOY_DIR="/opt/omni"
 SECRET_FILE="${REPO_DIR}/secret.yaml"
 COMPOSE_FILE="${REPO_DIR}/docker-compose.yml"
 GARAGE_TOML_SOPS="${REPO_DIR}/garage-config/garage.config.sops.yaml"
+GARAGE_META_LOCAL="${DEPLOY_DIR}/garage-meta"
 GARAGE_DATA_NFS="/mnt/truenas-backups/ubuntu-server/omni/garage-data"
-GARAGE_META_NFS="/mnt/truenas-backups/ubuntu-server/omni/garage-meta"
 RUN_USER="$(id -un)"
 RUN_GROUP="$(id -gn)"
 
@@ -44,11 +48,19 @@ command -v docker >/dev/null || { echo "ERROR: docker not found on PATH" >&2; ex
 for f in "${DEPLOY_DIR}/omni.asc" "${DEPLOY_DIR}/tls.crt" "${DEPLOY_DIR}/tls.key"; do
   [[ -f "$f" ]] || { echo "ERROR: missing $f — restore it from secure-backups before deploying. See README.md (Disaster Recovery)." >&2; exit 1; }
 done
-sudo mkdir -p "${DEPLOY_DIR}/etcd" "${DEPLOY_DIR}/sqlite"
+sudo mkdir -p "${DEPLOY_DIR}/etcd" "${DEPLOY_DIR}/sqlite" "${GARAGE_META_LOCAL}"
 
-for d in "$GARAGE_DATA_NFS" "$GARAGE_META_NFS"; do
-  [[ -d "$d" ]] || { echo "ERROR: $d does not exist — NFS share not mounted, or Garage was never bootstrapped. See README.md." >&2; exit 1; }
-done
+# Real mount check, not just "directory exists". If the NFS share is
+# unmounted, the mountpoint directory still exists locally (empty) and a
+# plain `[[ -d ... ]]` check would pass silently — Garage would then happily
+# write backup blobs to the VM's local root disk instead of the NFS share,
+# filling it up. Fail loudly instead.
+mountpoint -q "$GARAGE_DATA_NFS" || { echo "ERROR: ${GARAGE_DATA_NFS} exists but is NOT an active mount — NFS share not mounted, or Garage was never bootstrapped. See README.md." >&2; exit 1; }
+
+# Belt-and-suspenders: confirm it's actually writable before Garage tries to,
+# not after.
+TEST_FILE="${GARAGE_DATA_NFS}/.upgrade-sh-write-test"
+( touch "$TEST_FILE" && rm -f "$TEST_FILE" ) 2>/dev/null || { echo "ERROR: ${GARAGE_DATA_NFS} is mounted but not writable by ${RUN_USER}. Check NFS export permissions." >&2; exit 1; }
 
 echo "==> Decrypting secrets"
 
@@ -117,9 +129,12 @@ echo "==> Validating docker compose configuration"
 docker compose \
     --env-file .env \
     config >/dev/null
-docker compose up -d --pull always
+docker compose up -d --pull always --remove-orphans
 echo "==> Service status"
 docker compose ps
+
+echo "==> Memory limits in effect (host has 4GB total - keep an eye on this)"
+docker inspect --format '    {{.Name}}: limit={{.HostConfig.Memory}} bytes' omni omni-backup-garage 2>/dev/null || true
 
 echo "==> Done."
 echo "    omni:   $(docker inspect --format '{{.Config.Image}}' omni)"
@@ -129,3 +144,4 @@ echo "            docker logs -f omni-backup-garage"
 echo "    Verify: sudo cat \"\$(docker inspect --format '{{.HostsPath}}' omni)\" | grep auth.lan"
 echo "            (the omni image has no shell/cat - docker exec won't work)"
 echo "            docker compose exec garage /garage status"
+echo "    Watch:  docker stats omni omni-backup-garage"

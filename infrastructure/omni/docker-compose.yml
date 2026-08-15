@@ -22,6 +22,19 @@ services:
     environment:
       - SSL_CERT_FILE=/etc/ssl/certs/homelab-ca.crt
 
+    # Guardrail: this host only has 4GB total RAM. Without a limit, a runaway
+    # container can OOM the whole VM (including sshd) instead of just itself.
+    # These are Compose-spec `deploy.resources` limits - Compose V2 applies
+    # them even outside swarm mode, no `docker stack` needed. Tune with
+    # `docker stats omni` under real load and adjust if it's ever hitting the
+    # ceiling.
+    deploy:
+      resources:
+        limits:
+          memory: 1024M
+        reservations:
+          memory: 256M
+
     # NOTE: omni.asc, tls.crt, tls.key and the etcd/sqlite data dirs are NOT
     # managed by this repo. They are sensitive, long-lived, host-local state.
     # See README.md for what they are and where they're backed up.
@@ -70,19 +83,44 @@ services:
   # image was archived/frozen in April 2026; Garage is actively maintained and
   # purpose-built for exactly this (small, single-node self-hosted storage).
   #
-  # Data lives on the NFS backups share, NOT on local disk and NOT in git —
-  # see README.md for why. garage.toml's data_dir/metadata_dir paths are the
-  # CONTAINER-side paths (/var/lib/garage/...) — the host-side NFS paths are
-  # only ever referenced in the volumes: mapping below, never inside the TOML.
+  # IMPORTANT: metadata_dir (LMDB) lives on LOCAL disk under /opt/omni, NOT on
+  # NFS. LMDB memory-maps its database file and assumes reliable POSIX
+  # byte-range locking + coherent page cache, neither of which NFS reliably
+  # provides. Running LMDB's metadata store over NFS is a known source of
+  # lock-retry storms, hangs, and runaway memory/CPU use - Garage's own docs
+  # recommend fast local/SSD storage for metadata specifically for this
+  # reason. Only the actual object DATA (data_dir) is safe to put on NFS.
+  #
+  # Object data still lives on the NFS backups share, NOT in git - see
+  # README.md. garage.toml's data_dir/metadata_dir paths are the
+  # CONTAINER-side paths - the host-side paths are only ever referenced in
+  # the volumes: mapping below, never inside the TOML.
   garage:
     image: dxflrs/garage:v2.3.0
     container_name: omni-backup-garage
     restart: unless-stopped
     stop_grace_period: 30s
+
+    # Same rationale as omni above: bound this so a stuck LMDB-over-NFS retry
+    # loop (or any other misbehavior) can't take the whole VM down. Garage's
+    # own steady-state footprint for a single-node, small-scale S3 backend
+    # like this is normally well under 256M; 512M gives headroom before you
+    # hit the ceiling instead of the host's.
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+        reservations:
+          memory: 128M
+
     ports:
-      - "3900:3900"   # S3 API — Omni's --etcd-backup-s3-endpoint points here
-      - "3903:3903"   # Admin API — used only for one-time layout/bucket/key setup
+      - "3900:3900"           # S3 API — Omni's --etcd-backup-s3-endpoint points here
+      - "127.0.0.1:3903:3903" # Admin API — one-time layout/bucket/key setup only,
+                               # per the original comment, so there's no reason to
+                               # expose it beyond localhost. Reach it via
+                               # `docker compose exec garage /garage ...` or an SSH
+                               # tunnel if you need it remotely.
     volumes:
       - ./garage-config/garage.toml:/etc/garage.toml:ro
-      - /mnt/truenas-backups/ubuntu-server/omni/garage-meta:/var/lib/garage/meta
+      - /opt/omni/garage-meta:/var/lib/garage/meta
       - /mnt/truenas-backups/ubuntu-server/omni/garage-data:/var/lib/garage/data
