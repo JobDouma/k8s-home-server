@@ -35,7 +35,7 @@ spec:
           main:
             image:
               repository: n8nio/n8n
-              tag: 2.32.7@sha256:882b126a8ddd0646e7d17ec47630e7704615e4647f3363471859fddc3f8946e2
+              tag: 2.35.3@sha256:31375a4f730081a139bba2d379bf2efaa8e662cc9e131d12bb5e15859d4f0282
             env:
               N8N_HOST: n8n.lan
               N8N_PROTOCOL: https
