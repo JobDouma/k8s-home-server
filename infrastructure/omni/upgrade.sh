@@ -38,6 +38,7 @@ SECRET_FILE="${REPO_DIR}/secret.yaml"
 COMPOSE_FILE="${REPO_DIR}/docker-compose.yml"
 GARAGE_TOML_SOPS="${REPO_DIR}/garage-config/garage.config.sops.yaml"
 GARAGE_META_LOCAL="${DEPLOY_DIR}/garage-meta"
+NFS_MOUNT_ROOT="/mnt/truenas-backups"
 GARAGE_DATA_NFS="/mnt/truenas-backups/ubuntu-server/omni/garage-data"
 RUN_USER="$(id -un)"
 RUN_GROUP="$(id -gn)"
@@ -55,7 +56,13 @@ sudo mkdir -p "${DEPLOY_DIR}/etcd" "${DEPLOY_DIR}/sqlite" "${GARAGE_META_LOCAL}"
 # plain `[[ -d ... ]]` check would pass silently — Garage would then happily
 # write backup blobs to the VM's local root disk instead of the NFS share,
 # filling it up. Fail loudly instead.
-mountpoint -q "$GARAGE_DATA_NFS" || { echo "ERROR: ${GARAGE_DATA_NFS} exists but is NOT an active mount — NFS share not mounted, or Garage was never bootstrapped. See README.md." >&2; exit 1; }
+#
+# NOTE: mountpoint -q only returns true for the exact mount point
+# (NFS_MOUNT_ROOT here), not for subdirectories beneath it — GARAGE_DATA_NFS
+# is a subdir of the actual mount, so it's checked separately with -d plus
+# the write test below.
+mountpoint -q "$NFS_MOUNT_ROOT" || { echo "ERROR: ${NFS_MOUNT_ROOT} is NOT an active mount — NFS share not mounted. Check 'systemctl status mnt-truenas\\x2dbackups.mount'." >&2; exit 1; }
+[[ -d "$GARAGE_DATA_NFS" ]] || { echo "ERROR: ${GARAGE_DATA_NFS} does not exist under the NFS mount — Garage was never bootstrapped there. See README.md." >&2; exit 1; }
 
 # Belt-and-suspenders: confirm it's actually writable before Garage tries to,
 # not after.

@@ -24,16 +24,14 @@ services:
 
     # Guardrail: this host only has 4GB total RAM. Without a limit, a runaway
     # container can OOM the whole VM (including sshd) instead of just itself.
-    # These are Compose-spec `deploy.resources` limits - Compose V2 applies
-    # them even outside swarm mode, no `docker stack` needed. Tune with
-    # `docker stats omni` under real load and adjust if it's ever hitting the
-    # ceiling.
-    deploy:
-      resources:
-        limits:
-          memory: 1024M
-        reservations:
-          memory: 256M
+    # NOTE: `deploy.resources.limits` is a swarm-only construct and is
+    # silently ignored by plain `docker compose up` unless you pass
+    # `--compatibility` - it looks like it's applied but isn't. Use the
+    # legacy top-level `mem_limit`/`mem_reservation` keys instead; those
+    # apply directly, no flag needed. Tune with `docker stats omni` under
+    # real load and adjust if it's ever hitting the ceiling.
+    mem_limit: 1024m
+    mem_reservation: 256m
 
     # NOTE: omni.asc, tls.crt, tls.key and the etcd/sqlite data dirs are NOT
     # managed by this repo. They are sensitive, long-lived, host-local state.
@@ -101,17 +99,14 @@ services:
     restart: unless-stopped
     stop_grace_period: 30s
 
-    # Same rationale as omni above: bound this so a stuck LMDB-over-NFS retry
-    # loop (or any other misbehavior) can't take the whole VM down. Garage's
-    # own steady-state footprint for a single-node, small-scale S3 backend
-    # like this is normally well under 256M; 512M gives headroom before you
-    # hit the ceiling instead of the host's.
-    deploy:
-      resources:
-        limits:
-          memory: 512M
-        reservations:
-          memory: 128M
+    # Same rationale as omni above (plain mem_limit/mem_reservation, not
+    # deploy.resources - see the note there): bound this so a stuck
+    # LMDB-over-NFS retry loop (or any other misbehavior) can't take the
+    # whole VM down. Garage's own steady-state footprint for a single-node,
+    # small-scale S3 backend like this is normally well under 256M; 512M
+    # gives headroom before you hit the ceiling instead of the host's.
+    mem_limit: 512m
+    mem_reservation: 128m
 
     ports:
       - "3900:3900"           # S3 API — Omni's --etcd-backup-s3-endpoint points here
