@@ -51,7 +51,7 @@ spec:
           app:
             image:
               repository: postgres
-              tag: "18@sha256:3a82e1f56c8f0f5616a11103ac3d47e632c3938698946a7ad26da0df1334744a"
+              tag: "18@sha256:7157393f508fd8eb46119937fab39813783fe3e7d4c6316c45c12ce2ea25e61d"
               pullPolicy: IfNotPresent
             envFrom:
               - secretRef:
