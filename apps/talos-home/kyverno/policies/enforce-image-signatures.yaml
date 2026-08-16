@@ -12,7 +12,7 @@ metadata:
       this prevents tag-mutable attacks even if the registry is compromised after deployment.
       useCache: true avoids re-fetching the manifest on every admission call.
 spec:
-  validationFailureAction: Audit   # flipped from Audit
+  validationFailureAction: Audit   # change to Enforce after testing
   background: true
   rules:
     - name: verify-image-signature
@@ -24,13 +24,8 @@ spec:
       verifyImages:
         - imageReferences:
             - "ghcr.io/jobdouma/*"
-          # mutateDigest: true rewrites the image tag to its digest at admission.
-          # This means once a Pod is admitted, the exact image layer is pinned —
-          # even if someone pushes a new image to the same tag later.
-          mutateDigest: false
-          # Verify the digest matches what was signed — prevents digest substitution.
+          mutateDigest: true        # <--- changed from false
           verifyDigest: true
-          # Cache registry responses for 10 minutes to reduce latency
           useCache: true
           attestors:
             - entries:
@@ -40,8 +35,5 @@ spec:
                       MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAElfYkbUXi4Wjb7nH76No8CgnTZNw6
                       EQNYY+5VeuPasj7FatvrsOuVpPMWxPhelHld2RlQG1Id5flgmH2P1ZRPpQ==
                       -----END PUBLIC KEY-----
-                    # Rekor transparency log verification — set to false for air-gapped
-                    # or if you sign without --upload-tlog. Your cosign key is local so
-                    # you likely sign offline; set to false to avoid Rekor NETWORK calls.
                     rekor:
                       ignoreTlog: true
