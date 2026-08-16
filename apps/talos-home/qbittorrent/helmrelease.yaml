@@ -46,10 +46,25 @@ spec:
             - secretRef:
                 name: qbittorrent-webui
             env:
-              TZ: Europe/Amsterdam
-              QBITTORRENT__PORT: '8080'
-              QBITTORRENT__BT_PORT: '6881'
-              QBITTORRENT__WEBUI__ADDRESS: 0.0.0.0
+              - name: TZ
+                value: Europe/Amsterdam
+              - name: QBITTORRENT__PORT
+                value: '8080'
+              - name: QBITTORRENT__BT_PORT
+                value: '6881'
+              - name: QBITTORRENT__WEBUI__ADDRESS
+                value: 0.0.0.0
+              # Explicitly map the credentials to the expected env var names
+              - name: QBITTORRENT__WEBUI__USERNAME
+                valueFrom:
+                  secretKeyRef:
+                    name: qbittorrent-webui
+                    key: QBITTORRENT_USER
+              - name: QBITTORRENT__WEBUI__PASSWORD
+                valueFrom:
+                  secretKeyRef:
+                    name: qbittorrent-webui
+                    key: QBITTORRENT_PASS
             resources:
               requests:
                 cpu: 100m
@@ -71,14 +86,24 @@ spec:
             - secretRef:
                 name: qbittorrent-webui
             env:
-              QBITTORRENT_HOST: 127.0.0.1
-              QBITTORRENT_PORT: '8080'
-              QBITTORRENT_URL_BASE: ''
-              EXPORTER_PORT: '8000'
+              - name: QBITTORRENT_HOST
+                value: 127.0.0.1
+              - name: QBITTORRENT_PORT
+                value: '8080'
+              - name: QBITTORRENT_URL_BASE
+                value: ''
+              - name: EXPORTER_PORT
+                value: '8000'
             ports:
             - name: metrics
               containerPort: 8000
               protocol: TCP
+            resources:
+              requests:
+                cpu: 10m
+                memory: 32Mi
+              limits:
+                memory: 128Mi
     service:
       main:
         controller: main
