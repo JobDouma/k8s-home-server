@@ -25,7 +25,7 @@ spec:
       prowlarr:
         pod:
           securityContext:
-            runAsNonRoot: true
+            # Removed runAsNonRoot: true
             fsGroup: 1000
             fsGroupChangePolicy: OnRootMismatch
             seccompProfile:

@@ -25,7 +25,6 @@ spec:
       sonarr:
         pod:
           securityContext:
-            runAsNonRoot: true
             fsGroup: 1000
             fsGroupChangePolicy: OnRootMismatch
             seccompProfile:
@@ -43,6 +42,7 @@ spec:
             ports:
             - name: http
               containerPort: 8989
+              protocol: TCP
             resources:
               requests:
                 cpu: 50m
