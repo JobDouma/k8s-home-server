@@ -24,8 +24,7 @@ spec:
     controllers:
       freshrss:
         replicas: 1
-        pod:
-          securityContext: {}
+        # Removed the empty `securityContext` block – it's now absent.
         containers:
           app:
             image:
@@ -37,8 +36,8 @@ spec:
               TZ: Europe/Amsterdam
               FRESHRSS_DEFAULT_USER: job
             envFrom:
-              - secretRef:
-                  name: freshrss-secret
+            - secretRef:
+                name: freshrss-secret
             ports:
             - name: http
               containerPort: 80

@@ -25,7 +25,7 @@ spec:
       sonarr:
         pod:
           securityContext:
-            runAsNonRoot: true        # added
+            runAsNonRoot: true
             fsGroup: 1000
             fsGroupChangePolicy: OnRootMismatch
             seccompProfile:
@@ -40,12 +40,36 @@ spec:
               PUID: 1000
               PGID: 1000
               UMASK: 2
+            ports:
+            - name: http
+              containerPort: 8989
             resources:
               requests:
                 cpu: 50m
                 memory: 256Mi
               limits:
                 memory: 1Gi
+            probes:
+              readiness:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /
+                    port: 8989
+                  initialDelaySeconds: 15
+                  periodSeconds: 10
+                  failureThreshold: 3
+              liveness:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /
+                    port: 8989
+                  initialDelaySeconds: 30
+                  periodSeconds: 30
+                  failureThreshold: 5
     service:
       app:
         controller: sonarr
@@ -53,6 +77,7 @@ spec:
         ports:
           http:
             port: 8989
+            targetPort: http
     persistence:
       config:
         enabled: true

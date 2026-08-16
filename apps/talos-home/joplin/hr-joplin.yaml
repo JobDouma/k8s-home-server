@@ -6,16 +6,13 @@ metadata:
 spec:
   interval: 15m
   timeout: 10m
-
   install:
     remediation:
       retries: 3
-
   upgrade:
     remediation:
       strategy: uninstall
       retries: 3
-
   chart:
     spec:
       chart: app-template
@@ -24,12 +21,8 @@ spec:
         kind: HelmRepository
         name: bjw-s
         namespace: flux-system
-
   values:
-
-    defaultPodOptions:
-      securityContext: {}
-
+    # Removed the empty `defaultPodOptions.securityContext` – it's now absent.
     controllers:
       joplin:
         containers:
@@ -37,7 +30,6 @@ spec:
             image:
               repository: joplin/server
               tag: 3.7.1@sha256:0877bfba41a943017c42c58e90db9d8d548bfe699b5e410248b5b879371734f9
-
             resources:
               requests:
                 cpu: 50m
@@ -45,33 +37,46 @@ spec:
               limits:
                 cpu: 500m
                 memory: 512Mi
-
             ports:
-              - name: http
-                containerPort: 22300
-                protocol: TCP
-
+            - name: http
+              containerPort: 22300
+              protocol: TCP
             env:
               APP_BASE_URL: https://joplin.lan
               APP_PORT: "22300"
               APP_LISTEN_ADDRESS: 0.0.0.0
-
               DB_CLIENT: pg
               POSTGRES_HOST: joplin-postgres
               POSTGRES_PORT: "5432"
-
-              SIGNUP_ENABLED: "0" # make 1 if we need to register a new admin account
-
+              SIGNUP_ENABLED: "0"
               PM2_HOME: /home/joplin/.pm2
-
               TZ: Europe/Amsterdam
               PUID: 1000
               PGID: 1000
-
             envFrom:
-              - secretRef:
-                  name: joplin-secret
-
+            - secretRef:
+                name: joplin-secret
+            probes:
+              liveness:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /
+                    port: 22300
+                  initialDelaySeconds: 30
+                  periodSeconds: 30
+                  failureThreshold: 5
+              readiness:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /
+                    port: 22300
+                  initialDelaySeconds: 15
+                  periodSeconds: 10
+                  failureThreshold: 3
     service:
       app:
         controller: joplin
@@ -80,7 +85,6 @@ spec:
           http:
             port: 22300
             targetPort: http
-
     persistence:
       pm2:
         enabled: true
@@ -88,16 +92,14 @@ spec:
         accessMode: ReadWriteOnce
         size: 5Gi
         storageClass: local-path
-
         advancedMounts:
           joplin:
             app:
-              - path: /home/joplin/.pm2
-
+            - path: /home/joplin/.pm2
       logs:
         enabled: true
         type: emptyDir
         advancedMounts:
           joplin:
             app:
-              - path: /home/joplin/packages/server/logs
+            - path: /home/joplin/packages/server/logs

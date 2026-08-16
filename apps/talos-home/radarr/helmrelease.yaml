@@ -40,12 +40,36 @@ spec:
               PUID: 1000
               PGID: 1000
               UMASK: 2
+            ports:
+            - name: http
+              containerPort: 7878
             resources:
               requests:
                 cpu: 50m
                 memory: 256Mi
               limits:
                 memory: 1Gi
+            probes:
+              readiness:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /
+                    port: 7878
+                  initialDelaySeconds: 15
+                  periodSeconds: 10
+                  failureThreshold: 3
+              liveness:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /
+                    port: 7878
+                  initialDelaySeconds: 30
+                  periodSeconds: 30
+                  failureThreshold: 5
     service:
       app:
         controller: radarr
@@ -53,6 +77,7 @@ spec:
         ports:
           http:
             port: 7878
+            targetPort: http
     persistence:
       config:
         enabled: true

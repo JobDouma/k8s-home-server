@@ -38,12 +38,36 @@ spec:
             env:
               TZ: Europe/Amsterdam
               LOG_LEVEL: info
+            ports:
+            - name: http
+              containerPort: 5055
             resources:
               requests:
                 cpu: 100m
                 memory: 256Mi
               limits:
                 memory: 512Mi
+            probes:
+              readiness:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /
+                    port: 5055
+                  initialDelaySeconds: 15
+                  periodSeconds: 10
+                  failureThreshold: 3
+              liveness:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /
+                    port: 5055
+                  initialDelaySeconds: 30
+                  periodSeconds: 30
+                  failureThreshold: 5
     service:
       app:
         controller: jellyseerr
@@ -51,6 +75,7 @@ spec:
         ports:
           http:
             port: 5055
+            targetPort: http
     persistence:
       config:
         enabled: true
