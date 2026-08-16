@@ -29,9 +29,6 @@ spec:
         env:
         - name: TZ
           value: Europe/Amsterdam
-        # PUID/PGID are only consumed by the linuxserver s6 init wrapper.
-        # The official jellyfin/jellyfin image uses the pod securityContext above
-        # instead, so these env vars are removed to avoid confusion.
         ports:
         - containerPort: 8096
           name: http
@@ -40,7 +37,7 @@ spec:
           name: dlna
         securityContext:
           allowPrivilegeEscalation: false
-          readOnlyRootFilesystem: false  # Jellyfin writes transcodes/metadata at runtime
+          readOnlyRootFilesystem: false
           capabilities:
             drop:
               - ALL
@@ -56,12 +53,12 @@ spec:
             memory: 1Gi
             cpu: 250m
           limits:
-            memory: 4Gi   # raised from 2Gi — transcoding spikes need headroom
-            cpu: "4"      # was missing entirely; transcoding is CPU-heavy
+            memory: 4Gi
+            cpu: "4"
       volumes:
       - name: config
         persistentVolumeClaim:
-          claimName: jellyfin-config   # was: tank-configs
+          claimName: jellyfin-config
       - name: media
         persistentVolumeClaim:
           claimName: media
@@ -74,9 +71,7 @@ metadata:
   name: jellyfin
   namespace: media
 spec:
-  type: LoadBalancer
-  loadBalancerIP: 192.168.2.50
-  externalTrafficPolicy: Local
+  type: ClusterIP              # changed from LoadBalancer
   selector:
     app: jellyfin
   ports:
