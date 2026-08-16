@@ -40,12 +40,37 @@ spec:
               PUID: 1000
               PGID: 1000
               UMASK: 2
+            ports:
+            - name: http
+              containerPort: 9696
+              protocol: TCP
             resources:
               requests:
                 cpu: 50m
                 memory: 128Mi
               limits:
                 memory: 512Mi
+            probes:
+              readiness:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /
+                    port: 9696
+                  initialDelaySeconds: 15
+                  periodSeconds: 10
+                  failureThreshold: 3
+              liveness:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /
+                    port: 9696
+                  initialDelaySeconds: 30
+                  periodSeconds: 30
+                  failureThreshold: 5
     service:
       app:
         controller: prowlarr
@@ -53,6 +78,7 @@ spec:
         ports:
           http:
             port: 9696
+            targetPort: http
     persistence:
       config:
         enabled: true
