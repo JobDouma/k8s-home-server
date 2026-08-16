@@ -41,6 +41,11 @@ spec:
                   secretKeyRef:
                     name: gotify-secret
                     key: admin-password
+            # --- ADDED: container port ---
+            ports:
+            - name: http
+              containerPort: 80
+              protocol: TCP
             probes:
               readiness:
                 enabled: true
@@ -81,7 +86,7 @@ spec:
         ports:
           http:
             port: 80
-            targetPort: 80
+            targetPort: http   # changed from 80 to named port
     persistence:
       data:
         type: persistentVolumeClaim
@@ -89,4 +94,4 @@ spec:
         accessMode: ReadWriteOnce
         size: 1Gi
         globalMounts:
-          - path: /app/data
+        - path: /app/data
