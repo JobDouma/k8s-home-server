@@ -5,7 +5,7 @@ metadata:
   namespace: media
 spec:
   interval: 15m
-  timeout: 20m                    # increased from 10m
+  timeout: 20m
   install:
     remediation:
       retries: 3
@@ -21,6 +21,9 @@ spec:
         name: bjw-s
         namespace: flux-system
   values:
+    config:
+      enabled: true
+      data: {}
     controllers:
       radarr:
         pod:
@@ -43,6 +46,9 @@ spec:
             ports:
             - name: http
               containerPort: 7878
+            securityContext:                           # <-- ADDED
+              runAsUser: 1000
+              runAsGroup: 1000
             resources:
               requests:
                 cpu: 50m
@@ -57,9 +63,9 @@ spec:
                   httpGet:
                     path: /
                     port: 7878
-                  initialDelaySeconds: 60        # increased
+                  initialDelaySeconds: 60
                   periodSeconds: 10
-                  failureThreshold: 6            # increased
+                  failureThreshold: 6
               liveness:
                 enabled: true
                 custom: true
@@ -67,7 +73,7 @@ spec:
                   httpGet:
                     path: /
                     port: 7878
-                  initialDelaySeconds: 60        # increased
+                  initialDelaySeconds: 60
                   periodSeconds: 30
                   failureThreshold: 5
     service:
