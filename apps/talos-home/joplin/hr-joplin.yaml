@@ -5,7 +5,7 @@ metadata:
   namespace: joplin
 spec:
   interval: 15m
-  timeout: 20m                    # increased from 10m
+  timeout: 20m
   install:
     remediation:
       retries: 3
@@ -24,6 +24,10 @@ spec:
   values:
     controllers:
       joplin:
+        pod:                                     # <-- pod-level securityContext
+          securityContext:
+            fsGroup: 1000
+            fsGroupChangePolicy: OnRootMismatch
         containers:
           app:
             image:
@@ -55,10 +59,9 @@ spec:
             envFrom:
             - secretRef:
                 name: joplin-secret
-            securityContext:                     # <-- ADDED
+            securityContext:                     # <-- container-level
               runAsUser: 1000
               runAsGroup: 1000
-              fsGroup: 1000
               runAsNonRoot: true
             probes:
               liveness:
@@ -68,7 +71,7 @@ spec:
                   httpGet:
                     path: /
                     port: 22300
-                  initialDelaySeconds: 90        # increased
+                  initialDelaySeconds: 90
                   periodSeconds: 30
                   failureThreshold: 5
               readiness:
@@ -78,9 +81,9 @@ spec:
                   httpGet:
                     path: /
                     port: 22300
-                  initialDelaySeconds: 60        # increased
+                  initialDelaySeconds: 60
                   periodSeconds: 10
-                  failureThreshold: 5            # increased from 3
+                  failureThreshold: 5
     service:
       app:
         controller: joplin
