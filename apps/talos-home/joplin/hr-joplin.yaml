@@ -5,7 +5,7 @@ metadata:
   namespace: joplin
 spec:
   interval: 15m
-  timeout: 10m
+  timeout: 20m                    # increased from 10m
   install:
     remediation:
       retries: 3
@@ -55,6 +55,11 @@ spec:
             envFrom:
             - secretRef:
                 name: joplin-secret
+            securityContext:                     # <-- ADDED
+              runAsUser: 1000
+              runAsGroup: 1000
+              fsGroup: 1000
+              runAsNonRoot: true
             probes:
               liveness:
                 enabled: true
@@ -63,7 +68,7 @@ spec:
                   httpGet:
                     path: /
                     port: 22300
-                  initialDelaySeconds: 60  # increased from 30
+                  initialDelaySeconds: 90        # increased
                   periodSeconds: 30
                   failureThreshold: 5
               readiness:
@@ -73,9 +78,9 @@ spec:
                   httpGet:
                     path: /
                     port: 22300
-                  initialDelaySeconds: 45  # increased from 15
+                  initialDelaySeconds: 60        # increased
                   periodSeconds: 10
-                  failureThreshold: 3
+                  failureThreshold: 5            # increased from 3
     service:
       app:
         controller: joplin
