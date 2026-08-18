@@ -24,7 +24,7 @@ spec:
   values:
     controllers:
       joplin:
-        pod:                                     # <-- pod-level securityContext
+        pod:
           securityContext:
             fsGroup: 1000
             fsGroupChangePolicy: OnRootMismatch
@@ -59,7 +59,7 @@ spec:
             envFrom:
             - secretRef:
                 name: joplin-secret
-            securityContext:                     # <-- container-level
+            securityContext:
               runAsUser: 1000
               runAsGroup: 1000
               runAsNonRoot: true
@@ -110,3 +110,10 @@ spec:
           joplin:
             app:
             - path: /home/joplin/packages/server/logs
+      temp:                           # <-- NEW: writable temp directory
+        enabled: true
+        type: emptyDir
+        advancedMounts:
+          joplin:
+            app:
+            - path: /home/joplin/packages/server/temp
