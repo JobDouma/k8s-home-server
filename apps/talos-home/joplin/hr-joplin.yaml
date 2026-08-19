@@ -22,6 +22,9 @@ spec:
         name: bjw-s
         namespace: flux-system
   values:
+    config:                         # dummy to satisfy chart expectations
+      enabled: true
+      data: {}
     controllers:
       joplin:
         pod:
@@ -59,7 +62,7 @@ spec:
             envFrom:
             - secretRef:
                 name: joplin-secret
-            securityContext:
+            securityContext:       # <-- container-level user/group
               runAsUser: 1000
               runAsGroup: 1000
               runAsNonRoot: true
@@ -110,7 +113,7 @@ spec:
           joplin:
             app:
             - path: /home/joplin/packages/server/logs
-      temp:                           # <-- NEW: writable temp directory
+      temp:                           # writable temp directory
         enabled: true
         type: emptyDir
         advancedMounts:
