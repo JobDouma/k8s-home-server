@@ -38,13 +38,17 @@ spec:
               - sh
               - -c
               - |
-                mkdir -p /home/joplin/.pm2
-                chown -R 1000:1000 /home/joplin/.pm2
+                mkdir -p /home/joplin/.pm2 /home/joplin/packages/server/logs /home/joplin/packages/server/temp
+                chown -R 1000:1000 /home/joplin/.pm2 /home/joplin/packages/server/logs /home/joplin/packages/server/temp
             securityContext:
               runAsUser: 0
             volumeMounts:
               - name: pm2
                 mountPath: /home/joplin/.pm2
+              - name: logs
+                mountPath: /home/joplin/packages/server/logs
+              - name: temp
+                mountPath: /home/joplin/packages/server/temp
         containers:
           app:
             image:
@@ -71,8 +75,6 @@ spec:
               SIGNUP_ENABLED: "0"
               PM2_HOME: /home/joplin/.pm2
               TZ: Europe/Amsterdam
-              PUID: 1000
-              PGID: 1000
             envFrom:
             - secretRef:
                 name: joplin-secret
@@ -99,7 +101,8 @@ spec:
                   port: 22300
                 initialDelaySeconds: 120
                 periodSeconds: 30
-                failureThreshold: 5
+                failureThreshold: 10
+                timeoutSeconds: 5
             readiness:
               enabled: true
               custom: true
@@ -109,7 +112,8 @@ spec:
                   port: 22300
                 initialDelaySeconds: 60
                 periodSeconds: 10
-                failureThreshold: 5
+                failureThreshold: 10
+                timeoutSeconds: 5
     service:
       app:
         controller: joplin
@@ -121,10 +125,7 @@ spec:
     persistence:
       pm2:
         enabled: true
-        type: persistentVolumeClaim
-        accessMode: ReadWriteOnce
-        size: 5Gi
-        storageClass: local-path
+        type: emptyDir
         advancedMounts:
           joplin:
             app:
