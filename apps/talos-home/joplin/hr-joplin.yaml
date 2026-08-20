@@ -82,6 +82,7 @@ spec:
               runAsUser: 1000
               runAsGroup: 1000
               runAsNonRoot: true
+            # Fixed probe definitions
             startupProbe:
               enabled: true
               custom: true
@@ -92,7 +93,7 @@ spec:
                 failureThreshold: 30
                 periodSeconds: 10
                 initialDelaySeconds: 10
-            liveness:
+            livenessProbe:               # was 'liveness'
               enabled: true
               custom: true
               spec:
@@ -103,7 +104,7 @@ spec:
                 periodSeconds: 30
                 failureThreshold: 10
                 timeoutSeconds: 5
-            readiness:
+            readinessProbe:              # was 'readiness'
               enabled: true
               custom: true
               spec:
