@@ -13,6 +13,9 @@ spec:
     remediation:
       strategy: uninstall
       retries: 3
+  dependsOn:                          # ADDED – wait for database
+    - name: joplin-postgres
+      namespace: joplin
   chart:
     spec:
       chart: app-template
@@ -22,7 +25,7 @@ spec:
         name: bjw-s
         namespace: flux-system
   values:
-    config:                         # dummy to satisfy chart expectations
+    config:
       enabled: true
       data: {}
     controllers:
@@ -31,6 +34,20 @@ spec:
           securityContext:
             fsGroup: 1000
             fsGroupChangePolicy: OnRootMismatch
+        initContainers:               # ADDED – fix ownership of .pm2 directory
+          fix-perms:
+            image: busybox
+            command:
+              - sh
+              - -c
+              - |
+                mkdir -p /home/joplin/.pm2
+                chown -R 1000:1000 /home/joplin/.pm2
+            securityContext:
+              runAsUser: 0
+            volumeMounts:
+              - name: pm2
+                mountPath: /home/joplin/.pm2
         containers:
           app:
             image:
@@ -62,7 +79,7 @@ spec:
             envFrom:
             - secretRef:
                 name: joplin-secret
-            securityContext:       # <-- container-level user/group
+            securityContext:
               runAsUser: 1000
               runAsGroup: 1000
               runAsNonRoot: true
@@ -113,7 +130,7 @@ spec:
           joplin:
             app:
             - path: /home/joplin/packages/server/logs
-      temp:                           # writable temp directory
+      temp:
         enabled: true
         type: emptyDir
         advancedMounts:
