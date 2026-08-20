@@ -13,7 +13,7 @@ spec:
     remediation:
       strategy: uninstall
       retries: 3
-  dependsOn:                          # ADDED – wait for database
+  dependsOn:
     - name: joplin-postgres
       namespace: joplin
   chart:
@@ -25,17 +25,14 @@ spec:
         name: bjw-s
         namespace: flux-system
   values:
-    config:
-      enabled: true
-      data: {}
     controllers:
       joplin:
         pod:
           securityContext:
             fsGroup: 1000
             fsGroupChangePolicy: OnRootMismatch
-        initContainers:               # ADDED – fix ownership of .pm2 directory
-          fix-perms:
+        initContainers:                           # <-- LIST format (not map)
+          - name: fix-perms
             image: busybox
             command:
               - sh

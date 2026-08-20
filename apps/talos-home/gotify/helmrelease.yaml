@@ -22,9 +22,6 @@ spec:
         name: bjw-s
         namespace: flux-system
   values:
-    config:
-      enabled: true
-      data: {}
     controllers:
       gotify:
         containers:
@@ -64,7 +61,7 @@ spec:
                   httpGet:
                     path: /health
                     port: 80
-                  initialDelaySeconds: 30          # increased from 10
+                  initialDelaySeconds: 30
                   periodSeconds: 5
                   failureThreshold: 6
               liveness:
@@ -74,7 +71,7 @@ spec:
                   httpGet:
                     path: /health
                     port: 80
-                  initialDelaySeconds: 45          # increased from 15
+                  initialDelaySeconds: 45
                   periodSeconds: 10
                   failureThreshold: 3
             resources:
