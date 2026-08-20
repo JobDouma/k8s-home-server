@@ -31,7 +31,7 @@ spec:
           securityContext:
             fsGroup: 1000
             fsGroupChangePolicy: OnRootMismatch
-        initContainers:                           # <-- LIST format (not map)
+        initContainers:
           - name: fix-perms
             image: busybox
             command:
