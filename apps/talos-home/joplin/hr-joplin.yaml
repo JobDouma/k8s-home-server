@@ -32,7 +32,7 @@ spec:
             fsGroup: 1000
             fsGroupChangePolicy: OnRootMismatch
         initContainers:
-          - name: fix-perms
+          fix-perms:                                # changed from array to map
             image: busybox
             command:
               - sh
@@ -82,39 +82,39 @@ spec:
               runAsUser: 1000
               runAsGroup: 1000
               runAsNonRoot: true
-            # Fixed probe definitions
-            startupProbe:
-              enabled: true
-              custom: true
-              spec:
-                httpGet:
-                  path: /api/ping
-                  port: 22300
-                failureThreshold: 30
-                periodSeconds: 10
-                initialDelaySeconds: 10
-            livenessProbe:               # was 'liveness'
-              enabled: true
-              custom: true
-              spec:
-                httpGet:
-                  path: /api/ping
-                  port: 22300
-                initialDelaySeconds: 120
-                periodSeconds: 30
-                failureThreshold: 10
-                timeoutSeconds: 5
-            readinessProbe:              # was 'readiness'
-              enabled: true
-              custom: true
-              spec:
-                httpGet:
-                  path: /api/ping
-                  port: 22300
-                initialDelaySeconds: 60
-                periodSeconds: 10
-                failureThreshold: 10
-                timeoutSeconds: 5
+            probes:                                   # moved probes here
+              startup:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /api/ping
+                    port: 22300
+                  failureThreshold: 30
+                  periodSeconds: 10
+                  initialDelaySeconds: 10
+              liveness:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /api/ping
+                    port: 22300
+                  initialDelaySeconds: 120
+                  periodSeconds: 30
+                  failureThreshold: 10
+                  timeoutSeconds: 5
+              readiness:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /api/ping
+                    port: 22300
+                  initialDelaySeconds: 60
+                  periodSeconds: 10
+                  failureThreshold: 10
+                  timeoutSeconds: 5
     service:
       app:
         controller: joplin
