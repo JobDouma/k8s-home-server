@@ -32,7 +32,7 @@ spec:
             fsGroup: 1000
             fsGroupChangePolicy: OnRootMismatch
         initContainers:
-          fix-perms:                                # map key, not array
+          fix-perms:
             image:
               repository: busybox
               tag: latest
@@ -44,7 +44,7 @@ spec:
                 chown -R 1000:1000 /home/joplin/.pm2 /home/joplin/packages/server/logs /home/joplin/packages/server/temp
             securityContext:
               runAsUser: 0
-            # volumeMounts REMOVED – they are now defined via advancedMounts below
+            # No volumeMounts – globalMounts will handle it
         containers:
           app:
             image:
@@ -123,27 +123,15 @@ spec:
       pm2:
         enabled: true
         type: emptyDir
-        advancedMounts:
-          joplin:                                 # controller name
-            app:                                  # main container
-              - path: /home/joplin/.pm2
-            fix-perms:                            # initContainer name
-              - path: /home/joplin/.pm2
+        globalMounts:                     # applied to all containers (app + init)
+          - path: /home/joplin/.pm2
       logs:
         enabled: true
         type: emptyDir
-        advancedMounts:
-          joplin:
-            app:
-              - path: /home/joplin/packages/server/logs
-            fix-perms:
-              - path: /home/joplin/packages/server/logs
+        globalMounts:
+          - path: /home/joplin/packages/server/logs
       temp:
         enabled: true
         type: emptyDir
-        advancedMounts:
-          joplin:
-            app:
-              - path: /home/joplin/packages/server/temp
-            fix-perms:
-              - path: /home/joplin/packages/server/temp
+        globalMounts:
+          - path: /home/joplin/packages/server/temp

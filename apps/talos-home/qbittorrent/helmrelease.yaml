@@ -39,7 +39,7 @@ spec:
                     app.kubernetes.io/name: qbittorrent
                 topologyKey: kubernetes.io/hostname
         initContainers:
-          fix-perms:                                # map key, not array
+          fix-perms:
             image:
               repository: busybox
               tag: latest
@@ -52,7 +52,7 @@ spec:
                 echo "Permissions fixed and lock removed."
             securityContext:
               runAsUser: 0
-            # volumeMounts REMOVED – mounts are now via advancedMounts
+            # No volumeMounts – globalMounts will provide mounts
         containers:
           main:
             image:
@@ -141,14 +141,8 @@ spec:
         enabled: true
         type: persistentVolumeClaim
         existingClaim: qbittorrent-config
-        # globalMounts for main container (already works)
         globalMounts:
           - path: /config
-        # additional mounts for the initContainer
-        advancedMounts:
-          main:
-            fix-perms:
-              - path: /config
       downloads:
         enabled: true
         type: persistentVolumeClaim
@@ -156,7 +150,3 @@ spec:
         globalMounts:
           - path: /downloads
             subPath: downloads
-        advancedMounts:
-          main:
-            fix-perms:
-              - path: /downloads
