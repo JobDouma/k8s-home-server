@@ -28,7 +28,7 @@ spec:
           app:
             image:
               repository: ghcr.io/flaresolverr/flaresolverr
-              tag: latest  # or pin to a specific version, e.g., v3.3.11
+              tag: v3.5.0@sha256:258523d25e4e07028c3a206f0e03ae807b26a50a201dd320f09a18464ecf86fa
               pullPolicy: IfNotPresent
             env:
               LOG_LEVEL: info
