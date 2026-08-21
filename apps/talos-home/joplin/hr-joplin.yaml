@@ -70,8 +70,6 @@ spec:
               SIGNUP_ENABLED: "0"
               PM2_HOME: /home/joplin/.pm2
               TZ: Europe/Amsterdam
-              APP_ALLOWED_ORIGINS: "*"          # added
-              APP_ALLOWED_HOSTS: "*"          # added
             envFrom:
             - secretRef:
                 name: joplin-secret
@@ -79,6 +77,13 @@ spec:
               runAsUser: 1000
               runAsGroup: 1000
               runAsNonRoot: true
+            # The real fix: Joplin validates the request's Host header
+            # against APP_BASE_URL's host. Kubelet's probes hit the pod by
+            # IP by default, which never matches "joplin.lan" -> the app
+            # logs "Invalid origin" and returns 404 to every single probe,
+            # forever, regardless of what APP_ALLOWED_ORIGINS is set to.
+            # Setting the Host header here makes the probe look like a
+            # legitimate request from joplin.lan.
             probes:
               startup:
                 enabled: true
@@ -87,6 +92,9 @@ spec:
                   httpGet:
                     path: /api/ping
                     port: 22300
+                    httpHeaders:
+                      - name: Host
+                        value: joplin.lan
                   failureThreshold: 30
                   periodSeconds: 10
                   initialDelaySeconds: 10
@@ -97,6 +105,9 @@ spec:
                   httpGet:
                     path: /api/ping
                     port: 22300
+                    httpHeaders:
+                      - name: Host
+                        value: joplin.lan
                   initialDelaySeconds: 120
                   periodSeconds: 30
                   failureThreshold: 10
@@ -108,6 +119,9 @@ spec:
                   httpGet:
                     path: /api/ping
                     port: 22300
+                    httpHeaders:
+                      - name: Host
+                        value: joplin.lan
                   initialDelaySeconds: 60
                   periodSeconds: 10
                   failureThreshold: 10
