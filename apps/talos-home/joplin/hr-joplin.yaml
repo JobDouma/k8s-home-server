@@ -32,8 +32,10 @@ spec:
             fsGroup: 1000
             fsGroupChangePolicy: OnRootMismatch
         initContainers:
-          fix-perms:                                # changed from array to map
-            image: busybox
+          fix-perms:                                # map key, not array
+            image:
+              repository: busybox
+              tag: latest
             command:
               - sh
               - -c
@@ -42,13 +44,7 @@ spec:
                 chown -R 1000:1000 /home/joplin/.pm2 /home/joplin/packages/server/logs /home/joplin/packages/server/temp
             securityContext:
               runAsUser: 0
-            volumeMounts:
-              - name: pm2
-                mountPath: /home/joplin/.pm2
-              - name: logs
-                mountPath: /home/joplin/packages/server/logs
-              - name: temp
-                mountPath: /home/joplin/packages/server/temp
+            # volumeMounts REMOVED – they are now defined via advancedMounts below
         containers:
           app:
             image:
@@ -82,7 +78,7 @@ spec:
               runAsUser: 1000
               runAsGroup: 1000
               runAsNonRoot: true
-            probes:                                   # moved probes here
+            probes:
               startup:
                 enabled: true
                 custom: true
@@ -128,20 +124,26 @@ spec:
         enabled: true
         type: emptyDir
         advancedMounts:
-          joplin:
-            app:
-            - path: /home/joplin/.pm2
+          joplin:                                 # controller name
+            app:                                  # main container
+              - path: /home/joplin/.pm2
+            fix-perms:                            # initContainer name
+              - path: /home/joplin/.pm2
       logs:
         enabled: true
         type: emptyDir
         advancedMounts:
           joplin:
             app:
-            - path: /home/joplin/packages/server/logs
+              - path: /home/joplin/packages/server/logs
+            fix-perms:
+              - path: /home/joplin/packages/server/logs
       temp:
         enabled: true
         type: emptyDir
         advancedMounts:
           joplin:
             app:
-            - path: /home/joplin/packages/server/temp
+              - path: /home/joplin/packages/server/temp
+            fix-perms:
+              - path: /home/joplin/packages/server/temp
