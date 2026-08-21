@@ -44,7 +44,6 @@ spec:
                 chown -R 1000:1000 /home/joplin/.pm2 /home/joplin/packages/server/logs /home/joplin/packages/server/temp
             securityContext:
               runAsUser: 0
-            # No volumeMounts – globalMounts will handle it
         containers:
           app:
             image:
@@ -71,6 +70,7 @@ spec:
               SIGNUP_ENABLED: "0"
               PM2_HOME: /home/joplin/.pm2
               TZ: Europe/Amsterdam
+              APP_ALLOWED_ORIGINS: "*"          # added
             envFrom:
             - secretRef:
                 name: joplin-secret
@@ -123,7 +123,7 @@ spec:
       pm2:
         enabled: true
         type: emptyDir
-        globalMounts:                     # applied to all containers (app + init)
+        globalMounts:
           - path: /home/joplin/.pm2
       logs:
         enabled: true
