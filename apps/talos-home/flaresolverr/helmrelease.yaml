@@ -32,20 +32,19 @@ spec:
               pullPolicy: IfNotPresent
             env:
               LOG_LEVEL: info
-              CAPTCHA_SOLVER: none  # you can change to 'hcaptcha' if needed
+              CAPTCHA_SOLVER: none
               TZ: Europe/Amsterdam
             resources:
               requests:
-                cpu: 100m
-                memory: 256Mi
+                cpu: 200m
+                memory: 512Mi          # increased from 256Mi
               limits:
-                cpu: 500m
-                memory: 512Mi
+                cpu: 1000m
+                memory: 1Gi            # increased from 512Mi
             ports:
               - name: http
                 containerPort: 8191
                 protocol: TCP
-            # Probes are optional; FlareSolverr has a health endpoint
             probes:
               liveness:
                 enabled: true
@@ -71,5 +70,4 @@ spec:
           http:
             port: 8191
             targetPort: http
-    # No persistence required – all temporary data is ephemeral
     persistence: {}
