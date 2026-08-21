@@ -47,12 +47,12 @@ spec:
               - sh
               - -c
               - |
+                mkdir -p /config/qBittorrent/logs
                 chown -R 1000:1000 /config /downloads
                 rm -f /config/qBittorrent/qbittorrent.lock || true
                 echo "Permissions fixed and lock removed."
             securityContext:
               runAsUser: 0
-            # No volumeMounts – globalMounts will provide mounts
         containers:
           main:
             image:
@@ -66,6 +66,8 @@ spec:
                 value: Europe/Amsterdam
               - name: QBITTORRENT__LOG__LEVEL
                 value: "DEBUG"
+              - name: QBITTORRENT__NO_HOSTS_CHECK
+                value: "1"
               - name: QBITTORRENT__PORT
                 value: '8080'
               - name: QBITTORRENT__BT_PORT
