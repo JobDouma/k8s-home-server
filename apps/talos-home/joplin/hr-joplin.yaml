@@ -71,6 +71,7 @@ spec:
               PM2_HOME: /home/joplin/.pm2
               TZ: Europe/Amsterdam
               APP_ALLOWED_ORIGINS: "*"          # added
+              APP_ALLOWED_HOSTS: "*"          # added
             envFrom:
             - secretRef:
                 name: joplin-secret
