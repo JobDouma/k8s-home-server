@@ -260,3 +260,10 @@ resources:
   - argus/ingressroute.yaml
   - argus/certificate.yaml
   - argus/configmap.yaml
+
+
+  # ──────────────────────────────────────
+  # Flaresolverr
+  # ──────────────────────────────────────
+  - flaresolverr/namespace.yaml
+  - flaresolverr/helmrelease.yaml
