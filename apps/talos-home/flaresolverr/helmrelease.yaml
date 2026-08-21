@@ -1,0 +1,73 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: flaresolverr
+  namespace: flaresolverr
+spec:
+  interval: 15m
+  timeout: 10m
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    remediation:
+      strategy: uninstall
+      retries: 3
+  chart:
+    spec:
+      chart: app-template
+      version: "5.1.0"
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s
+        namespace: flux-system
+  values:
+    controllers:
+      flaresolverr:
+        containers:
+          app:
+            image:
+              repository: ghcr.io/flaresolverr/flaresolverr
+              tag: v3.5.0@sha256:258523d25e4e07028c3a206f0e03ae807b26a50a201dd320f09a18464ecf86fa
+              pullPolicy: IfNotPresent
+            env:
+              LOG_LEVEL: info
+              CAPTCHA_SOLVER: none
+              TZ: Europe/Amsterdam
+            resources:
+              requests:
+                cpu: 200m
+                memory: 512Mi          # increased from 256Mi
+              limits:
+                cpu: 1000m
+                memory: 1Gi            # increased from 512Mi
+            ports:
+              - name: http
+                containerPort: 8191
+                protocol: TCP
+            probes:
+              liveness:
+                enabled: true
+                spec:
+                  httpGet:
+                    path: /health
+                    port: 8191
+                  initialDelaySeconds: 30
+                  periodSeconds: 10
+              readiness:
+                enabled: true
+                spec:
+                  httpGet:
+                    path: /health
+                    port: 8191
+                  initialDelaySeconds: 10
+                  periodSeconds: 5
+    service:
+      app:
+        controller: flaresolverr
+        type: ClusterIP
+        ports:
+          http:
+            port: 8191
+            targetPort: http
+    persistence: {}

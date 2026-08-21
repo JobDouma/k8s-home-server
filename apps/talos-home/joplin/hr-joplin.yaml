@@ -32,8 +32,10 @@ spec:
             fsGroup: 1000
             fsGroupChangePolicy: OnRootMismatch
         initContainers:
-          - name: fix-perms
-            image: busybox
+          fix-perms:
+            image:
+              repository: busybox
+              tag: latest
             command:
               - sh
               - -c
@@ -42,13 +44,6 @@ spec:
                 chown -R 1000:1000 /home/joplin/.pm2 /home/joplin/packages/server/logs /home/joplin/packages/server/temp
             securityContext:
               runAsUser: 0
-            volumeMounts:
-              - name: pm2
-                mountPath: /home/joplin/.pm2
-              - name: logs
-                mountPath: /home/joplin/packages/server/logs
-              - name: temp
-                mountPath: /home/joplin/packages/server/temp
         containers:
           app:
             image:
@@ -82,39 +77,55 @@ spec:
               runAsUser: 1000
               runAsGroup: 1000
               runAsNonRoot: true
-            # Fixed probe definitions
-            startupProbe:
-              enabled: true
-              custom: true
-              spec:
-                httpGet:
-                  path: /api/ping
-                  port: 22300
-                failureThreshold: 30
-                periodSeconds: 10
-                initialDelaySeconds: 10
-            livenessProbe:               # was 'liveness'
-              enabled: true
-              custom: true
-              spec:
-                httpGet:
-                  path: /api/ping
-                  port: 22300
-                initialDelaySeconds: 120
-                periodSeconds: 30
-                failureThreshold: 10
-                timeoutSeconds: 5
-            readinessProbe:              # was 'readiness'
-              enabled: true
-              custom: true
-              spec:
-                httpGet:
-                  path: /api/ping
-                  port: 22300
-                initialDelaySeconds: 60
-                periodSeconds: 10
-                failureThreshold: 10
-                timeoutSeconds: 5
+            # The real fix: Joplin validates the request's Host header
+            # against APP_BASE_URL's host. Kubelet's probes hit the pod by
+            # IP by default, which never matches "joplin.lan" -> the app
+            # logs "Invalid origin" and returns 404 to every single probe,
+            # forever, regardless of what APP_ALLOWED_ORIGINS is set to.
+            # Setting the Host header here makes the probe look like a
+            # legitimate request from joplin.lan.
+            probes:
+              startup:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /api/ping
+                    port: 22300
+                    httpHeaders:
+                      - name: Host
+                        value: joplin.lan
+                  failureThreshold: 30
+                  periodSeconds: 10
+                  initialDelaySeconds: 10
+              liveness:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /api/ping
+                    port: 22300
+                    httpHeaders:
+                      - name: Host
+                        value: joplin.lan
+                  initialDelaySeconds: 120
+                  periodSeconds: 30
+                  failureThreshold: 10
+                  timeoutSeconds: 5
+              readiness:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /api/ping
+                    port: 22300
+                    httpHeaders:
+                      - name: Host
+                        value: joplin.lan
+                  initialDelaySeconds: 60
+                  periodSeconds: 10
+                  failureThreshold: 10
+                  timeoutSeconds: 5
     service:
       app:
         controller: joplin
@@ -127,21 +138,15 @@ spec:
       pm2:
         enabled: true
         type: emptyDir
-        advancedMounts:
-          joplin:
-            app:
-            - path: /home/joplin/.pm2
+        globalMounts:
+          - path: /home/joplin/.pm2
       logs:
         enabled: true
         type: emptyDir
-        advancedMounts:
-          joplin:
-            app:
-            - path: /home/joplin/packages/server/logs
+        globalMounts:
+          - path: /home/joplin/packages/server/logs
       temp:
         enabled: true
         type: emptyDir
-        advancedMounts:
-          joplin:
-            app:
-            - path: /home/joplin/packages/server/temp
+        globalMounts:
+          - path: /home/joplin/packages/server/temp
