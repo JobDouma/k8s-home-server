@@ -35,10 +35,7 @@ spec:
       existingRulesConfigMaps:
         - falco-rules
         - falco-custom-rules
-      grpc:
-        enabled: false
-      grpc_output:
-        enabled: false
+      # REMOVED: grpc and grpc_output sections (no longer supported)
       http_output:
         enabled: true
         url: "http://falcosidekick.falco.svc.cluster.local:2801"
