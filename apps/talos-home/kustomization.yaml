@@ -247,15 +247,6 @@ resources:
 
 
   # ──────────────────────────────────────
-  # n8n
-  # ──────────────────────────────────────
-  # - n8n/namespace.yaml
-  # - n8n/secret.yaml
-  # - n8n/helmrelease.yaml
-  # - n8n/ingressroute.yaml
-  # - n8n/certificate.yaml
-
-  # ──────────────────────────────────────
   # Argus (WatchYourPorts)
   # ──────────────────────────────────────
   # - argus/namespace.yaml
