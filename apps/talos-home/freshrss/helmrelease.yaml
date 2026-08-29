@@ -24,12 +24,11 @@ spec:
     controllers:
       freshrss:
         replicas: 1
-        # Removed the empty `securityContext` block – it's now absent.
         containers:
           app:
             image:
               repository: lscr.io/linuxserver/freshrss
-              tag: 1.28.1-ls297
+              tag: 1.28.1-ls297@sha256:b75efdc71fb365aab41764bfdb00dd097cef52594a0481d2bc91103af6e98588
             env:
               PUID: '1000'
               PGID: '1000'
@@ -62,6 +61,13 @@ spec:
                   initialDelaySeconds: 15
                   periodSeconds: 10
                   failureThreshold: 3
+            # ========== NEW ==========
+            resources:
+              requests:
+                memory: 128Mi
+              limits:
+                memory: 256Mi
+            # =========================
     service:
       app:
         controller: freshrss

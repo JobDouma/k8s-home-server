@@ -11,28 +11,12 @@ data:
     - No external libraries needed
     - Idempotent: skips monitors that already exist by name
     - Handles deletions: removes monitors listed in REMOVED
-    - Sentinel file: skips entire run if already provisioned today
-    - To force re-run: delete /app/data/.provisioned or bump job name suffix
     """
     import sqlite3, sys, os, time, json, datetime
 
-    DB      = "/app/data/kuma.db"
-    SENTINEL = "/app/data/.provisioned"
+    DB = "/app/data/kuma.db"
 
     def log(msg): print(f"[provision] {msg}", flush=True)
-
-    # ── Sentinel check ───────────────────────────────────────────────────────────
-    if os.path.exists(SENTINEL):
-        try:
-            stamp = open(SENTINEL).read().strip()
-            today = datetime.date.today().isoformat()
-            if stamp == today:
-                log(f"Already provisioned today ({today}), exiting.")
-                sys.exit(0)
-            else:
-                log(f"Sentinel is from {stamp}, re-provisioning for {today}.")
-        except Exception as e:
-            log(f"Could not read sentinel ({e}), continuing.")
 
     # ── Wait for DB ──────────────────────────────────────────────────────────────
     con = None
@@ -60,7 +44,7 @@ data:
     else:
         log("ERROR: DB not ready after 200s"); sys.exit(1)
 
-    # ── Ensure admin user exists ─────────────────────────────────────────────────
+    # ── Ensure admin user exists (container should already create it, but safe) ──
     existing_user = con.execute("SELECT id FROM user LIMIT 1").fetchone()
     if not existing_user:
         import subprocess
@@ -110,7 +94,7 @@ data:
             config = json.dumps({
                 "type": "gotify",
                 "gotifyserverurl": gotify_url,
-                "gotifyapplicationToken": gotify_token,  # capital T — matches Uptime Kuma source
+                "gotifyapplicationToken": gotify_token,
                 "gotifyPriority": 8
             })
             con.execute(
@@ -122,7 +106,7 @@ data:
         config = json.dumps({
             "type": "gotify",
             "gotifyserverurl": gotify_url,
-            "gotifyapplicationToken": gotify_token,  # capital T — matches Uptime Kuma source
+            "gotifyapplicationToken": gotify_token,
             "gotifyPriority": 8
         })
         cur = con.execute("""
@@ -220,8 +204,3 @@ data:
     con.close()
 
     log(f"Done. added={added_count}, skipped={skipped_count}, removed={removed_count}")
-
-    # ── Write sentinel ───────────────────────────────────────────────────────────
-    with open(SENTINEL, "w") as f:
-        f.write(datetime.date.today().isoformat())
-    log(f"Sentinel written for {datetime.date.today().isoformat()}")

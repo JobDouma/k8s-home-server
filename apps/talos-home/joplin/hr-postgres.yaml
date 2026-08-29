@@ -16,7 +16,7 @@ spec:
   chart:
     spec:
       chart: app-template
-      version: "5.1.0"
+      version: 5.1.0
       sourceRef:
         kind: HelmRepository
         name: bjw-s
@@ -36,14 +36,17 @@ spec:
           fix-permissions:
             image:
               repository: busybox
-              tag: latest
+              tag: latest@sha256:dc2d74b28e4cf8984fa52af1f39bc7c3d9c73760b41a74d629f5d11b1ab28616
             command:
-              - sh
-              - -c
-              - |
-                mkdir -p /var/lib/postgresql/data/pgdata
-                chown -R 999:999 /var/lib/postgresql/data
-                chmod 700 /var/lib/postgresql/data/pgdata
+            - sh
+            - -c
+            - 'mkdir -p /var/lib/postgresql/data/pgdata
+
+              chown -R 999:999 /var/lib/postgresql/data
+
+              chmod 700 /var/lib/postgresql/data/pgdata
+
+              '
             securityContext:
               runAsUser: 0
               runAsNonRoot: false
@@ -51,14 +54,14 @@ spec:
           app:
             image:
               repository: postgres
-              tag: "18@sha256:4ef4dbc939d61acea57712655ddb4b4ab27419c913f94cca0cd57cb3ea3c2280"
+              tag: 18@sha256:06cad38a5d9f5d24b4d83d86def30795d5e4b757fedbf5281172b576dedcd941
               pullPolicy: IfNotPresent
             envFrom:
-              - secretRef:
-                  name: joplin-secret
+            - secretRef:
+                name: joplin-secret
             env:
               PGDATA: /var/lib/postgresql/data/pgdata
-              POSTGRES_INITDB_ARGS: "--auth-host=scram-sha-256 --auth-local=trust"
+              POSTGRES_INITDB_ARGS: --auth-host=scram-sha-256 --auth-local=trust
               POSTGRES_HOST: 0.0.0.0
               TZ: Europe/Amsterdam
             resources:
@@ -73,9 +76,9 @@ spec:
                 spec:
                   exec:
                     command:
-                      - sh
-                      - -c
-                      - pg_isready -U "$POSTGRES_USER"
+                    - sh
+                    - -c
+                    - pg_isready -U "$POSTGRES_USER"
                   failureThreshold: 30
                   periodSeconds: 5
               readiness:
@@ -83,17 +86,17 @@ spec:
                 spec:
                   exec:
                     command:
-                      - sh
-                      - -c
-                      - pg_isready -U "$POSTGRES_USER"
+                    - sh
+                    - -c
+                    - pg_isready -U "$POSTGRES_USER"
               liveness:
                 enabled: true
                 spec:
                   exec:
                     command:
-                      - sh
-                      - -c
-                      - pg_isready -U "$POSTGRES_USER"
+                    - sh
+                    - -c
+                    - pg_isready -U "$POSTGRES_USER"
     service:
       postgres:
         controller: postgres
@@ -112,4 +115,4 @@ spec:
         advancedMounts:
           postgres:
             app:
-              - path: /var/lib/postgresql/data
+            - path: /var/lib/postgresql/data

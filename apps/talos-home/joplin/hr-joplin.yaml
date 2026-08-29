@@ -14,12 +14,12 @@ spec:
       strategy: uninstall
       retries: 3
   dependsOn:
-    - name: joplin-postgres
-      namespace: joplin
+  - name: joplin-postgres
+    namespace: joplin
   chart:
     spec:
       chart: app-template
-      version: "5.1.0"
+      version: 5.1.0
       sourceRef:
         kind: HelmRepository
         name: bjw-s
@@ -35,13 +35,16 @@ spec:
           fix-perms:
             image:
               repository: busybox
-              tag: latest
+              tag: latest@sha256:dc2d74b28e4cf8984fa52af1f39bc7c3d9c73760b41a74d629f5d11b1ab28616
             command:
-              - sh
-              - -c
-              - |
-                mkdir -p /home/joplin/.pm2 /home/joplin/packages/server/logs /home/joplin/packages/server/temp
-                chown -R 1000:1000 /home/joplin/.pm2 /home/joplin/packages/server/logs /home/joplin/packages/server/temp
+            - sh
+            - -c
+            - 'mkdir -p /home/joplin/.pm2 /home/joplin/packages/server/logs /home/joplin/packages/server/temp
+
+              chown -R 1000:1000 /home/joplin/.pm2 /home/joplin/packages/server/logs
+              /home/joplin/packages/server/temp
+
+              '
             securityContext:
               runAsUser: 0
         containers:
@@ -62,12 +65,12 @@ spec:
               protocol: TCP
             env:
               APP_BASE_URL: https://joplin.lan
-              APP_PORT: "22300"
+              APP_PORT: '22300'
               APP_LISTEN_ADDRESS: 0.0.0.0
               DB_CLIENT: pg
               POSTGRES_HOST: joplin-postgres
-              POSTGRES_PORT: "5432"
-              SIGNUP_ENABLED: "0"
+              POSTGRES_PORT: '5432'
+              SIGNUP_ENABLED: '0'
               PM2_HOME: /home/joplin/.pm2
               TZ: Europe/Amsterdam
             envFrom:
@@ -77,13 +80,6 @@ spec:
               runAsUser: 1000
               runAsGroup: 1000
               runAsNonRoot: true
-            # The real fix: Joplin validates the request's Host header
-            # against APP_BASE_URL's host. Kubelet's probes hit the pod by
-            # IP by default, which never matches "joplin.lan" -> the app
-            # logs "Invalid origin" and returns 404 to every single probe,
-            # forever, regardless of what APP_ALLOWED_ORIGINS is set to.
-            # Setting the Host header here makes the probe look like a
-            # legitimate request from joplin.lan.
             probes:
               startup:
                 enabled: true
@@ -93,8 +89,8 @@ spec:
                     path: /api/ping
                     port: 22300
                     httpHeaders:
-                      - name: Host
-                        value: joplin.lan
+                    - name: Host
+                      value: joplin.lan
                   failureThreshold: 30
                   periodSeconds: 10
                   initialDelaySeconds: 10
@@ -106,8 +102,8 @@ spec:
                     path: /api/ping
                     port: 22300
                     httpHeaders:
-                      - name: Host
-                        value: joplin.lan
+                    - name: Host
+                      value: joplin.lan
                   initialDelaySeconds: 120
                   periodSeconds: 30
                   failureThreshold: 10
@@ -120,8 +116,8 @@ spec:
                     path: /api/ping
                     port: 22300
                     httpHeaders:
-                      - name: Host
-                        value: joplin.lan
+                    - name: Host
+                      value: joplin.lan
                   initialDelaySeconds: 60
                   periodSeconds: 10
                   failureThreshold: 10
@@ -139,14 +135,14 @@ spec:
         enabled: true
         type: emptyDir
         globalMounts:
-          - path: /home/joplin/.pm2
+        - path: /home/joplin/.pm2
       logs:
         enabled: true
         type: emptyDir
         globalMounts:
-          - path: /home/joplin/packages/server/logs
+        - path: /home/joplin/packages/server/logs
       temp:
         enabled: true
         type: emptyDir
         globalMounts:
-          - path: /home/joplin/packages/server/temp
+        - path: /home/joplin/packages/server/temp

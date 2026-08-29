@@ -4,7 +4,7 @@ metadata:
   name: qbittorrent
   namespace: media
   annotations:
-    fluxcd.io/version: "v3"
+    fluxcd.io/version: v3
 spec:
   interval: 15m
   timeout: 20m
@@ -33,9 +33,6 @@ spec:
               type: RuntimeDefault
           affinity:
             podAntiAffinity:
-              # Changed from `required` to `preferred`: `required` can block
-              # scheduling entirely on small/single-node clusters during
-              # rollouts, since a second pod briefly needs a second node.
               preferredDuringSchedulingIgnoredDuringExecution:
               - weight: 100
                 podAffinityTerm:
@@ -47,15 +44,19 @@ spec:
           fix-perms:
             image:
               repository: busybox
-              tag: latest
+              tag: 1.36@sha256:73aaf090f3d85aa34ee199857f03fa3a95c8ede2ffd4cc2cdb5b94e566b11662
             command:
-              - sh
-              - -c
-              - |
-                mkdir -p /config/qBittorrent/logs
-                chown -R 1000:1000 /config /downloads
-                rm -f /config/qBittorrent/qbittorrent.lock || true
-                echo "Permissions fixed and lock removed."
+            - sh
+            - -c
+            - 'mkdir -p /config/qBittorrent/logs
+
+              chown -R 1000:1000 /config /downloads
+
+              rm -f /config/qBittorrent/qbittorrent.lock || true
+
+              echo "Permissions fixed and lock removed."
+
+              '
             securityContext:
               runAsUser: 0
         containers:
@@ -63,10 +64,6 @@ spec:
             image:
               repository: ghcr.io/onedr0p/qbittorrent
               tag: 5.0.4@sha256:17e3e5f1c7e7fe81434f9d1f5f2e00da9a67f6dbfda1c988c0619932cb856047
-            # Pinned to match the fix-perms chown (1000:1000). Without this,
-            # the container's default user may not match the chowned
-            # directories, causing it to fail permission checks and exit
-            # cleanly (Exit Code 0) instead of erroring loudly.
             securityContext:
               runAsUser: 1000
               runAsGroup: 1000
@@ -74,28 +71,28 @@ spec:
             - secretRef:
                 name: qbittorrent-webui
             env:
-              - name: TZ
-                value: Europe/Amsterdam
-              - name: QBITTORRENT__LOG__LEVEL
-                value: "DEBUG"
-              - name: QBITTORRENT__NO_HOSTS_CHECK
-                value: "1"
-              - name: QBITTORRENT__PORT
-                value: '8080'
-              - name: QBITTORRENT__BT_PORT
-                value: '6881'
-              - name: QBITTORRENT__WEBUI__ADDRESS
-                value: 0.0.0.0
-              - name: QBITTORRENT__WEBUI__USERNAME
-                valueFrom:
-                  secretKeyRef:
-                    name: qbittorrent-webui
-                    key: QBITTORRENT_USER
-              - name: QBITTORRENT__WEBUI__PASSWORD
-                valueFrom:
-                  secretKeyRef:
-                    name: qbittorrent-webui
-                    key: QBITTORRENT_PASS
+            - name: TZ
+              value: Europe/Amsterdam
+            - name: QBITTORRENT__LOG__LEVEL
+              value: DEBUG
+            - name: QBITTORRENT__NO_HOSTS_CHECK
+              value: '1'
+            - name: QBITTORRENT__PORT
+              value: '8080'
+            - name: QBITTORRENT__BT_PORT
+              value: '6881'
+            - name: QBITTORRENT__WEBUI__ADDRESS
+              value: 0.0.0.0
+            - name: QBITTORRENT__WEBUI__USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: qbittorrent-webui
+                  key: QBITTORRENT_USER
+            - name: QBITTORRENT__WEBUI__PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: qbittorrent-webui
+                  key: QBITTORRENT_PASS
             resources:
               requests:
                 cpu: 100m
@@ -109,10 +106,6 @@ spec:
             - name: bt
               containerPort: 6881
               protocol: TCP
-            # No probes existed before, so kubelet had no way to know the
-            # container was actually failing to serve traffic. tcpSocket is
-            # used instead of httpGet since the WebUI can be slow to bind
-            # and auth pages complicate simple HTTP checks.
             probes:
               startup:
                 enabled: true
@@ -149,14 +142,14 @@ spec:
             - secretRef:
                 name: qbittorrent-webui
             env:
-              - name: QBITTORRENT_HOST
-                value: 127.0.0.1
-              - name: QBITTORRENT_PORT
-                value: '8080'
-              - name: QBITTORRENT_URL_BASE
-                value: ''
-              - name: EXPORTER_PORT
-                value: '8000'
+            - name: QBITTORRENT_HOST
+              value: 127.0.0.1
+            - name: QBITTORRENT_PORT
+              value: '8080'
+            - name: QBITTORRENT_URL_BASE
+              value: ''
+            - name: EXPORTER_PORT
+              value: '8000'
             ports:
             - name: metrics
               containerPort: 8000
@@ -190,11 +183,11 @@ spec:
         type: persistentVolumeClaim
         existingClaim: qbittorrent-config
         globalMounts:
-          - path: /config
+        - path: /config
       downloads:
         enabled: true
         type: persistentVolumeClaim
         existingClaim: media
         globalMounts:
-          - path: /downloads
-            subPath: downloads
+        - path: /downloads
+          subPath: downloads

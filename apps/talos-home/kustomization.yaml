@@ -76,6 +76,9 @@ resources:
   - networkpolicies/allow-dns-from-lan.yaml
   - networkpolicies/allow-all-metallb.yaml
   - networkpolicies/media-namespace.yaml
+  - networkpolicies/dns-namespace.yaml
+  - networkpolicies/networking-namespace.yaml
+  - networkpolicies/monitoring-namespace.yaml
 
   # ──────────────────────────────────────
   # Sonarr
@@ -167,16 +170,17 @@ resources:
   # ──────────────────────────────────────
   # Falco
   # ──────────────────────────────────────
-  # - falco/namespace.yaml
-  # - falco/helmrepository.yaml
-  # - falco/helmrelease.yaml
-  # - falco/falcosidekick-helmrelease.yaml
-  # - falco/falcosidekick-secret.yaml
-  # - falco/ingressroute.yaml
-  # - falco/servicemonitor.yaml
-  # - falco/certificate.yaml
-  # - falco/configmap.yaml
-  # - falco/networkpolicy.yaml
+  - falco/namespace.yaml
+  - falco/helmrepository.yaml
+  - falco/helmrelease.yaml
+  - falco/falcosidekick-helmrelease.yaml
+  - falco/falcosidekick-secret.yaml
+  - falco/ingressroute.yaml
+  - falco/servicemonitor.yaml
+  - falco/servicemonitor-sidekick.yaml
+  - falco/certificate.yaml
+  - falco/configmap.yaml
+  - falco/networkpolicy.yaml
 
   # ──────────────────────────────────────
   # gotify
@@ -220,46 +224,36 @@ resources:
   # ──────────────────────────────────────
   # Uptime Kuma
   # ──────────────────────────────────────
-  # - uptime-kuma/namespace.yaml
-  # - uptime-kuma/secret.yaml
-  # - uptime-kuma/certificate.yaml
-  # - uptime-kuma/configmap.yaml
-  # - uptime-kuma/helmrelease.yaml
-  # - uptime-kuma/job.yaml
-  # - uptime-kuma/ingressroute.yaml
-  # - uptime-kuma/pvc.yaml
+  - uptime-kuma/namespace.yaml
+  - uptime-kuma/secret.yaml
+  - uptime-kuma/certificate.yaml
+  - uptime-kuma/configmap.yaml
+  - uptime-kuma/helmrelease.yaml
+  - uptime-kuma/job.yaml
+  - uptime-kuma/ingressroute.yaml
+  - uptime-kuma/pvc.yaml
   
   # ──────────────────────────────────────
   # Kyverno
   # ──────────────────────────────────────
-  # - kyverno/namespace.yaml
-  # - kyverno/helmrepository.yaml
-  # - kyverno/helmrelease.yaml
-  # - kyverno/cosign-secret.yaml
-  # - kyverno/networkpolicy.yaml 
-  # - kyverno/policies/enforce-image-signatures.yaml
-  # - kyverno/policies/block-latest-tag.yaml
-  # - kyverno/policies/require-resource-limits.yaml    
-  # - kyverno/policies/disallow-privilege-escalation.yaml
+  - kyverno/namespace.yaml
+  - kyverno/helmrepository.yaml
+  - kyverno/helmrelease.yaml
+  - kyverno/cosign-secret.yaml
+  - kyverno/networkpolicy.yaml 
+  - kyverno/policies/block-latest-tag.yaml
+  - kyverno/policies/require-resource-limits.yaml    
+  - kyverno/policies/disallow-privilege-escalation.yaml
 
-
-  # ──────────────────────────────────────
-  # n8n
-  # ──────────────────────────────────────
-  - n8n/namespace.yaml
-  - n8n/secret.yaml
-  - n8n/helmrelease.yaml
-  - n8n/ingressroute.yaml
-  - n8n/certificate.yaml
 
   # ──────────────────────────────────────
   # Argus (WatchYourPorts)
   # ──────────────────────────────────────
-  - argus/namespace.yaml
-  - argus/helmrelease.yaml
-  - argus/ingressroute.yaml
-  - argus/certificate.yaml
-  - argus/configmap.yaml
+  # - argus/namespace.yaml
+  # - argus/helmrelease.yaml
+  # - argus/ingressroute.yaml
+  # - argus/certificate.yaml
+  # - argus/configmap.yaml
 
 
   # ──────────────────────────────────────

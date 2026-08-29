@@ -97,6 +97,8 @@ spec:
         - operator: Exists
     grafana:
       enabled: true
+      defaultDashboards:
+        enabled: false
       revisionHistoryLimit: 2
       tolerations:
       - key: node-role.kubernetes.io/control-plane

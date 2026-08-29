@@ -17,3 +17,26 @@ spec:
     crds:
       enabled: true
     replicaCount: 1
+    # ========== NEW: resources for all components ==========
+    resources:
+      # For the controller
+      requests:
+        memory: 64Mi
+        cpu: 10m
+      limits:
+        memory: 256Mi
+    cainjector:
+      resources:
+        requests:
+          memory: 64Mi
+          cpu: 10m
+        limits:
+          memory: 256Mi
+    webhook:
+      resources:
+        requests:
+          memory: 64Mi
+          cpu: 10m
+        limits:
+          memory: 128Mi
+    # =====================================================

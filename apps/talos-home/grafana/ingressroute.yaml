@@ -13,7 +13,7 @@ spec:
         - name: traefik-chain-noauth
           namespace: networking
       services:
-        - name: vm-stack-grafana
-          port: 80
+        - name: victoria-metrics-k8s-stack-grafana   # ← fixed
+          port: 80                                   # ← or the correct port
   tls:
     secretName: grafana-tls
