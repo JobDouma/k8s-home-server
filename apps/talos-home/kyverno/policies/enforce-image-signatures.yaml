@@ -12,7 +12,7 @@ metadata:
       this prevents tag-mutable attacks even if the registry is compromised after deployment.
       useCache: true avoids re-fetching the manifest on every admission call.
 spec:
-  validationFailureAction: Audit   # change to Enforce after testing
+  validationFailureAction: Enforce   # change to Enforce after testing
   background: true
   rules:
     - name: verify-image-signature
