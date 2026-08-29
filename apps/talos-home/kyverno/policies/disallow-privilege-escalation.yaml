@@ -30,7 +30,6 @@ spec:
                 - tailscale
                 - metallb-system
                 - falco
-                - actual-ai
       validate:
         message: "Container must set securityContext.allowPrivilegeEscalation: false."
         foreach:
