@@ -2,7 +2,7 @@ name: omni-on-prem
 services:
   omni:
     container_name: omni
-    image: ghcr.io/siderolabs/omni:v1.10.4@sha256:a706da7d239be27b065841ae6ba1ff671a2299e40c9cea5a80cf98ea5e279a2f
+    image: ghcr.io/siderolabs/omni:v1.10.5
     restart: unless-stopped
     network_mode: host
     extra_hosts:
