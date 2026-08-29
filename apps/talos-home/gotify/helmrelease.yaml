@@ -28,6 +28,11 @@ spec:
           securityContext:
             fsGroup: 1000
             fsGroupChangePolicy: OnRootMismatch
+            runAsUser: 1000               # <-- added
+            runAsGroup: 1000              # <-- added
+            runAsNonRoot: true            # <-- added
+            seccompProfile:
+              type: RuntimeDefault
         containers:
           app:
             image:
@@ -49,7 +54,13 @@ spec:
             - name: http
               containerPort: 80
               protocol: TCP
-            # Removed securityContext to let the image run as its default user (root)
+            securityContext:                # <-- new block
+              runAsUser: 1000
+              runAsGroup: 1000
+              runAsNonRoot: true
+              allowPrivilegeEscalation: false
+              capabilities:
+                drop: ["ALL"]
             probes:
               readiness:
                 enabled: true

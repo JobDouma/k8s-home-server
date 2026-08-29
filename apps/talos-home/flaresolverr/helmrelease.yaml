@@ -37,14 +37,21 @@ spec:
             resources:
               requests:
                 cpu: 200m
-                memory: 512Mi          # increased from 256Mi
+                memory: 512Mi
               limits:
                 cpu: 1000m
-                memory: 1Gi            # increased from 512Mi
+                memory: 1Gi
             ports:
               - name: http
                 containerPort: 8191
                 protocol: TCP
+            securityContext:                    # <-- new block
+              runAsUser: 1000
+              runAsGroup: 1000
+              runAsNonRoot: true
+              allowPrivilegeEscalation: false
+              capabilities:
+                drop: ["ALL"]
             probes:
               liveness:
                 enabled: true

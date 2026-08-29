@@ -25,11 +25,13 @@ spec:
       prowlarr:
         pod:
           securityContext:
-            # Removed runAsNonRoot: true
             fsGroup: 1000
             fsGroupChangePolicy: OnRootMismatch
             seccompProfile:
               type: RuntimeDefault
+            runAsUser: 1000               # <-- added
+            runAsGroup: 1000              # <-- added
+            runAsNonRoot: true            # <-- added
         containers:
           app:
             image:
@@ -44,6 +46,13 @@ spec:
             - name: http
               containerPort: 9696
               protocol: TCP
+            securityContext:                # <-- new block
+              runAsUser: 1000
+              runAsGroup: 1000
+              runAsNonRoot: true
+              allowPrivilegeEscalation: false
+              capabilities:
+                drop: ["ALL"]
             resources:
               requests:
                 cpu: 50m

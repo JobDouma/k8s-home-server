@@ -27,6 +27,13 @@ spec:
         pod:
           annotations:
             configmap.reloader.stakater.com/reload: dashy-config
+          securityContext:
+            runAsUser: 1000
+            runAsGroup: 1000
+            fsGroup: 1000
+            runAsNonRoot: true          # <-- added
+            seccompProfile:
+              type: RuntimeDefault
         containers:
           main:
             image:
@@ -39,13 +46,20 @@ spec:
             - name: http
               containerPort: 8080
               protocol: TCP
+            securityContext:              # <-- new block
+              runAsUser: 1000
+              runAsGroup: 1000
+              runAsNonRoot: true
+              allowPrivilegeEscalation: false
+              capabilities:
+                drop: ["ALL"]
             resources:
               limits:
                 cpu: 300m
                 memory: 2500Mi
               requests:
                 cpu: 50m
-                memory: 128Mi  # idles at ~100MB after build completes
+                memory: 128Mi
     service:
       main:
         controller: main

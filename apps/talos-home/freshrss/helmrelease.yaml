@@ -24,6 +24,14 @@ spec:
     controllers:
       freshrss:
         replicas: 1
+        pod:
+          securityContext:                    # <-- pod-level
+            runAsUser: 1000
+            runAsGroup: 1000
+            fsGroup: 1000
+            runAsNonRoot: true
+            seccompProfile:
+              type: RuntimeDefault
         containers:
           app:
             image:
@@ -40,6 +48,18 @@ spec:
             ports:
             - name: http
               containerPort: 80
+            securityContext:                  # <-- container-level
+              runAsUser: 1000
+              runAsGroup: 1000
+              runAsNonRoot: true
+              allowPrivilegeEscalation: false
+              capabilities:
+                drop: ["ALL"]
+            resources:
+              requests:
+                memory: 128Mi
+              limits:
+                memory: 256Mi
             probes:
               liveness:
                 enabled: true
@@ -61,13 +81,6 @@ spec:
                   initialDelaySeconds: 15
                   periodSeconds: 10
                   failureThreshold: 3
-            # ========== NEW ==========
-            resources:
-              requests:
-                memory: 128Mi
-              limits:
-                memory: 256Mi
-            # =========================
     service:
       app:
         controller: freshrss

@@ -143,6 +143,7 @@ resources:
   - joplin/hr-joplin.yaml
   - joplin/ingressroute.yaml
   - joplin/certificate.yaml
+  - joplin/networkpolicy.yaml
 
   # ──────────────────────────────────────
   # TrueNAS NFS dynamic provisioner
@@ -166,6 +167,7 @@ resources:
   - freshrss/helmrelease.yaml
   - freshrss/ingressroute.yaml
   - freshrss/certificate.yaml
+  - freshrss/networkpolicy.yaml
 
   # ──────────────────────────────────────
   # Falco
@@ -261,3 +263,4 @@ resources:
   # ──────────────────────────────────────
   - flaresolverr/namespace.yaml
   - flaresolverr/helmrelease.yaml
+  - flaresolverr/networkpolicy.yaml
