@@ -36,8 +36,9 @@ spec:
         skipResourceFilters: true
 
     admissionController:
-      replicas: 2                       # reduced from 3 for minimal footprint
-      # PodDisruptionBudget removed – allow immediate restarts during updates
+      replicas: 2
+      podDisruptionBudget:
+        enabled: false          # <-- add this
       serviceMonitor:
         enabled: true
       webhookConfiguration:
