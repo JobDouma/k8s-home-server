@@ -63,6 +63,15 @@ spec:
                     secretKeyRef:
                       name: recyclarr-secrets
                       key: sonarr_apikey
+              # ========== NEW: Resources ==========
+              resources:
+                requests:
+                  cpu: 50m
+                  memory: 64Mi
+                limits:
+                  cpu: 200m
+                  memory: 256Mi
+              # ====================================
               volumeMounts:
                 - name: config-file
                   mountPath: /config/recyclarr.yml

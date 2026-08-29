@@ -28,6 +28,16 @@ spec:
       watchGlobally: true
       reloadOnCreate: true
 
+    # ========== NEW: Resources ==========
+    resources:
+      requests:
+        cpu: 20m
+        memory: 32Mi
+      limits:
+        cpu: 100m
+        memory: 128Mi
+    # ====================================
+
     podSecurityContext:
       runAsNonRoot: true
 

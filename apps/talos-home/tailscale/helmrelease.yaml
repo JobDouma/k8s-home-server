@@ -40,6 +40,16 @@ spec:
     apiServerProxyConfig:
       mode: "true"
 
+    # ========== NEW: Resources ==========
+    resources:
+      requests:
+        cpu: 50m
+        memory: 64Mi
+      limits:
+        cpu: 200m
+        memory: 256Mi
+    # ====================================
+
     # Emit Prometheus metrics for the operator pod itself
     podAnnotations:
       prometheus.io/scrape: "true"
