@@ -2,75 +2,55 @@ name: omni-on-prem
 services:
   omni:
     container_name: omni
-    image: ghcr.io/siderolabs/omni:v1.10.4
+    image: ghcr.io/siderolabs/omni:v1.10.4@sha256:a706da7d239be27b065841ae6ba1ff671a2299e40c9cea5a80cf98ea5e279a2f
     restart: unless-stopped
     network_mode: host
     extra_hosts:
-      - "auth.lan:192.168.2.100"
+    - auth.lan:192.168.2.100
     devices:
-      - /dev/net/tun
+    - /dev/net/tun
     cap_add:
-      - NET_ADMIN
+    - NET_ADMIN
     environment:
-      - SSL_CERT_FILE=/etc/ssl/certs/homelab-ca.crt
-      - OMNI_ETCD_BACKUP_S3_ENDPOINT=http://127.0.0.1:3900
-      - OMNI_ETCD_BACKUP_S3_REGION=homelab
-      - OMNI_ETCD_BACKUP_S3_BUCKET=omni-etcd-backups
-      - OMNI_ETCD_BACKUP_S3_ACCESS_KEY=${OMNI_ETCD_BACKUP_S3_ACCESS_KEY}
-      - OMNI_ETCD_BACKUP_S3_SECRET_KEY=${OMNI_ETCD_BACKUP_S3_SECRET_KEY}
+    - SSL_CERT_FILE=/etc/ssl/certs/homelab-ca.crt
+    - OMNI_ETCD_BACKUP_S3_ENDPOINT=http://127.0.0.1:3900
+    - OMNI_ETCD_BACKUP_S3_REGION=homelab
+    - OMNI_ETCD_BACKUP_S3_BUCKET=omni-etcd-backups
+    - OMNI_ETCD_BACKUP_S3_ACCESS_KEY=${OMNI_ETCD_BACKUP_S3_ACCESS_KEY}
+    - OMNI_ETCD_BACKUP_S3_SECRET_KEY=${OMNI_ETCD_BACKUP_S3_SECRET_KEY}
     mem_limit: 1024m
     mem_reservation: 256m
     volumes:
-      - /opt/omni/etcd:/_out/etcd
-      - /opt/omni/sqlite:/_out/sqlite
-      - /opt/omni/omni.asc:/omni.asc
-      - /opt/omni/tls.crt:/tls.crt
-      - /opt/omni/tls.key:/tls.key
-      - /usr/local/share/ca-certificates/homelab-ca.crt:/etc/ssl/certs/homelab-ca.crt:ro
-    command: >
-      --account-id=400d4180-9f90-479f-b0cd-aa3643f53765
-      --name=homelab-omni
-      --sqlite-storage-path=/_out/sqlite/omni.db
-      --cert=/tls.crt
-      --key=/tls.key
-      --machine-api-cert=/tls.crt
-      --machine-api-key=/tls.key
-      --private-key-source=file:///omni.asc
-      --event-sink-port=8091
-      --bind-addr=0.0.0.0:443
-      --machine-api-bind-addr=0.0.0.0:8090
-      --k8s-proxy-bind-addr=0.0.0.0:8100
-      --advertised-api-url=https://omni.lan/
-      --advertised-kubernetes-proxy-url=https://omni.lan:8100/
-      --siderolink-api-advertised-url=https://omni.lan:8090/
-      --siderolink-wireguard-advertised-addr=192.168.2.12:50180
-      --initial-users=jobdouma@hotmail.com
-      --auth-auth0-enabled=false
-      --auth-saml-enabled=false
-      --auth-oidc-enabled=true
-      --auth-oidc-provider-url=https://auth.lan/application/o/omni/
-      --auth-oidc-client-id=omni-homelab
-      --auth-oidc-allow-unverified-email=true
-      --auth-oidc-client-secret=${OMNI_OIDC_CLIENT_SECRET}
-      --eula-accept-name=job
-      --eula-accept-email=jobdouma@hotmail.com
-      --etcd-backup-s3
+    - /opt/omni/etcd:/_out/etcd
+    - /opt/omni/sqlite:/_out/sqlite
+    - /opt/omni/omni.asc:/omni.asc
+    - /opt/omni/tls.crt:/tls.crt
+    - /opt/omni/tls.key:/tls.key
+    - /usr/local/share/ca-certificates/homelab-ca.crt:/etc/ssl/certs/homelab-ca.crt:ro
+    command: '--account-id=400d4180-9f90-479f-b0cd-aa3643f53765 --name=homelab-omni
+      --sqlite-storage-path=/_out/sqlite/omni.db --cert=/tls.crt --key=/tls.key --machine-api-cert=/tls.crt
+      --machine-api-key=/tls.key --private-key-source=file:///omni.asc --event-sink-port=8091
+      --bind-addr=0.0.0.0:443 --machine-api-bind-addr=0.0.0.0:8090 --k8s-proxy-bind-addr=0.0.0.0:8100
+      --advertised-api-url=https://omni.lan/ --advertised-kubernetes-proxy-url=https://omni.lan:8100/
+      --siderolink-api-advertised-url=https://omni.lan:8090/ --siderolink-wireguard-advertised-addr=192.168.2.12:50180
+      --initial-users=jobdouma@hotmail.com --auth-auth0-enabled=false --auth-saml-enabled=false
+      --auth-oidc-enabled=true --auth-oidc-provider-url=https://auth.lan/application/o/omni/
+      --auth-oidc-client-id=omni-homelab --auth-oidc-allow-unverified-email=true --auth-oidc-client-secret=${OMNI_OIDC_CLIENT_SECRET}
+      --eula-accept-name=job --eula-accept-email=jobdouma@hotmail.com --etcd-backup-s3
       --log-level=info
 
+      '
   garage:
-    image: dxflrs/garage:v2.3.0
+    image: dxflrs/garage:v2.3.0@sha256:866bd13ed2038ba7e7190e840482bc27234c4afaf77be8cfa439ae088c1e4690
     container_name: omni-backup-garage
     restart: unless-stopped
     stop_grace_period: 30s
-
     mem_limit: 512m
     mem_reservation: 128m
-
     ports:
-      - "3900:3900"
-      - "127.0.0.1:3903:3903"
-
+    - 3900:3900
+    - 127.0.0.1:3903:3903
     volumes:
-      - ./garage-config/garage.toml:/etc/garage.toml:ro
-      - /opt/omni/garage-meta:/var/lib/garage/meta
-      - /mnt/truenas-backups/ubuntu-server/omni/garage-data:/var/lib/garage/data
+    - ./garage-config/garage.toml:/etc/garage.toml:ro
+    - /opt/omni/garage-meta:/var/lib/garage/meta
+    - /mnt/truenas-backups/ubuntu-server/omni/garage-data:/var/lib/garage/data
