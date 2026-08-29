@@ -146,7 +146,7 @@ spec:
               maxLines: 1000
       sidecar:
         dashboards:
-          enabled: false
+          enabled: true
           searchNamespace: ALL
           label: grafana_dashboard
           labelValue: '1'
