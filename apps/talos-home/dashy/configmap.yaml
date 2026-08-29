@@ -82,11 +82,6 @@ data:
             icon: fas fa-bell
             url: https://gotify.lan
 
-          - title: n8n
-            description: Workflow Automation
-            icon: fas fa-robot
-            url: https://n8n.lan
-
 
       - name: Monitoring
         icon: fas fa-chart-line
