@@ -76,6 +76,7 @@ resources:
   - networkpolicies/allow-dns-from-lan.yaml
   - networkpolicies/allow-all-metallb.yaml
   - networkpolicies/media-namespace.yaml
+  - networkpolicies/dns-namespace.yaml
 
   # ──────────────────────────────────────
   # Sonarr
