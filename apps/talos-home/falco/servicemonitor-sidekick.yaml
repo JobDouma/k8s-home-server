@@ -1,9 +1,10 @@
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
-  name: falco
+  name: falcosidekick
   namespace: falco
   labels:
+    # Must match your kube-prometheus-stack's serviceMonitorSelector
     release: kube-prometheus-stack
 spec:
   namespaceSelector:
@@ -11,8 +12,8 @@ spec:
       - falco
   selector:
     matchLabels:
-      app.kubernetes.io/name: falco
+      app.kubernetes.io/name: falcosidekick
   endpoints:
-    - port: metrics   # Falco exposes metrics on port 8765 with name "metrics"
+    - port: http
       path: /metrics
       interval: 90s
