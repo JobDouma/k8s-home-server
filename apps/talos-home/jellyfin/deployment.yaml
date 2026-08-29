@@ -41,6 +41,22 @@ spec:
           capabilities:
             drop:
               - ALL
+        # ========== NEW: Probes ==========
+        livenessProbe:
+          httpGet:
+            path: /web/index.html
+            port: 8096
+          initialDelaySeconds: 30
+          periodSeconds: 30
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /web/index.html
+            port: 8096
+          initialDelaySeconds: 15
+          periodSeconds: 10
+          failureThreshold: 3
+        # =================================
         volumeMounts:
         - name: config
           mountPath: /config
@@ -71,7 +87,7 @@ metadata:
   name: jellyfin
   namespace: media
 spec:
-  type: ClusterIP              # changed from LoadBalancer
+  type: ClusterIP
   selector:
     app: jellyfin
   ports:

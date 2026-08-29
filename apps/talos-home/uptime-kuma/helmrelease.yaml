@@ -25,7 +25,7 @@ spec:
       uptime-kuma:
         replicas: 1
         pod:
-          securityContext:                # <-- new block
+          securityContext:
             runAsUser: 1000
             runAsGroup: 1000
             fsGroup: 1000
@@ -52,13 +52,21 @@ spec:
             ports:
             - name: http
               containerPort: 3001
-            securityContext:                # <-- new block
+            securityContext:
               runAsUser: 1000
               runAsGroup: 1000
               runAsNonRoot: true
               allowPrivilegeEscalation: false
               capabilities:
                 drop: ["ALL"]
+            # ========== FIX: Added CPU request ==========
+            resources:
+              requests:
+                cpu: 50m          # <-- NEW
+                memory: 128Mi
+              limits:
+                memory: 256Mi
+            # ===========================================
             probes:
               liveness:
                 enabled: true
@@ -80,11 +88,6 @@ spec:
                   initialDelaySeconds: 15
                   periodSeconds: 10
                   failureThreshold: 3
-            resources:
-              requests:
-                memory: 128Mi
-              limits:
-                memory: 256Mi
     service:
       app:
         controller: uptime-kuma
