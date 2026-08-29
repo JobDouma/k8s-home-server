@@ -9,7 +9,7 @@ metadata:
       Ensures containers set allowPrivilegeEscalation: false.
       This prevents a process inside a container from gaining more privileges
       than its parent process — blocking most setuid-based escalation paths.
-      Exempts namespaces that legitimately need privilege.
+      Exempts namespaces that legitimately need privilege.  # ← removed
 spec:
   validationFailureAction: Enforce
   background: true
@@ -20,16 +20,16 @@ spec:
           - resources:
               kinds:
                 - Pod
-      exclude:
-        any:
-          - resources:
-              namespaces:
-                - kube-system
-                - local-path-storage
-                - flux-system
-                - tailscale
-                - metallb-system
-                - falco
+      # exclude:                                       # ← removed entirely
+      #   any:
+      #     - resources:
+      #         namespaces:
+      #           - kube-system
+      #           - local-path-storage
+      #           - flux-system
+      #           - tailscale
+      #           - metallb-system
+      #           - falco
       validate:
         message: "Container must set securityContext.allowPrivilegeEscalation: false."
         foreach:
