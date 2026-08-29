@@ -77,6 +77,8 @@ resources:
   - networkpolicies/allow-all-metallb.yaml
   - networkpolicies/media-namespace.yaml
   - networkpolicies/dns-namespace.yaml
+  - networkpolicies/networking-namespace.yaml
+  - networkpolicies/monitoring-namespace.yaml
 
   # ──────────────────────────────────────
   # Sonarr

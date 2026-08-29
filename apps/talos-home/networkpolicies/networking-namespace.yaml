@@ -1,0 +1,60 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: default-deny
+  namespace: networking
+spec:
+  podSelector: {}
+  policyTypes:
+    - Ingress
+    - Egress
+---
+# Allow Traefik to receive traffic from the LAN via its LoadBalancer IP
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: traefik-ingress
+  namespace: networking
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: traefik
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - ipBlock:
+            cidr: 192.168.2.0/24   # your LAN CIDR
+      ports:
+        - port: 80
+        - port: 443
+        - port: 9100   # metrics port, if scraped externally
+---
+# Allow Traefik to talk to all services (ClusterIP) and DNS
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: traefik-egress
+  namespace: networking
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: traefik
+  policyTypes:
+    - Egress
+  egress:
+    - to:
+        - namespaceSelector: {}   # all namespaces
+      ports:
+        - port: 80
+        - port: 443
+        - port: 53
+          protocol: UDP
+        - port: 53
+          protocol: TCP
+    # Allow Traefik to reach the Kubernetes API (for dynamic config)
+    - to:
+        - ipBlock:
+            cidr: 192.168.2.0/24   # adjust to your control-plane IP
+      ports:
+        - port: 6443
