@@ -167,16 +167,16 @@ resources:
   # ──────────────────────────────────────
   # Falco
   # ──────────────────────────────────────
-  # - falco/namespace.yaml
-  # - falco/helmrepository.yaml
-  # - falco/helmrelease.yaml
-  # - falco/falcosidekick-helmrelease.yaml
-  # - falco/falcosidekick-secret.yaml
-  # - falco/ingressroute.yaml
-  # - falco/servicemonitor.yaml
-  # - falco/certificate.yaml
-  # - falco/configmap.yaml
-  # - falco/networkpolicy.yaml
+  - falco/namespace.yaml
+  - falco/helmrepository.yaml
+  - falco/helmrelease.yaml
+  - falco/falcosidekick-helmrelease.yaml
+  - falco/falcosidekick-secret.yaml
+  - falco/ingressroute.yaml
+  - falco/servicemonitor.yaml
+  - falco/certificate.yaml
+  - falco/configmap.yaml
+  - falco/networkpolicy.yaml
 
   # ──────────────────────────────────────
   # gotify
@@ -246,20 +246,20 @@ resources:
   # ──────────────────────────────────────
   # n8n
   # ──────────────────────────────────────
-  - n8n/namespace.yaml
-  - n8n/secret.yaml
-  - n8n/helmrelease.yaml
-  - n8n/ingressroute.yaml
-  - n8n/certificate.yaml
+  # - n8n/namespace.yaml
+  # - n8n/secret.yaml
+  # - n8n/helmrelease.yaml
+  # - n8n/ingressroute.yaml
+  # - n8n/certificate.yaml
 
   # ──────────────────────────────────────
   # Argus (WatchYourPorts)
   # ──────────────────────────────────────
-  - argus/namespace.yaml
-  - argus/helmrelease.yaml
-  - argus/ingressroute.yaml
-  - argus/certificate.yaml
-  - argus/configmap.yaml
+  # - argus/namespace.yaml
+  # - argus/helmrelease.yaml
+  # - argus/ingressroute.yaml
+  # - argus/certificate.yaml
+  # - argus/configmap.yaml
 
 
   # ──────────────────────────────────────
