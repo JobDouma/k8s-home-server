@@ -2,11 +2,22 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
 resources:
+  # ──────────────────────────────────────
+  # Cilium
+  # ──────────────────────────────────────
+  - Cilium/helmrepository.yaml
+  - Cilium/helmrelease.yaml 
+
+  # ──────────────────────────────────────
   # Storage
+  # ──────────────────────────────────────
   - storage/namespace.yaml
   - storage/pv-media.yaml
   - storage/pvc-media.yaml
 
+  # ──────────────────────────────────────
+  # Traefik
+  # ──────────────────────────────────────
   - traefik/namespace.yaml
   - traefik/helmrepository.yaml
   - traefik/helmrelease.yaml
@@ -16,12 +27,18 @@ resources:
   - traefik/certificate.yaml
   - traefik/clusterrole.yaml
 
+  # ──────────────────────────────────────
+  # MetalLB
+  # ──────────────────────────────────────
   - metallb/namespace.yaml
   - metallb/helmrelease.yaml
   - metallb/helmrepository.yaml
   - metallb/config/ipaddress-pools.yaml
   - metallb/config/l2-advertisements.yaml
-
+  
+  # ──────────────────────────────────────
+  # Authentik
+  # ──────────────────────────────────────
   - authentik/namespace.yaml
   - authentik/certificate.yaml
   - authentik/helmrepository.yaml
@@ -38,6 +55,9 @@ resources:
   - metrics-server/helmrepository.yaml
   - metrics-server/helmrelease.yaml
 
+  # ──────────────────────────────────────
+  # Cert Manager
+  # ──────────────────────────────────────
   - cert-manager/namespace.yaml
   - cert-manager/helmrepository.yaml
   - cert-manager/helmrelease.yaml
