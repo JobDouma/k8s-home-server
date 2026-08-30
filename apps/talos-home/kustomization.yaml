@@ -74,7 +74,6 @@ resources:
   - networkpolicies/allow-all-kube-system.yaml
   - networkpolicies/allow-renovate-egress.yaml
   - networkpolicies/allow-dns-from-lan.yaml
-  - networkpolicies/allow-all-metallb.yaml
   - networkpolicies/media-namespace.yaml
   - networkpolicies/dns-namespace.yaml
   - networkpolicies/networking-namespace.yaml
