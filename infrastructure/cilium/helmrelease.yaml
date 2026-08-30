@@ -29,13 +29,6 @@ spec:
         enabled: false
       ui:
         enabled: false
-    hostMounts:
-      - name: bpf-mount
-        mountPath: /sys/fs/bpf
-        hostPath: /sys/fs/bpf
-      - name: cilium-run
-        mountPath: /run/cilium
-        hostPath: /run/cilium
     image:
       repository: cilium/cilium
       tag: v1.20.1
