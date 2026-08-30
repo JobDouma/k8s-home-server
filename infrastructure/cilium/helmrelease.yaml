@@ -1,0 +1,55 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: cilium
+  namespace: kube-system
+spec:
+  interval: 30m
+  chart:
+    spec:
+      chart: cilium
+      version: 1.20.1
+      sourceRef:
+        kind: HelmRepository
+        name: cilium
+        namespace: kube-system
+  values:
+    kubeProxyReplacement: true
+    k8sServiceHost: 192.168.2.22
+    k8sServicePort: 6443
+    ipam:
+      mode: kubernetes
+    l2announcements:
+      enabled: true
+    externalIPs:
+      enabled: true
+    hubble:
+      enabled: true
+      relay:
+        enabled: true
+      ui:
+        enabled: true
+    image:
+      repository: cilium/cilium
+      tag: v1.20.1@sha256:ae9ea21f7427fe24bc6ea7247eb552157a1b0a431744045d3f641545ca71d11b
+    operator:
+      replicas: 1
+      image:
+        repository: cilium/operator
+        tag: v1.20.1@sha256:67adaf5575902dcce31dc36ba5b5acad397a8b40ec986b55696c94f80b6d861d
+      resources:
+        requests:
+          cpu: 50m
+          memory: 128Mi
+        limits:
+          cpu: 200m
+          memory: 256Mi
+    resources:
+      requests:
+        cpu: 100m
+        memory: 256Mi
+      limits:
+        cpu: 500m
+        memory: 512Mi
+    rollOutCiliumPods: true
+    enableIPv4Masquerade: true

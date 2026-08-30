@@ -5,8 +5,8 @@ resources:
   # ──────────────────────────────────────
   # Cilium
   # ──────────────────────────────────────
-  - Cilium/helmrepository.yaml
-  - Cilium/helmrelease.yaml 
+  - cilium/helmrepository.yaml
+  - cilium/helmrelease.yaml 
 
   # ──────────────────────────────────────
   # Storage
