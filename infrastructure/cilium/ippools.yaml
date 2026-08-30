@@ -1,28 +1,33 @@
-# infrastructure/cilium/ippools.yaml
 apiVersion: cilium.io/v2alpha1
 kind: CiliumLoadBalancerIPPool
 metadata:
   name: dns-pool
 spec:
-  cidr: 192.168.2.53/32
+  blocks:
+    - cidr: 192.168.2.53/32
 ---
 apiVersion: cilium.io/v2alpha1
 kind: CiliumLoadBalancerIPPool
 metadata:
   name: traefik-pool
 spec:
-  cidr: 192.168.2.100/32
+  blocks:
+    - cidr: 192.168.2.100/32
 ---
 apiVersion: cilium.io/v2alpha1
 kind: CiliumLoadBalancerIPPool
 metadata:
   name: core-pool
 spec:
-  cidr: 192.168.2.101/32   # you can add multiple blocks for ranges
+  blocks:
+    - cidr: 192.168.2.101/32
+    # add more entries here for multiple blocks/ranges, e.g.:
+    # - cidr: 192.168.2.102/32
 ---
 apiVersion: cilium.io/v2alpha1
 kind: CiliumLoadBalancerIPPool
 metadata:
   name: jellyfin-pool
 spec:
-  cidr: 192.168.2.50/32
+  blocks:
+    - cidr: 192.168.2.50/32

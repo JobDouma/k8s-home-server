@@ -23,10 +23,6 @@ spec:
       enabled: true
     externalIPs:
       enabled: true
-    # ---- ADD THIS ----
-    loadBalancerIPPool:
-      enabled: true
-    # ------------------
     hubble:
       enabled: false
       relay:
