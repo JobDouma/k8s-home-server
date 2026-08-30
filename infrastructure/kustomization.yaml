@@ -68,3 +68,9 @@ resources:
   - cert-manager/clusterissuer-selfsigned.yaml
 
   - local-path-storage
+
+  # ──────────────────────────────────────
+  # CoreDNS to Blocky
+  # ──────────────────────────────────────
+  - coredns/configmap.yaml
+  - coredns/servicemonitor.yaml

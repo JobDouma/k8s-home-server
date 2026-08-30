@@ -151,12 +151,6 @@ resources:
   - truenas-nfs/helmrelease.yaml
 
   # ──────────────────────────────────────
-  # CoreDNS to Blocky
-  # ──────────────────────────────────────
-  - coredns/configmap.yaml
-  - coredns/servicemonitor.yaml
-
-  # ──────────────────────────────────────
   # FreshRSS
   # ──────────────────────────────────────
   - freshrss/namespace.yaml

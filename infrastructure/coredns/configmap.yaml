@@ -17,16 +17,11 @@ data:
             fallthrough in-addr.arpa ip6.arpa
         }
 
-        # .lan goes to Blocky using its ClusterIP
-        forward lan 10.102.205.119 {
-            policy sequential
-            max_fails 3
-            expire 30s
-            health_check 5s
-        }
-
-        # All other DNS goes to Blocky first, fallback to public resolvers
-        forward . 10.102.205.119 1.1.1.1 8.8.8.8 {
+        # Forward all non-cluster queries to Blocky's pinned Cilium LB IP,
+        # then to public resolvers as a fallback if Blocky is unreachable.
+        # 192.168.2.53 is reserved for Blocky in infrastructure/cilium/ippools.yaml (dns-pool)
+        # — change it there first if it ever needs to move, then here.
+        forward . 192.168.2.53 1.1.1.1 8.8.8.8 {
             policy sequential
             max_fails 3
             expire 30s
