@@ -12,17 +12,17 @@ metadata:
 spec:
   validationFailureAction: Enforce
   background: true
-  exclude:
-    any:
-      - resources:
-          namespaces: ["kube-system"]   # <-- ADD THIS
   rules:
     - name: deny-privilege-escalation
       match:
         any:
           - resources:
-              kinds:
-                - Pod
+              kinds: [Pod]
+      preconditions:
+        any:
+          - key: "{{ request.namespace }}"
+            operator: NotEquals
+            value: "kube-system"
       validate:
         message: "Container must set securityContext.allowPrivilegeEscalation: false."
         foreach:
