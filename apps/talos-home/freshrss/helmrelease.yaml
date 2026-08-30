@@ -61,22 +61,20 @@ spec:
                 enabled: true
                 custom: true
                 spec:
-                  httpGet:
-                    path: /i/
+                  tcpSocket:
                     port: 80
-                  initialDelaySeconds: 60
-                  periodSeconds: 30
+                  initialDelaySeconds: 30
+                  periodSeconds: 10
                   failureThreshold: 5
               readiness:
                 enabled: true
                 custom: true
                 spec:
-                  httpGet:
-                    path: /i/
+                  tcpSocket:
                     port: 80
-                  initialDelaySeconds: 30
+                  initialDelaySeconds: 15
                   periodSeconds: 10
-                  failureThreshold: 10
+                  failureThreshold: 3
     service:
       app:
         controller: freshrss
