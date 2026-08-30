@@ -5,6 +5,9 @@ metadata:
 spec:
   blocks:
     - cidr: 192.168.2.53/32
+  serviceSelector:
+    matchLabels:
+      io.cilium/lb-pool: dns
 ---
 apiVersion: cilium.io/v2alpha1
 kind: CiliumLoadBalancerIPPool
@@ -13,6 +16,9 @@ metadata:
 spec:
   blocks:
     - cidr: 192.168.2.100/32
+  serviceSelector:
+    matchLabels:
+      io.cilium/lb-pool: traefik
 ---
 apiVersion: cilium.io/v2alpha1
 kind: CiliumLoadBalancerIPPool
@@ -21,8 +27,9 @@ metadata:
 spec:
   blocks:
     - cidr: 192.168.2.101/32
-    # add more entries here for multiple blocks/ranges, e.g.:
-    # - cidr: 192.168.2.102/32
+  serviceSelector:
+    matchLabels:
+      io.cilium/lb-pool: core
 ---
 apiVersion: cilium.io/v2alpha1
 kind: CiliumLoadBalancerIPPool
@@ -31,3 +38,6 @@ metadata:
 spec:
   blocks:
     - cidr: 192.168.2.50/32
+  serviceSelector:
+    matchLabels:
+      io.cilium/lb-pool: jellyfin
