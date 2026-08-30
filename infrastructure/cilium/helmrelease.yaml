@@ -14,6 +14,7 @@ spec:
         name: cilium
         namespace: kube-system
   values:
+    # --- Core ---
     kubeProxyReplacement: true
     k8sServiceHost: 192.168.2.22
     k8sServicePort: 6443
@@ -21,11 +22,13 @@ spec:
     ipam:
       mode: kubernetes
 
+    # --- L2 announcements (optional, keep if you want) ---
     l2announcements:
       enabled: true
     externalIPs:
       enabled: true
 
+    # --- Hubble ---
     hubble:
       enabled: true
       relay:
@@ -33,7 +36,22 @@ spec:
       ui:
         enabled: true
 
-    # --- Use separate tag and digest ---
+    # --- Auto‑mount BPF and cgroup ---
+    cgroup:
+      autoMount: true
+    bpf:
+      autoMount: true
+
+    # --- Explicit host mounts (redundant with autoMount, but safe) ---
+    hostMounts:
+      - name: bpf-mount
+        mountPath: /sys/fs/bpf
+        hostPath: /sys/fs/bpf
+      - name: cilium-run
+        mountPath: /run/cilium
+        hostPath: /run/cilium
+
+    # --- Images ---
     image:
       repository: cilium/cilium
       tag: v1.20.1
@@ -61,6 +79,13 @@ spec:
       limits:
         cpu: 500m
         memory: 512Mi
+
+    # --- Critical: set privileged mode for both agent and init containers ---
+    securityContext:
+      privileged: true
+    initContainers:
+      securityContext:
+        privileged: true
 
     rollOutCiliumPods: true
     enableIPv4Masquerade: true
