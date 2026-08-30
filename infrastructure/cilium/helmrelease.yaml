@@ -17,25 +17,18 @@ spec:
     kubeProxyReplacement: true
     k8sServiceHost: 192.168.2.22
     k8sServicePort: 6443
-
     ipam:
       mode: kubernetes
-
     l2announcements:
       enabled: true
     externalIPs:
       enabled: true
-
     hubble:
       enabled: true
       relay:
         enabled: true
       ui:
         enabled: true
-
-    # ✅ cgroup and bpf are removed – the chart will use its defaults
-    # which work fine on Talos (cgroup2 + bpffs are mounted automatically).
-
     hostMounts:
       - name: bpf-mount
         mountPath: /sys/fs/bpf
@@ -43,12 +36,10 @@ spec:
       - name: cilium-run
         mountPath: /run/cilium
         hostPath: /run/cilium
-
     image:
       repository: cilium/cilium
       tag: v1.20.1
       digest: sha256:ae9ea21f7427fe24bc6ea7247eb552157a1b0a431744045d3f641545ca71d11b
-
     operator:
       replicas: 1
       image:
@@ -62,7 +53,6 @@ spec:
         limits:
           cpu: 200m
           memory: 256Mi
-
     resources:
       requests:
         cpu: 100m
@@ -70,12 +60,5 @@ spec:
       limits:
         cpu: 500m
         memory: 512Mi
-
-    # ❌ Removed invalid top-level fields:
-    # - securityContext (privileged: true)
-    # - initContainers
-    # - cgroup.autoMount (boolean → object)
-    # - bpf.autoMount   (boolean → object)
-
     rollOutCiliumPods: true
     enableIPv4Masquerade: true
