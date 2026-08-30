@@ -24,11 +24,11 @@ spec:
     externalIPs:
       enabled: true
     hubble:
-      enabled: true
+      enabled: false          # turn off Hubble to avoid relay dependency
       relay:
-        enabled: true
+        enabled: false
       ui:
-        enabled: true
+        enabled: false
     hostMounts:
       - name: bpf-mount
         mountPath: /sys/fs/bpf
