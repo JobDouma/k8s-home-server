@@ -91,7 +91,7 @@ spec:
                     httpHeaders:
                     - name: Host
                       value: joplin.lan
-                  failureThreshold: 30
+                  failureThreshold: 60
                   periodSeconds: 10
                   initialDelaySeconds: 10
               liveness:

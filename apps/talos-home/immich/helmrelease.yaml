@@ -60,6 +60,16 @@ spec:
                 cpu: 1000m
                 memory: 4Gi
             probes:
+              startup:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /api/server/ping
+                    port: 2283
+                  initialDelaySeconds: 10
+                  periodSeconds: 10
+                  failureThreshold: 60   # increased from 30
               readiness:
                 enabled: true
                 custom: true
@@ -114,7 +124,7 @@ spec:
                     port: 3003
                   initialDelaySeconds: 10
                   periodSeconds: 10
-                  failureThreshold: 12
+                  failureThreshold: 30
               readiness:
                 enabled: true
                 custom: true
@@ -185,7 +195,7 @@ spec:
                     - sh
                     - -c
                     - pg_isready -U $POSTGRES_USER
-                  failureThreshold: 30
+                  failureThreshold: 60
                   periodSeconds: 5
               readiness:
                 enabled: true

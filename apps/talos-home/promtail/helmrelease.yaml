@@ -25,9 +25,8 @@ spec:
 
     config:
       clients:
-        - url: http://loki-gateway.monitoring.svc.cluster.local/loki/api/v1/push
+        - url: http://loki-gateway.monitoring.svc.cluster.local/loki/api/v1/push   # corrected
 
-    # ========== NEW: Resources ==========
     resources:
       requests:
         cpu: 50m
@@ -35,9 +34,7 @@ spec:
       limits:
         cpu: 200m
         memory: 256Mi
-    # ====================================
 
-    # Talos uses containerd, not Docker — /var/lib/docker/containers does not exist.
     defaultVolumes:
       - name: pods
         hostPath:

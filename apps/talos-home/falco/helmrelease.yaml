@@ -29,13 +29,11 @@ spec:
       kind: modern_ebpf
 
     falco:
-      # Use snake_case — the chart dumps camelCase as raw passthrough keys that Falco ignores
       json_output: true
       log_level: info
       existingRulesConfigMaps:
         - falco-rules
         - falco-custom-rules
-      # REMOVED: grpc and grpc_output sections (no longer supported)
       http_output:
         enabled: true
         url: "http://falcosidekick.falco.svc.cluster.local:2801"
@@ -50,7 +48,7 @@ spec:
 
     resources:
       requests:
-        cpu: 30m
+        cpu: 50m
         memory: 256Mi
       limits:
         cpu: 500m

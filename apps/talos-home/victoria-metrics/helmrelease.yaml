@@ -186,10 +186,10 @@ spec:
       resources:
         requests:
           cpu: 50m
-          memory: 32Mi
+          memory: 64Mi   # increased from 32Mi
         limits:
           cpu: 250m
-          memory: 256Mi
+          memory: 512Mi  # increased from 256Mi
     vmcluster:
       enabled: false
     vmauth:

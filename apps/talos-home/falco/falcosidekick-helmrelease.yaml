@@ -46,12 +46,28 @@ spec:
 
     config:
       loki:
-        hostport: "http://loki-gateway.monitoring.svc.cluster.local"
+        hostport: "http://loki-gateway.monitoring.svc.cluster.local"  # corrected from previous
         minimumpriority: "warning"
+      # Remove any other outputs that may be misconfigured
 
     webui:
       enabled: true
       replicaCount: 1
+      resources:
+        requests:
+          cpu: 10m
+          memory: 32Mi
+        limits:
+          cpu: 100m
+          memory: 128Mi
 
     serviceMonitor:
       enabled: true
+
+    resources:
+      requests:
+        cpu: 20m
+        memory: 64Mi
+      limits:
+        cpu: 200m
+        memory: 256Mi
