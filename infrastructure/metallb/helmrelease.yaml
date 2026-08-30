@@ -5,13 +5,6 @@ metadata:
   namespace: metallb-system
 spec:
   interval: 10m
-  timeout: 10m
-  install:
-    remediation:
-      retries: 3
-  upgrade:
-    remediation:
-      retries: 3
   chart:
     spec:
       chart: metallb
@@ -23,9 +16,9 @@ spec:
   values:
     controller:
       enabled: true
+      replicas: 0        # <-- scale to 0
     speaker:
       enabled: true
-      hostNetwork: true
-    # Prevent webhook from blocking Flux when controller is starting
+      replicas: 0        # <-- scale to 0
     crds:
       validationFailurePolicy: Ignore
