@@ -73,15 +73,13 @@ spec:
         cpu: 500m
         memory: 512Mi
 
-    # --- Critical additions for Talos + Kyverno ---
+    # --- Simple: just set privileged for all containers (init + main) ---
     securityContext:
       privileged: true
-      allowPrivilegeEscalation: false
 
     initContainers:
       securityContext:
         privileged: true
-        allowPrivilegeEscalation: false
 
     rollOutCiliumPods: true
     enableIPv4Masquerade: true

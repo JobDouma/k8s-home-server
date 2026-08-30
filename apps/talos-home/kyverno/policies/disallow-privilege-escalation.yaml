@@ -12,6 +12,10 @@ metadata:
 spec:
   validationFailureAction: Enforce
   background: true
+  exclude:
+    any:
+      - resources:
+          namespaces: ["kube-system"]   # <-- ADD THIS
   rules:
     - name: deny-privilege-escalation
       match:
