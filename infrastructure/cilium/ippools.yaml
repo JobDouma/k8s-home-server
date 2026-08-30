@@ -1,34 +1,32 @@
-# CiliumLoadBalancerIPPool replaces MetalLB IPAddressPools
 ---
-apiVersion: cilium.io/v2alpha1
+apiVersion: cilium.io/v2
 kind: CiliumLoadBalancerIPPool
 metadata:
   name: dns-pool
-  namespace: kube-system   # Cilium pools are cluster-scoped, but we can put in any namespace
 spec:
   cidrs:
-    - cidr: 192.168.2.53/32
+    - 192.168.2.53/32
 ---
-apiVersion: cilium.io/v2alpha1
+apiVersion: cilium.io/v2
 kind: CiliumLoadBalancerIPPool
 metadata:
   name: traefik-pool
 spec:
   cidrs:
-    - cidr: 192.168.2.100/32
+    - 192.168.2.100/32
 ---
-apiVersion: cilium.io/v2alpha1
+apiVersion: cilium.io/v2
 kind: CiliumLoadBalancerIPPool
 metadata:
   name: core-pool
 spec:
   cidrs:
-    - cidr: 192.168.2.101-192.168.2.110
+    - 192.168.2.101-192.168.2.110
 ---
-apiVersion: cilium.io/v2alpha1
+apiVersion: cilium.io/v2
 kind: CiliumLoadBalancerIPPool
 metadata:
   name: jellyfin-pool
 spec:
   cidrs:
-    - cidr: 192.168.2.50/32
+    - 192.168.2.50/32
