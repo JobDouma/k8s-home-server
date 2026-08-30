@@ -9,7 +9,7 @@ spec:
     - Ingress
     - Egress
 ---
-# Allow ingress from Traefik to Grafana (port 80) and Prometheus (port 8428)
+# Allow ingress from Traefik to Grafana
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
@@ -18,7 +18,7 @@ metadata:
 spec:
   podSelector:
     matchLabels:
-      app.kubernetes.io/name: vm-stack-grafana   # adjust if different
+      app.kubernetes.io/name: vm-stack-grafana
   policyTypes:
     - Ingress
   ingress:
@@ -29,6 +29,7 @@ spec:
       ports:
         - port: 80
 ---
+# Allow ingress from Traefik to Prometheus (VMSingle)
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
@@ -37,7 +38,7 @@ metadata:
 spec:
   podSelector:
     matchLabels:
-      app.kubernetes.io/name: vmsingle-vm-stack   # adjust to your VMSingle pod label
+      app.kubernetes.io/name: vmsingle-vm-stack
   policyTypes:
     - Ingress
   ingress:
@@ -48,7 +49,7 @@ spec:
       ports:
         - port: 8428
 ---
-# Allow VMAgent to egress to VMSingle for remote write
+# Allow VMAgent to egress to VMSingle
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
@@ -57,7 +58,7 @@ metadata:
 spec:
   podSelector:
     matchLabels:
-      app.kubernetes.io/name: vmagent   # adjust label
+      app.kubernetes.io/name: vmagent
   policyTypes:
     - Egress
   egress:
@@ -68,8 +69,7 @@ spec:
       ports:
         - port: 8428
 ---
-# Allow VMAgent to scrape metrics from other namespaces (optional)
-# Usually VMAgent scrapes via ServiceMonitors, so it needs to reach pods across namespaces.
+# Allow VMAgent to scrape metrics (and now allow all pods to reach API server)
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
@@ -89,7 +89,32 @@ spec:
         - port: 443
         - port: 9090
         - port: 8080
-        # add any other metrics ports your apps expose
+    - to:
+        - namespaceSelector: {}
+      ports:
+        - port: 53
+          protocol: UDP
+        - port: 53
+          protocol: TCP
+---
+# NEW: Allow Promtail and kube-state-metrics to talk to the API server
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-egress-to-apiserver
+  namespace: monitoring
+spec:
+  podSelector: {}   # applies to all pods in monitoring namespace
+  policyTypes:
+    - Egress
+  egress:
+    # Allow access to the Kubernetes API server (service IP 10.96.0.1)
+    - to:
+        - ipBlock:
+            cidr: 10.96.0.0/12   # covers the service CIDR; adjust if yours differs
+      ports:
+        - port: 443
+    # Also allow DNS (already covered but keep for safety)
     - to:
         - namespaceSelector: {}
       ports:

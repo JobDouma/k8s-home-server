@@ -42,14 +42,25 @@ spec:
       tolerations:
         - operator: Exists
       podAnnotations: {}
+      # increase resources for the falco container and the sidecar
+      resources:
+        requests:
+          cpu: 100m
+          memory: 256Mi
+        limits:
+          cpu: 500m
+          memory: 512Mi
 
     falcosidekick:
       enabled: false
 
-    resources:
-      requests:
-        cpu: 50m
-        memory: 256Mi
-      limits:
-        cpu: 500m
-        memory: 512Mi
+    # The sidecar container (falcoctl-artifact-follow) also needs resources
+    artifact:
+      follow:
+        resources:
+          requests:
+            cpu: 10m
+            memory: 64Mi
+          limits:
+            cpu: 100m
+            memory: 128Mi

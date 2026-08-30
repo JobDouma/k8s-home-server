@@ -40,11 +40,8 @@ spec:
             - sh
             - -c
             - 'mkdir -p /home/joplin/.pm2 /home/joplin/packages/server/logs /home/joplin/packages/server/temp
-
               chown -R 1000:1000 /home/joplin/.pm2 /home/joplin/packages/server/logs
-              /home/joplin/packages/server/temp
-
-              '
+              /home/joplin/packages/server/temp'
             securityContext:
               runAsUser: 0
         containers:
@@ -73,6 +70,8 @@ spec:
               SIGNUP_ENABLED: '0'
               PM2_HOME: /home/joplin/.pm2
               TZ: Europe/Amsterdam
+              # NEW: disable NTP check to avoid timeout
+              DISABLE_NTP_CHECK: 'true'
             envFrom:
             - secretRef:
                 name: joplin-secret
@@ -91,7 +90,7 @@ spec:
                     httpHeaders:
                     - name: Host
                       value: joplin.lan
-                  failureThreshold: 60
+                  failureThreshold: 60   # increased from 30
                   periodSeconds: 10
                   initialDelaySeconds: 10
               liveness:
