@@ -19,7 +19,7 @@ data:
 
         # .lan always goes to Blocky — no fallback needed,
         # these are your private records only Blocky knows.
-        forward lan 192.168.2.53 {
+        forward lan blocky.dns.svc.cluster.local {
             policy sequential
             max_fails 3
             expire 30s
@@ -29,7 +29,7 @@ data:
         # ALL other DNS goes to Blocky first.
         # Public resolvers are emergency fallback only — only
         # reached when Blocky has exceeded max_fails.
-        forward . 192.168.2.53 1.1.1.1 8.8.8.8 {
+        forward . blocky.dns.svc.cluster.local 1.1.1.1 8.8.8.8 {
             policy sequential
             max_fails 3
             expire 30s
