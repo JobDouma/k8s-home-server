@@ -101,25 +101,25 @@ data:
     customDNS:
       filterUnmappedTypes: true
       mapping:
-        dashy.lan: 192.168.2.100
-        jellyfin.lan: 192.168.2.100
-        jellyseerr.lan: 192.168.2.100
-        radarr.lan: 192.168.2.100
-        sonarr.lan: 192.168.2.100
-        qbittorrent.lan: 192.168.2.100
-        prowlarr.lan: 192.168.2.100
-        prometheus.lan: 192.168.2.100
-        grafana.lan: 192.168.2.100
-        joplin.lan: 192.168.2.100
-        traefik.lan: 192.168.2.100
-        blocky.lan: 192.168.2.100
-        freshrss.lan: 192.168.2.100
-        auth.lan: 192.168.2.100
-        falco.lan: 192.168.2.100
-        gotify.lan: 192.168.2.100
-        immich.lan: 192.168.2.100
-        uptime-kuma.lan: 192.168.2.100
-        argus.lan: 192.168.2.100
+        dashy.lan: 192.168.2.101
+        jellyfin.lan: 192.168.2.101
+        jellyseerr.lan: 192.168.2.101
+        radarr.lan: 192.168.2.101
+        sonarr.lan: 192.168.2.101
+        qbittorrent.lan: 192.168.2.101
+        prowlarr.lan: 192.168.2.101
+        prometheus.lan: 192.168.2.101
+        grafana.lan: 192.168.2.101
+        joplin.lan: 192.168.2.101
+        traefik.lan: 192.168.2.101
+        blocky.lan: 192.168.2.101
+        freshrss.lan: 192.168.2.101
+        auth.lan: 192.168.2.101
+        falco.lan: 192.168.2.101
+        gotify.lan: 192.168.2.101
+        immich.lan: 192.168.2.101
+        uptime-kuma.lan: 192.168.2.101
+        argus.lan: 192.168.2.101
         truenas.lan: 192.168.2.5
         router.lan: 192.168.2.254
         omni.lan: 192.168.2.12
