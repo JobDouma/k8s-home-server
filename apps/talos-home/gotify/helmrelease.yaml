@@ -5,7 +5,7 @@ metadata:
   namespace: gotify
 spec:
   interval: 15m
-  timeout: 20m
+  timeout: 20m                # was 20m (already, but kept)
   maxHistory: 2
   install:
     remediation:
@@ -28,9 +28,9 @@ spec:
           securityContext:
             fsGroup: 1000
             fsGroupChangePolicy: OnRootMismatch
-            runAsUser: 1000               # <-- added
-            runAsGroup: 1000              # <-- added
-            runAsNonRoot: true            # <-- added
+            runAsUser: 1000
+            runAsGroup: 1000
+            runAsNonRoot: true
             seccompProfile:
               type: RuntimeDefault
         containers:
@@ -54,7 +54,7 @@ spec:
             - name: http
               containerPort: 80
               protocol: TCP
-            securityContext:                # <-- new block
+            securityContext:
               runAsUser: 1000
               runAsGroup: 1000
               runAsNonRoot: true
@@ -79,9 +79,9 @@ spec:
                   httpGet:
                     path: /health
                     port: 80
-                  initialDelaySeconds: 45
+                  initialDelaySeconds: 60     # was 45
                   periodSeconds: 10
-                  failureThreshold: 3
+                  failureThreshold: 5         # was 3
             resources:
               requests:
                 cpu: 50m

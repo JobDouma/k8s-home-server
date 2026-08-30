@@ -5,7 +5,7 @@ metadata:
   namespace: freshrss
 spec:
   interval: 15m
-  timeout: 10m
+  timeout: 20m                # was 10m
   install:
     remediation:
       retries: 3
@@ -55,14 +55,12 @@ spec:
               allowPrivilegeEscalation: false
               capabilities:
                 drop: ["ALL"]
-            # ========== FIX: Added CPU request ==========
             resources:
               requests:
-                cpu: 50m          # <-- NEW
+                cpu: 50m
                 memory: 128Mi
               limits:
                 memory: 256Mi
-            # ===========================================
             probes:
               liveness:
                 enabled: true
@@ -71,7 +69,7 @@ spec:
                   httpGet:
                     path: /i/
                     port: 80
-                  initialDelaySeconds: 30
+                  initialDelaySeconds: 60    # was 30
                   periodSeconds: 30
                   failureThreshold: 5
               readiness:
@@ -81,9 +79,9 @@ spec:
                   httpGet:
                     path: /i/
                     port: 80
-                  initialDelaySeconds: 15
+                  initialDelaySeconds: 30    # was 15
                   periodSeconds: 10
-                  failureThreshold: 3
+                  failureThreshold: 10       # was 3
     service:
       app:
         controller: freshrss

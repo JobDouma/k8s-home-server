@@ -18,11 +18,11 @@ spec:
         name: victoriametrics
         namespace: flux-system
   install:
-    crds: CreateReplace          # <-- ensure CRDs are created/replaced
+    crds: CreateReplace
     remediation:
       retries: 3
   upgrade:
-    crds: CreateReplace          # <-- same for upgrades
+    crds: CreateReplace
     remediation:
       retries: 3
   values:
@@ -31,7 +31,7 @@ spec:
       enabled: true
       fullnameOverride: vm-operator
       crds:
-        plain: true              # <-- install CRDs directly
+        plain: true
       operator:
         disable_prometheus_converter: false
       admissionWebhooks:
@@ -84,7 +84,7 @@ spec:
     alertmanager:
       enabled: true
       spec:
-        configSecret: alertmanager-gotify-config   # <-- ensure this secret exists in namespace
+        configSecret: alertmanager-gotify-config
         templates: []
         resources:
           requests:
@@ -147,6 +147,13 @@ spec:
             jsonData:
               maxLines: 1000
       sidecar:
+        # ========== ADDED: memory limits for sidecar container (Kyverno fix) ==========
+        resources:
+          limits:
+            memory: 64Mi
+          requests:
+            memory: 32Mi
+        # ==============================================================================
         dashboards:
           enabled: true
           searchNamespace: ALL
