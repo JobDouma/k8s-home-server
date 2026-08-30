@@ -35,6 +35,7 @@ spec:
       ports:
         - port: 2283
   egress:
+    # Allow egress to PostgreSQL and Redis via pod selectors (using broad labels)
     - to:
         - podSelector:
             matchLabels:
@@ -53,6 +54,7 @@ spec:
               app.kubernetes.io/name: immich-machine-learning
       ports:
         - port: 3003
+    # Allow DNS
     - to:
         - namespaceSelector: {}
       ports:
@@ -60,39 +62,16 @@ spec:
           protocol: UDP
         - port: 53
           protocol: TCP
----
-apiVersion: networking.k8s.io/v1
-kind: NetworkPolicy
-metadata:
-  name: immich-machine-learning
-  namespace: immich
-spec:
-  podSelector:
-    matchLabels:
-      app.kubernetes.io/name: immich-machine-learning
-  policyTypes:
-    - Ingress
-    - Egress
-  ingress:
-    - from:
-        - podSelector:
-            matchLabels:
-              app.kubernetes.io/name: immich-server
-      ports:
-        - port: 3003
-  egress:
-    - to:
-        - namespaceSelector: {}
-      ports:
-        - port: 53
-          protocol: UDP
-        - port: 53
-          protocol: TCP
+    # Allow egress to the API server (so Immich can authenticate if needed)
     - to:
         - ipBlock:
-            cidr: 0.0.0.0/0
+            cidr: 10.96.0.1/32
       ports:
-        - port: 443    # model downloads on first run
+        - port: 443
+    # Allow egress to the pod network (for any other internal communication)
+    - to:
+        - ipBlock:
+            cidr: 10.244.0.0/16
 ---
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy

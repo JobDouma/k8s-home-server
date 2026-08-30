@@ -97,24 +97,25 @@ spec:
         - port: 53
           protocol: TCP
 ---
-# NEW: Allow Promtail and kube-state-metrics to talk to the API server
+# Allow egress to API server for all pods in monitoring
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
   name: allow-egress-to-apiserver
   namespace: monitoring
 spec:
-  podSelector: {}   # applies to all pods in monitoring namespace
+  podSelector: {}   # applies to all pods
   policyTypes:
     - Egress
   egress:
-    # Allow access to the Kubernetes API server (cluster IP)
     - to:
         - ipBlock:
-            cidr: 10.96.0.1/32   # adjust if your API server IP differs
+            cidr: 10.96.0.1/32
       ports:
         - port: 443
-    # Also allow DNS (already covered but keep for safety)
+    - to:
+        - ipBlock:
+            cidr: 10.244.0.0/16
     - to:
         - namespaceSelector: {}
       ports:

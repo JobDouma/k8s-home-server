@@ -73,7 +73,8 @@ spec:
               SIGNUP_ENABLED: '0'
               PM2_HOME: /home/joplin/.pm2
               TZ: Europe/Amsterdam
-              DISABLE_NTP_CHECK: 'true'
+              DISABLE_NTP_CHECK: 'false'   # set to false, we'll rely on NTP_SERVER
+              NTP_SERVER: pool.ntp.org:123
             envFrom:
             - secretRef:
                 name: joplin-secret

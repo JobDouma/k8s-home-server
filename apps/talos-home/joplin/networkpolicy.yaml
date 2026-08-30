@@ -29,6 +29,7 @@ spec:
       ports:
         - port: 22300
   egress:
+    # DNS
     - to:
         - namespaceSelector: {}
       ports:
@@ -36,22 +37,30 @@ spec:
           protocol: UDP
         - port: 53
           protocol: TCP
+    # PostgreSQL
     - to:
         - podSelector:
             matchLabels:
               app.kubernetes.io/name: joplin-postgres
       ports:
         - port: 5432
+    # NTP (UDP 123)
     - to:
         - ipBlock:
             cidr: 0.0.0.0/0
-            except:
-              - 10.0.0.0/8
-              - 172.16.0.0/12
-              - 192.168.0.0/16
+      ports:
+        - port: 123
+          protocol: UDP
+    # API server (if needed)
+    - to:
+        - ipBlock:
+            cidr: 10.96.0.1/32
       ports:
         - port: 443
-        - port: 80
+    # Allow egress to pod network for internal communication
+    - to:
+        - ipBlock:
+            cidr: 10.244.0.0/16
 ---
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
