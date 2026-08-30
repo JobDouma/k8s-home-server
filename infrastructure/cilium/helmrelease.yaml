@@ -20,9 +20,9 @@ spec:
     ipam:
       mode: kubernetes
     l2announcements:
-      enabled: true
+      enabled: false
     externalIPs:
-      enabled: true
+      enabled: false
     hubble:
       enabled: false          # turn off Hubble to avoid relay dependency
       relay:
