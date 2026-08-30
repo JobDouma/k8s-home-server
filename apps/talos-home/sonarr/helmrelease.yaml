@@ -44,8 +44,6 @@ spec:
               containerPort: 8989
               protocol: TCP
             securityContext:
-              runAsUser: 1000
-              runAsGroup: 1000
               allowPrivilegeEscalation: false
             resources:
               requests:
