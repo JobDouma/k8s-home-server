@@ -44,6 +44,9 @@ spec:
               chown -R 1000:1000 /home/joplin/.pm2 /home/joplin/packages/server/logs /home/joplin/packages/server/temp
             securityContext:
               runAsUser: 0
+              allowPrivilegeEscalation: false
+              capabilities:
+                drop: ["ALL"]
         containers:
           app:
             image:
@@ -78,6 +81,9 @@ spec:
               runAsUser: 1000
               runAsGroup: 1000
               runAsNonRoot: true
+              allowPrivilegeEscalation: false
+              capabilities:
+                drop: ["ALL"]
             probes:
               startup:
                 enabled: true
