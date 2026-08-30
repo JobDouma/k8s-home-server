@@ -69,14 +69,12 @@ spec:
               capabilities:
                 add:
                 - NET_BIND_SERVICE
-            # ========== NEW ==========
             resources:
               requests:
                 cpu: 10m
                 memory: 128Mi
               limits:
                 memory: 256Mi
-            # =========================
     service:
       main:
         controller: main
@@ -84,8 +82,7 @@ spec:
         type: LoadBalancer
         loadBalancerIP: 192.168.2.53
         externalTrafficPolicy: Cluster
-        annotations:
-          metallb.universe.tf/address-pool: dns-pool
+        # ANNOTATION REMOVED: metallb.universe.tf/address-pool
         ports:
           dns-udp:
             port: 53

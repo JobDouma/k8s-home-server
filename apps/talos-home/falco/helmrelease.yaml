@@ -27,22 +27,30 @@ spec:
   values:
     driver:
       kind: modern_ebpf
-
     falco:
       json_output: true
       log_level: info
-      existingRulesConfigMaps:
-        - falco-rules
-        - falco-custom-rules
+      # removed existingRulesConfigMaps, using rules_files + volume mount
+      rules_files:
+        - /etc/falco/falco_rules.yaml
+        - /etc/falco/custom-rules.yaml
       http_output:
         enabled: true
         url: "http://falcosidekick.falco.svc.cluster.local:2801"
-
     daemonset:
       tolerations:
         - operator: Exists
       podAnnotations: {}
-      # increase resources for the falco container and the sidecar
+      # added extra volumes to mount custom rules ConfigMap
+      extraVolumes:
+        - name: custom-rules
+          configMap:
+            name: falco-custom-rules
+      extraVolumeMounts:
+        - name: custom-rules
+          mountPath: /etc/falco/custom-rules.yaml
+          subPath: custom-rules.yaml
+          readOnly: true
       resources:
         requests:
           cpu: 100m
@@ -50,11 +58,8 @@ spec:
         limits:
           cpu: 500m
           memory: 512Mi
-
     falcosidekick:
       enabled: false
-
-    # The sidecar container (falcoctl-artifact-follow) also needs resources
     artifact:
       follow:
         resources:

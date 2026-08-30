@@ -69,7 +69,7 @@ spec:
       ports:
         - port: 8428
 ---
-# Allow VMAgent to scrape metrics (and now allow all pods to reach API server)
+# Allow VMAgent to scrape metrics
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
@@ -108,10 +108,10 @@ spec:
   policyTypes:
     - Egress
   egress:
-    # Allow access to the Kubernetes API server (service IP 10.96.0.1)
+    # Allow access to the Kubernetes API server (cluster IP)
     - to:
         - ipBlock:
-            cidr: 10.96.0.0/12   # covers the service CIDR; adjust if yours differs
+            cidr: 10.96.0.1/32   # adjust if your API server IP differs
       ports:
         - port: 443
     # Also allow DNS (already covered but keep for safety)
