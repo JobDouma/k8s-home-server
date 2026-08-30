@@ -8,3 +8,4 @@ spec:
   serviceSelector:
     matchLabels: {}
   externalIPs: true
+  loadBalancerIPs: true   # <-- was missing; announces LB-IPAM assigned IPs via ARP
