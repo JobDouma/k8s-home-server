@@ -7,7 +7,7 @@ resources:
   # ──────────────────────────────────────
   - cilium/helmrepository.yaml
   - cilium/helmrelease.yaml 
-  - cilium/ippools.yaml
+  # - cilium/ippools.yaml
 
   # ──────────────────────────────────────
   # Storage
