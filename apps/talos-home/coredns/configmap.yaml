@@ -17,19 +17,16 @@ data:
             fallthrough in-addr.arpa ip6.arpa
         }
 
-        # .lan always goes to Blocky — no fallback needed,
-        # these are your private records only Blocky knows.
-        forward lan blocky.dns.svc.cluster.local {
+        # .lan goes to Blocky using its ClusterIP
+        forward lan 10.102.205.119 {
             policy sequential
             max_fails 3
             expire 30s
             health_check 5s
         }
 
-        # ALL other DNS goes to Blocky first.
-        # Public resolvers are emergency fallback only — only
-        # reached when Blocky has exceeded max_fails.
-        forward . blocky.dns.svc.cluster.local 1.1.1.1 8.8.8.8 {
+        # All other DNS goes to Blocky first, fallback to public resolvers
+        forward . 10.102.205.119 1.1.1.1 8.8.8.8 {
             policy sequential
             max_fails 3
             expire 30s
