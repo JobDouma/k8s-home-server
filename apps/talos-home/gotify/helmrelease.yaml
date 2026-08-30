@@ -5,7 +5,7 @@ metadata:
   namespace: gotify
 spec:
   interval: 15m
-  timeout: 20m                # was 20m (already, but kept)
+  timeout: 20m
   maxHistory: 2
   install:
     remediation:
@@ -28,11 +28,23 @@ spec:
           securityContext:
             fsGroup: 1000
             fsGroupChangePolicy: OnRootMismatch
-            runAsUser: 1000
-            runAsGroup: 1000
-            runAsNonRoot: true
             seccompProfile:
               type: RuntimeDefault
+        initContainers:
+          fix-perms:
+            image:
+              repository: busybox
+              tag: 1.36@sha256:73aaf090f3d85aa34ee199857f03fa3a95c8ede2ffd4cc2cdb5b94e566b11662
+            command:
+            - sh
+            - -c
+            - chown -R 1000:1000 /app/data
+            securityContext:
+              runAsUser: 0
+              runAsNonRoot: false
+            volumeMounts:
+            - name: data
+              mountPath: /app/data
         containers:
           app:
             image:
@@ -55,9 +67,6 @@ spec:
               containerPort: 80
               protocol: TCP
             securityContext:
-              runAsUser: 1000
-              runAsGroup: 1000
-              runAsNonRoot: true
               allowPrivilegeEscalation: false
               capabilities:
                 drop: ["ALL"]
@@ -79,9 +88,9 @@ spec:
                   httpGet:
                     path: /health
                     port: 80
-                  initialDelaySeconds: 60     # was 45
+                  initialDelaySeconds: 60
                   periodSeconds: 10
-                  failureThreshold: 5         # was 3
+                  failureThreshold: 5
             resources:
               requests:
                 cpu: 50m

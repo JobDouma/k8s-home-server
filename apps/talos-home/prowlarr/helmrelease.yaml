@@ -5,7 +5,7 @@ metadata:
   namespace: media
 spec:
   interval: 15m
-  timeout: 20m                # was 10m
+  timeout: 20m
   install:
     remediation:
       retries: 3
@@ -29,9 +29,6 @@ spec:
             fsGroupChangePolicy: OnRootMismatch
             seccompProfile:
               type: RuntimeDefault
-            runAsUser: 1000
-            runAsGroup: 1000
-            runAsNonRoot: true
         containers:
           app:
             image:
@@ -47,9 +44,6 @@ spec:
               containerPort: 9696
               protocol: TCP
             securityContext:
-              runAsUser: 1000
-              runAsGroup: 1000
-              runAsNonRoot: true
               allowPrivilegeEscalation: false
               capabilities:
                 drop: ["ALL"]
@@ -67,9 +61,9 @@ spec:
                   httpGet:
                     path: /
                     port: 9696
-                  initialDelaySeconds: 30     # was 15
+                  initialDelaySeconds: 30
                   periodSeconds: 10
-                  failureThreshold: 10        # was 3
+                  failureThreshold: 10
               liveness:
                 enabled: true
                 custom: true
@@ -77,7 +71,7 @@ spec:
                   httpGet:
                     path: /
                     port: 9696
-                  initialDelaySeconds: 60     # was 30
+                  initialDelaySeconds: 60
                   periodSeconds: 30
                   failureThreshold: 5
     service:

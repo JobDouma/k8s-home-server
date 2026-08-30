@@ -27,6 +27,14 @@ spec:
       retries: 3
   values:
     fullnameOverride: vm-stack
+    # ========== NEW: resources for the sync job (post-upgrade hook) ==========
+    syncJob:
+      resources:
+        limits:
+          memory: 128Mi
+        requests:
+          memory: 64Mi
+    # =========================================================================
     victoria-metrics-operator:
       enabled: true
       fullnameOverride: vm-operator
@@ -147,13 +155,11 @@ spec:
             jsonData:
               maxLines: 1000
       sidecar:
-        # ========== ADDED: memory limits for sidecar container (Kyverno fix) ==========
         resources:
           limits:
             memory: 64Mi
           requests:
             memory: 32Mi
-        # ==============================================================================
         dashboards:
           enabled: true
           searchNamespace: ALL
