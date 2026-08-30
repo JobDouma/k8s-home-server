@@ -26,7 +26,6 @@ spec:
  
   statefulSet:
     pod:
-      hostNetwork: true
       tailscaleContainer:
         resources:
           requests:

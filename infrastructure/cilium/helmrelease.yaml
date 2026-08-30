@@ -15,6 +15,7 @@ spec:
         namespace: kube-system
   values:
     devices: "ens18"   # your LAN interface
+    masqueradeInterfaces: "ens18"   # explicitly tell Cilium which interface to masquerade on
     kubeProxyReplacement: true
     k8sServiceHost: 192.168.2.22
     k8sServicePort: 6443
