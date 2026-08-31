@@ -1,0 +1,22 @@
+contexts:
+    default:
+        url: ENC[AES256_GCM,data:jTrs9art8jrLGG4Ctexq/+8=,iv:5K4zQK56sgUUmLSm4CY3AZJ+nAC1GkWHo+YJxQN9W04=,tag:8uhpf5pdSd/ZJ9tbWTRrGQ==,type:str]
+        auth:
+            siderov1:
+                identity: ENC[AES256_GCM,data:qtuMNJ4cO2kmF8ACH2ZF+vlHBKM=,iv:BAqZQjm6ZhkDK/X5dD/X3AWFyr6s3q+1yDdU4ZbpV2E=,tag:TxNXQhvlqHLsYTArdfplng==,type:str]
+context: ENC[AES256_GCM,data:bhwpspAhRA==,iv:BSMKAJAKFCrxmsEMGoia7b96i3kxzadAPgCKXee9XeM=,tag:3k58dkw3vUz6yDQz/5RORA==,type:str]
+sops:
+    age:
+        - recipient: age18zx3u4cnpe3y55rruzp5v4uregm0kxe2ge6wzle54nu9vlxlndmqweckld
+          enc: |
+            -----BEGIN AGE ENCRYPTED FILE-----
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBJWmNLYXFUc0g5NzZwblBF
+            WnZIRkJnTjh2ajhlZjVvYnluaGxBeS9Fb1hvCkliVzVxSXVmNjFhaWFYN3VBdVVX
+            c2l3cStZdG1ETHFlbXdhUFhpMFdick0KLS0tIHdiZVJNa0VhWE14SnJ1ZDkwSmlD
+            YmZrWTVtS3p5ZCtJaXBUazE1NVBONkEKJZY7Xgl8FqPhSo8VJgTDFbciXtNSc3Xb
+            QqBvphO9cy7rSA3vJpv0//1KP0It7oLKVebeNkZLAUNzQOcTxFqdKw==
+            -----END AGE ENCRYPTED FILE-----
+    lastmodified: "2026-08-31T17:32:05Z"
+    mac: ENC[AES256_GCM,data:AcD/FSIJu/TCG71uzNPRICTcupcAPhKyOkEXAMeWPiKI9vRV0evci3QtX9VmvWJduhxHybYdDoi+RH7kr7EfhLrnRTyTEQQLwHpRZ6xWYqj7reJGxFFUSCyeSS9lVckkac4IIaGTXHx8kcrN52/OAqBINP7xOH+7xPAeGBEuuo0=,iv:0SMaZ/rb2YfcWYZnSO3AdPIgXA16KOugEdHGRFnFQso=,tag:P2x5476TKFf6Ysyh2gif+A==,type:str]
+    unencrypted_suffix: _unencrypted
+    version: 3.11.0
