@@ -26,11 +26,12 @@ spec:
     externalIPs:
       enabled: true
     hubble:
-      enabled: false
+      enabled: true
       relay:
-        enabled: false
+        enabled: true
+        replicas: 1
       ui:
-        enabled: false
+        enabled: true
     image:
       repository: cilium/cilium
       tag: v1.20.1
@@ -47,7 +48,7 @@ spec:
           memory: 128Mi
         limits:
           cpu: 200m
-          memory: 256Mi
+          memory: 1Gi
     resources:
       requests:
         cpu: 100m

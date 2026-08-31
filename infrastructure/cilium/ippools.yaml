@@ -23,17 +23,6 @@ spec:
 apiVersion: cilium.io/v2alpha1
 kind: CiliumLoadBalancerIPPool
 metadata:
-  name: core-pool
-spec:
-  blocks:
-    - cidr: 192.168.2.101/32
-  serviceSelector:
-    matchLabels:
-      io.cilium/lb-pool: core
----
-apiVersion: cilium.io/v2alpha1
-kind: CiliumLoadBalancerIPPool
-metadata:
   name: jellyfin-pool
 spec:
   blocks:
