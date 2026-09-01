@@ -77,7 +77,7 @@ resources:
   - networkpolicies/media-namespace.yaml
   - networkpolicies/dns-namespace.yaml
   - networkpolicies/networking-namespace.yaml
-  - networkpolicies/monitoring-namespace.yaml
+  # - networkpolicies/monitoring-namespace.yaml
 
   # ──────────────────────────────────────
   # Sonarr
@@ -175,7 +175,7 @@ resources:
   - falco/servicemonitor-sidekick.yaml
   - falco/certificate.yaml
   - falco/configmap.yaml
-  - falco/networkpolicy.yaml
+  # - falco/networkpolicy.yaml
 
   # ──────────────────────────────────────
   # gotify
@@ -212,7 +212,7 @@ resources:
   - immich/certificate.yaml
   - immich/helmrelease.yaml
   - immich/ingressroute.yaml
-  - immich/networkpolicy.yaml
+  # - immich/networkpolicy.yaml
   - immich/servicemonitor.yaml
   - immich/serverstransport.yaml
 
