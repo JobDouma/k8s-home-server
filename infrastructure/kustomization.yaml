@@ -28,15 +28,6 @@ resources:
   - traefik/servicemonitor.yaml
   - traefik/certificate.yaml
   - traefik/clusterrole.yaml
-
-  # ──────────────────────────────────────
-  # MetalLB
-  # ──────────────────────────────────────
-  # - metallb/namespace.yaml
-  # - metallb/helmrelease.yaml
-  # - metallb/helmrepository.yaml
-  # - metallb/config/ipaddress-pools.yaml
-  # - metallb/config/l2-advertisements.yaml
   
   # ──────────────────────────────────────
   # Authentik
