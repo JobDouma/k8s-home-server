@@ -9,7 +9,6 @@ spec:
     - Ingress
     - Egress
 ---
-# Allow ingress from Traefik to Grafana
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
@@ -29,7 +28,6 @@ spec:
       ports:
         - port: 80
 ---
-# Allow ingress from Traefik to Prometheus (VMSingle)
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
@@ -49,7 +47,6 @@ spec:
       ports:
         - port: 8428
 ---
-# Allow VMAgent to egress to VMSingle
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
@@ -69,7 +66,6 @@ spec:
       ports:
         - port: 8428
 ---
-# Allow VMAgent to scrape metrics
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
@@ -97,25 +93,35 @@ spec:
         - port: 53
           protocol: TCP
 ---
-# Allow egress to API server for all pods in monitoring
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
   name: allow-egress-to-apiserver
   namespace: monitoring
 spec:
-  podSelector: {}   # applies to all pods
+  podSelector: {}
   policyTypes:
     - Egress
   egress:
+    # Original rule for the API server IP (explicit)
     - to:
         - ipBlock:
             cidr: 10.96.0.1/32
       ports:
         - port: 443
+          protocol: TCP
+    # NEW: broader service CIDR rule to ensure connectivity
+    - to:
+        - ipBlock:
+            cidr: 10.96.0.0/16
+      ports:
+        - port: 443
+          protocol: TCP
+    # Pod CIDR for internal communication
     - to:
         - ipBlock:
             cidr: 10.244.0.0/16
+    # DNS
     - to:
         - namespaceSelector: {}
       ports:

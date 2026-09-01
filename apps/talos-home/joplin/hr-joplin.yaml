@@ -41,7 +41,7 @@ spec:
             - -c
             - |
               mkdir -p /home/joplin/.pm2 /home/joplin/packages/server/logs /home/joplin/packages/server/temp
-              chown -R 1000:1000 /home/joplin/.pm2 /home/joplin/packages/server/logs /home/joplin/packages/server/temp
+              # Ownership is handled by fsGroup; no chown needed
             securityContext:
               runAsUser: 0
               allowPrivilegeEscalation: false
@@ -73,7 +73,7 @@ spec:
               SIGNUP_ENABLED: '0'
               PM2_HOME: /home/joplin/.pm2
               TZ: Europe/Amsterdam
-              DISABLE_NTP_CHECK: 'false'   # set to false, we'll rely on NTP_SERVER
+              DISABLE_NTP_CHECK: 'false'
               NTP_SERVER: pool.ntp.org:123
             envFrom:
             - secretRef:
