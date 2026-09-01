@@ -19,9 +19,9 @@ data:
 
         # Forward all non-cluster queries to Blocky's pinned Cilium LB IP,
         # then to public resolvers as a fallback if Blocky is unreachable.
-        # 192.168.2.53 is reserved for Blocky in infrastructure/cilium/ippools.yaml (dns-pool)
+        # 192.168.2.54 is reserved for Blocky in infrastructure/cilium/ippools.yaml (dns-pool)
         # — change it there first if it ever needs to move, then here.
-        forward . 192.168.2.53 1.1.1.1 8.8.8.8 {
+        forward . 192.168.2.54 1.1.1.1 8.8.8.8 {
             policy sequential
             max_fails 3
             expire 30s
