@@ -1,23 +1,3 @@
-# Step 5 — HA Connector (subnet router with 2 replicas)
-#
-# Your current Connector runs as a single pod. If it restarts (Talos node
-# drain, OOM, upgrade), your phone loses access to .lan, blocky DNS, TrueNAS,
-# and the pod CIDR for ~30-60 seconds.
-#
-# Adding replicas: 2 spins up TWO subnet router pods. Tailscale's control
-# plane automatically load-balances traffic across them and routes around
-# a pod that goes down. Both pods advertise the same routes; the autoApprovers
-# policy already covers this.
-#
-# Requirements:
-#   - Tailscale operator >= 1.92 (you're on 1.94.2 ✓)
-#   - proxyClass: homelab → applies the metrics/resource config from step 2
-#
-# IMPORTANT: delete the old single-replica Connector first if you're applying
-# this as a replacement, since the name stays the same:
-#   kubectl delete connector homelab-subnet-router -n tailscale
-#   kubectl apply -f step5-connector-ha.yaml
-# Or just apply directly — the operator will reconcile the new spec.
 apiVersion: tailscale.com/v1alpha1
 kind: Connector
 metadata:
@@ -40,5 +20,17 @@ spec:
 
   subnetRouter:
     advertiseRoutes:
-      - "192.168.2.0/24"
-      - "10.244.0.0/16"
+      # --- Web apps behind Traefik ---
+      - 192.168.2.100/32  # traefik (dashy, jellyfin, jellyseerr, radarr, sonarr,
+                           # qbittorrent, prowlarr, prometheus, grafana, joplin,
+                           # traefik, blocky-ui, freshrss, auth, falco, gotify,
+                           # immich, uptime-kuma, argus — all .lan names)
+
+      # --- Direct infra IPs, not behind Traefik ---
+      - 192.168.2.54/32   # blocky (DNS)
+      - 192.168.2.5/32    # truenas.lan
+      - 192.168.2.254/32  # router.lan
+      - 192.168.2.12/32   # omni.lan (runs on ubuntu-server host itself)
+
+      # --- Pod CIDR, for direct pod/service access (Hubble, in-cluster tools, etc) ---
+      - 10.244.0.0/16

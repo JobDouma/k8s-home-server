@@ -113,7 +113,7 @@ data:
         grafana.lan: 192.168.2.100
         joplin.lan: 192.168.2.100
         traefik.lan: 192.168.2.100
-        blocky.lan: 192.168.2.100   # Blocky UI is also via Traefik
+        blocky.lan: 192.168.2.100
         freshrss.lan: 192.168.2.100
         auth.lan: 192.168.2.100
         falco.lan: 192.168.2.100
@@ -125,4 +125,4 @@ data:
         # --- Direct infrastructure IPs (NOT behind Traefik) ---
         truenas.lan: 192.168.2.5
         router.lan: 192.168.2.254
-        omni.lan: 192.168.2.12      # Omni runs directly on the host
+        omni.lan: 192.168.2.12
