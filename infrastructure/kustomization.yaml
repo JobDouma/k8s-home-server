@@ -9,6 +9,8 @@ resources:
   - cilium/helmrelease.yaml 
   - cilium/ippools.yaml
   - cilium/l2-announcement.yaml 
+  - cilium/certificate.yaml
+  - cilium/ingressroute.yaml
 
   # ──────────────────────────────────────
   # Storage

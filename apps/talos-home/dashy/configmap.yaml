@@ -117,6 +117,11 @@ data:
             icon: fas fa-server
             url: https://omni.lan
 
+          - title: Cilium                     # <-- new tile
+            description: Hubble Network Observability
+            icon: fas fa-network-wired
+            url: https://cilium.lan
+
 
       - name: Infrastructure
         icon: fas fa-server

@@ -1,0 +1,19 @@
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: cilium
+  namespace: kube-system
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: Host(`cilium.lan`)
+      kind: Rule
+      middlewares:
+        - name: traefik-chain-noauth   # no Authentik login; adjust to traefik-chain if you want auth
+          namespace: networking
+      services:
+        - name: hubble-ui              # the Hubble UI service deployed by Cilium
+          port: 80
+  tls:
+    secretName: cilium-tls

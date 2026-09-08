@@ -1,0 +1,15 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: cilium-tls
+  namespace: kube-system
+spec:
+  secretName: cilium-tls
+  duration: 8760h          # 1 year
+  renewBefore: 720h        # 30 days before expiry
+  dnsNames:
+    - cilium.lan
+  issuerRef:
+    name: homelab-ca
+    kind: ClusterIssuer
+    group: cert-manager.io

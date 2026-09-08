@@ -121,6 +121,7 @@ data:
         immich.lan: 192.168.2.100
         uptime-kuma.lan: 192.168.2.100
         argus.lan: 192.168.2.100
+        cilium.lan: 192.168.2.100         # <-- added
 
         # --- Direct infrastructure IPs (NOT behind Traefik) ---
         truenas.lan: 192.168.2.5
