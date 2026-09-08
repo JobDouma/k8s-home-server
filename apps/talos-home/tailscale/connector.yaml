@@ -27,7 +27,7 @@ spec:
                            # immich, uptime-kuma, argus — all .lan names)
 
       # --- Direct infra IPs, not behind Traefik ---
-      - 192.168.2.54/32   # blocky (DNS)
+      - 192.168.2.53/32   # blocky (DNS)
       - 192.168.2.5/32    # truenas.lan
       - 192.168.2.254/32  # router.lan
       - 192.168.2.12/32   # omni.lan (runs on ubuntu-server host itself)
