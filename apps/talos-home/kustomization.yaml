@@ -71,12 +71,12 @@ resources:
   # ──────────────────────────────────────
   # Network Policies
   # ──────────────────────────────────────
-  - networkpolicies/allow-all-kube-system.yaml
-  - networkpolicies/allow-renovate-egress.yaml
-  - networkpolicies/allow-dns-from-lan.yaml
-  - networkpolicies/media-namespace.yaml
-  - networkpolicies/dns-namespace.yaml
-  - networkpolicies/networking-namespace.yaml
+  # - networkpolicies/allow-all-kube-system.yaml
+  # - networkpolicies/allow-renovate-egress.yaml
+  # - networkpolicies/allow-dns-from-lan.yaml
+  # - networkpolicies/media-namespace.yaml
+  # - networkpolicies/dns-namespace.yaml
+  # - networkpolicies/networking-namespace.yaml
   # - networkpolicies/monitoring-namespace.yaml
 
   # ──────────────────────────────────────
