@@ -32,30 +32,28 @@ spec:
         replicas: 1
       ui:
         enabled: true
-    # FIXED IMAGE REFERENCES
-    image:
-      repository: cilium/cilium
-      tag: v1.20.1
-      digest: sha256:ae9ea21f7427fe24bc6ea7247eb552157a1b0a431744045d3f641545ca71d11b
+
+    # --- FIXED IMAGE REFERENCES (string format) ---
+    image: cilium/cilium:v1.20.1@sha256:ae9ea21f7427fe24bc6ea7247eb552157a1b0a431744045d3f641545ca71d11b
+
     operator:
       replicas: 1
-      image:
-        repository: cilium/operator-generic
-        tag: v1.20.1
-        digest: sha256:67adaf5575902dcce31dc36ba5b5acad397a8b40ec986b55696c94f80b6d861d
+      image: cilium/operator-generic:v1.20.1@sha256:67adaf5575902dcce31dc36ba5b5acad397a8b40ec986b55696c94f80b6d861d
       resources:
         requests:
-          cpu: 50m          # reduced from 100m
+          cpu: 50m
           memory: 128Mi
         limits:
           cpu: 200m
           memory: 1Gi
+
     resources:
       requests:
-        cpu: 100m           # reduced from 200m (typical default)
+        cpu: 100m
         memory: 256Mi
       limits:
         cpu: 500m
         memory: 512Mi
+
     rollOutCiliumPods: true
     enableIPv4Masquerade: true
