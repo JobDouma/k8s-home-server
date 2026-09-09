@@ -42,11 +42,10 @@ spec:
     operator:
       replicas: 1
       image:
-        repository: quay.io/cilium/operator
+        repository: quay.io/cilium/operator-generic
         tag: v1.20.1
-        genericDigest: "sha256:6c3885fc7b629099fdbe2a5c87869c86feb825fa18fae299eac0f61918d16ecf"
         useDigest: true
-        suffix: "-generic"
+        digest: "sha256:6c3885fc7b629099fdbe2a5c87869c86feb825fa18fae299eac0f61918d16ecf"
       resources:
         requests:
           cpu: 50m
@@ -54,6 +53,6 @@ spec:
         limits:
           cpu: 200m
           memory: 1Gi
-
+          
     rollOutCiliumPods: true
     enableIPv4Masquerade: true
