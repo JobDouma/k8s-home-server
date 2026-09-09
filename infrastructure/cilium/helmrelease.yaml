@@ -38,7 +38,7 @@ spec:
 
     operator:
       replicas: 1
-      image: cilium/operator-generic:v1.20.1@sha256:67adaf5575902dcce31dc36ba5b5acad397a8b40ec986b55696c94f80b6d861d
+      image: cilium/operator-generic:v1.20.1@sha256:6c3885fc7b629099fdbe2a5c87869c86feb825fa18fae299eac0f61918d16ecf
       resources:
         requests:
           cpu: 50m
