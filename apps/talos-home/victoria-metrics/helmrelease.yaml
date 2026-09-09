@@ -55,11 +55,11 @@ spec:
               storage: 20Gi
         resources:
           requests:
-            cpu: 100m
-            memory: 512Mi
+            cpu: 50m              # reduced from 100m
+            memory: 256Mi         # reduced from 512Mi
           limits:
-            cpu: 1000m
-            memory: 2Gi
+            cpu: 500m             # reduced from 1000m
+            memory: 1Gi           # reduced from 2Gi
         tolerations:
         - operator: Exists
     vmagent:
@@ -70,8 +70,8 @@ spec:
             cpu: 10m
             memory: 64Mi
           limits:
-            cpu: 200m
-            memory: 256Mi
+            cpu: 100m             # reduced from 200m
+            memory: 128Mi         # reduced from 256Mi
         tolerations:
         - operator: Exists
         extraArgs:
@@ -85,8 +85,8 @@ spec:
             cpu: 10m
             memory: 32Mi
           limits:
-            cpu: 100m
-            memory: 128Mi
+            cpu: 50m              # reduced from 100m
+            memory: 64Mi          # reduced from 128Mi
     alertmanager:
       enabled: true
       spec:
@@ -97,15 +97,13 @@ spec:
             cpu: 10m
             memory: 64Mi
           limits:
-            cpu: 100m
-            memory: 256Mi
+            cpu: 50m              # reduced from 100m
+            memory: 128Mi         # reduced from 256Mi
         tolerations:
         - operator: Exists
     grafana:
       enabled: true
-      defaultDashboards:
-        enabled: false
-      revisionHistoryLimit: 2
+      replicas: 1                 # keep at 1
       tolerations:
       - key: node-role.kubernetes.io/control-plane
         operator: Exists
@@ -127,11 +125,11 @@ spec:
           enabled: false
       resources:
         requests:
-          cpu: 50m
-          memory: 128Mi
+          cpu: 20m               # reduced from 50m
+          memory: 64Mi           # reduced from 128Mi
         limits:
-          cpu: 200m
-          memory: 512Mi
+          cpu: 100m              # reduced from 200m
+          memory: 256Mi          # reduced from 512Mi
       datasources:
         datasources.yaml:
           apiVersion: 1
@@ -155,9 +153,9 @@ spec:
       sidecar:
         resources:
           limits:
-            memory: 128Mi
-          requests:
             memory: 64Mi
+          requests:
+            memory: 32Mi
         dashboards:
           enabled: true
           searchNamespace: ALL
@@ -180,16 +178,16 @@ spec:
           cpu: 10m
           memory: 32Mi
         limits:
-          cpu: 100m
-          memory: 128Mi
+          cpu: 50m               # reduced from 100m
+          memory: 64Mi           # reduced from 128Mi
     kube-state-metrics:
       resources:
         requests:
-          cpu: 50m
-          memory: 128Mi
+          cpu: 20m               # reduced from 50m
+          memory: 64Mi           # reduced from 128Mi
         limits:
-          cpu: 250m
-          memory: 512Mi
+          cpu: 100m              # reduced from 250m
+          memory: 256Mi          # reduced from 512Mi
       startupProbe:
         enabled: true
         failureThreshold: 30

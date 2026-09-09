@@ -14,7 +14,6 @@ spec:
     crds: CreateReplace
     remediation:
       retries: 3
-
   chart:
     spec:
       chart: kyverno
@@ -23,22 +22,19 @@ spec:
         kind: HelmRepository
         name: kyverno
         namespace: flux-system
-
   values:
     crds:
       install: true
-
     features:
       backgroundScan:
         enabled: true
         backgroundScanWorkers: 2
         backgroundScanInterval: 12h
         skipResourceFilters: true
-
     admissionController:
-      replicas: 2
+      replicas: 1                    # reduced from 2
       podDisruptionBudget:
-        enabled: false          # <-- add this
+        enabled: false               # disabled to save scheduling attempts
       serviceMonitor:
         enabled: true
       webhookConfiguration:
@@ -46,11 +42,11 @@ spec:
         timeoutSeconds: 10
       resources:
         limits:
-          cpu: 500m
+          cpu: 300m                  # reduced from 500m
           memory: 384Mi
         requests:
-          cpu: 50m                      # lowered from 100m
-          memory: 192Mi
+          cpu: 30m                   # reduced from 50m
+          memory: 128Mi             # reduced from 192Mi
       tolerations:
         - key: node-role.kubernetes.io/control-plane
           operator: Exists
@@ -63,19 +59,17 @@ spec:
             matchLabels:
               app.kubernetes.io/component: admission-controller
               app.kubernetes.io/instance: kyverno
-
     backgroundController:
       enabled: true
       serviceMonitor:
         enabled: true
       resources:
         limits:
-          cpu: 150m
+          cpu: 100m                  # reduced from 150m
           memory: 256Mi
         requests:
-          cpu: 50m
-          memory: 128Mi
-
+          cpu: 30m                   # reduced from 50m
+          memory: 64Mi              # reduced from 128Mi
     cleanupController:
       enabled: true
       resources:
@@ -83,9 +77,8 @@ spec:
           cpu: 100m
           memory: 128Mi
         requests:
-          cpu: 50m
-          memory: 64Mi
-
+          cpu: 30m                   # reduced from 50m
+          memory: 32Mi              # reduced from 64Mi
     reportsController:
       enabled: true
       serviceMonitor:
@@ -95,9 +88,8 @@ spec:
           cpu: 100m
           memory: 256Mi
         requests:
-          cpu: 50m
-          memory: 128Mi
-
+          cpu: 30m                   # reduced from 50m
+          memory: 64Mi              # reduced from 128Mi
     config:
       excludeGroups:
         - system:nodes
