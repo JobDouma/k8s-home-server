@@ -2,7 +2,7 @@ name: omni-on-prem
 services:
   omni:
     container_name: omni
-    image: ghcr.io/siderolabs/omni:v1.10.5@sha256:e72572d2c2de61b0c9fccc0bd50114b9d1e2c5b8532fca67300dea6da3873ae2
+    image: ghcr.io/siderolabs/omni:v1.11.0@sha256:746c3298864ca7cb0da280fa1bfb08711df7c6ebe56085cde175541eef89540c
     restart: unless-stopped
     network_mode: host
     extra_hosts:
@@ -41,7 +41,7 @@ services:
 
       '
   garage:
-    image: dxflrs/garage:v2.3.0@sha256:866bd13ed2038ba7e7190e840482bc27234c4afaf77be8cfa439ae088c1e4690
+    image: dxflrs/garage:v2.4.1@sha256:9c96caa2612d3411acc5b0e6701fb238dbfba33e533a6d7d3d811a4b12d0d020
     container_name: omni-backup-garage
     restart: unless-stopped
     stop_grace_period: 30s
