@@ -33,12 +33,20 @@ spec:
       ui:
         enabled: true
 
-    # --- FIXED IMAGE REFERENCES (string format) ---
-    image: cilium/cilium:v1.20.1@sha256:ae9ea21f7427fe24bc6ea7247eb552157a1b0a431744045d3f641545ca71d11b
+    image:
+      repository: quay.io/cilium/cilium
+      tag: v1.20.1
+      digest: "sha256:ae9ea21f7427fe24bc6ea7247eb552157a1b0a431744045d3f641545ca71d11b"
+      useDigest: true
 
     operator:
       replicas: 1
-      image: cilium/operator-generic:v1.20.1@sha256:6c3885fc7b629099fdbe2a5c87869c86feb825fa18fae299eac0f61918d16ecf
+      image:
+        repository: quay.io/cilium/operator
+        tag: v1.20.1
+        genericDigest: "sha256:6c3885fc7b629099fdbe2a5c87869c86feb825fa18fae299eac0f61918d16ecf"
+        useDigest: true
+        suffix: "-generic"
       resources:
         requests:
           cpu: 50m
@@ -46,14 +54,6 @@ spec:
         limits:
           cpu: 200m
           memory: 1Gi
-
-    resources:
-      requests:
-        cpu: 100m
-        memory: 256Mi
-      limits:
-        cpu: 500m
-        memory: 512Mi
 
     rollOutCiliumPods: true
     enableIPv4Masquerade: true
