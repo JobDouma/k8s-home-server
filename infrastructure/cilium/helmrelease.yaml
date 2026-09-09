@@ -42,10 +42,10 @@ spec:
     operator:
       replicas: 1
       image:
-        repository: quay.io/cilium/operator-generic
+        repository: quay.io/cilium/operator
         tag: v1.20.1
         useDigest: true
-        digest: "sha256:6c3885fc7b629099fdbe2a5c87869c86feb825fa18fae299eac0f61918d16ecf"
+        genericDigest: "sha256:6c3885fc7b629099fdbe2a5c87869c86feb825fa18fae299eac0f61918d16ecf"
       resources:
         requests:
           cpu: 50m
