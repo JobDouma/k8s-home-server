@@ -21,13 +21,32 @@ spec:
         name: authentik
         namespace: flux-system
   values:
+    # ─────────────────────────────────────────────────────────────
+    # FIX #1: existingSecret suppresses chart-injected env vars.
+    # authentik-secret is MISSING AUTHENTIK_REDIS__HOST, so without
+    # this block the server tries to reach the hostname `redis`
+    # (authentik's default) and crashloops even once postgres is up.
+    # ─────────────────────────────────────────────────────────────
+    global:
+      env:
+        - name: AUTHENTIK_REDIS__HOST
+          value: authentik-redis-master
+        - name: AUTHENTIK_LISTEN__HTTP
+          value: 0.0.0.0:9000
+        - name: AUTHENTIK_LISTEN__HTTPS
+          value: 0.0.0.0:9443
+        - name: AUTHENTIK_LISTEN__METRICS
+          value: 0.0.0.0:9300
+
     blueprints:
       enabled: true
       secrets:
         - authentik-blueprints
+
     prometheus:
       rules:
         create: false
+
     authentik:
       existingSecret:
         secretName: authentik-secret
@@ -35,6 +54,7 @@ spec:
         enabled: false
       web:
         path: /
+
     server:
       strategy:
         type: Recreate
@@ -70,6 +90,7 @@ spec:
         failureThreshold: 120
         periodSeconds: 10
         timeoutSeconds: 10
+
     worker:
       strategy:
         type: Recreate
@@ -99,12 +120,15 @@ spec:
         failureThreshold: 120
         periodSeconds: 10
         timeoutSeconds: 10
+
     postgresql:
       enabled: true
       # ─────────────────────────────────────────────────────────────
-      # FIX: use Bitnami's built-in volumePermissions init container
-      # instead of a custom busybox init container that crashes on
-      # local-path volumes (chown fails on lost+found / perms).
+      # FIX #2: use Bitnami's built-in volumePermissions init container.
+      # The previous custom `fix-permissions` container joined its
+      # commands without separators ("... data chown -R 1001:1001 ..."),
+      # so mkdir received -R as an argument and exited 1 immediately.
+      # Do NOT reintroduce a custom initContainers block here.
       # ─────────────────────────────────────────────────────────────
       volumePermissions:
         enabled: true
@@ -117,8 +141,6 @@ spec:
           enabled: true
           storageClass: local-path
           size: 10Gi
-        # NOTE: the custom `initContainers:` block was REMOVED here.
-        # volumePermissions.enabled above handles ownership of the PV.
         extendedConfiguration: |
           autovacuum_vacuum_scale_factor = 0.05
           autovacuum_analyze_scale_factor = 0.02
@@ -134,6 +156,7 @@ spec:
           limits:
             cpu: 500m
             memory: 512Mi
+
     redis:
       enabled: true
       auth:
