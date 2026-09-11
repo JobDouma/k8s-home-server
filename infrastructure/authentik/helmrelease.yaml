@@ -24,7 +24,7 @@ spec:
     blueprints:
       enabled: true
       secrets:
-      - authentik-blueprints
+        - authentik-blueprints
     prometheus:
       rules:
         create: false
@@ -50,22 +50,22 @@ spec:
         configmap.reloader.stakater.com/reload: authentik-blueprints
       resources:
         requests:
-          cpu: 30m           # reduced from 50m
+          cpu: 30m
           memory: 512Mi
         limits:
           cpu: 750m
           memory: 1Gi
-      tolerations: []        # you can add if needed
+      tolerations: []
       affinity:
         podAntiAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:
-          - weight: 100
-            podAffinityTerm:
-              labelSelector:
-                matchLabels:
-                  app.kubernetes.io/name: authentik
-                  app.kubernetes.io/component: server
-              topologyKey: kubernetes.io/hostname
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    app.kubernetes.io/name: authentik
+                    app.kubernetes.io/component: server
+                topologyKey: kubernetes.io/hostname
       startupProbe:
         failureThreshold: 120
         periodSeconds: 10
@@ -74,33 +74,40 @@ spec:
       strategy:
         type: Recreate
       revisionHistoryLimit: 2
-      replicas: 1            # keep at 1, but you could set to 0 if not needed
+      replicas: 1
       podAnnotations:
         configmap.reloader.stakater.com/reload: authentik-blueprints
       resources:
         requests:
-          cpu: 50m            # reduced from 100m
+          cpu: 50m
           memory: 512Mi
         limits:
-          cpu: 300m           # reduced from 500m
+          cpu: 300m
           memory: 1536Mi
       tolerations: []
       affinity:
         podAntiAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:
-          - weight: 100
-            podAffinityTerm:
-              labelSelector:
-                matchLabels:
-                  app.kubernetes.io/name: authentik
-                  app.kubernetes.io/component: worker
-              topologyKey: kubernetes.io/hostname
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    app.kubernetes.io/name: authentik
+                    app.kubernetes.io/component: worker
+                topologyKey: kubernetes.io/hostname
       startupProbe:
         failureThreshold: 120
         periodSeconds: 10
         timeoutSeconds: 10
     postgresql:
       enabled: true
+      # ─────────────────────────────────────────────────────────────
+      # FIX: use Bitnami's built-in volumePermissions init container
+      # instead of a custom busybox init container that crashes on
+      # local-path volumes (chown fails on lost+found / perms).
+      # ─────────────────────────────────────────────────────────────
+      volumePermissions:
+        enabled: true
       auth:
         username: authentik
         database: authentik
@@ -110,19 +117,8 @@ spec:
           enabled: true
           storageClass: local-path
           size: 10Gi
-        initContainers:
-        - name: fix-permissions
-          image: busybox:1.38@sha256:dc2d74b28e4cf8984fa52af1f39bc7c3d9c73760b41a74d629f5d11b1ab28616
-          command:
-          - sh
-          - -c
-          - 'mkdir -p /bitnami/postgresql/data && chown -R 1001:1001 /bitnami/postgresql && chmod 700 /bitnami/postgresql/data'
-          securityContext:
-            runAsUser: 0
-            runAsNonRoot: false
-          volumeMounts:
-          - name: data
-            mountPath: /bitnami/postgresql
+        # NOTE: the custom `initContainers:` block was REMOVED here.
+        # volumePermissions.enabled above handles ownership of the PV.
         extendedConfiguration: |
           autovacuum_vacuum_scale_factor = 0.05
           autovacuum_analyze_scale_factor = 0.02
@@ -155,5 +151,5 @@ spec:
             cpu: 100m
             memory: 256Mi
         args:
-        - --appendonly yes
-        - --appendfsync everysec
+          - --appendonly yes
+          - --appendfsync everysec
