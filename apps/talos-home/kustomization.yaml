@@ -219,13 +219,13 @@ resources:
   # ──────────────────────────────────────
   # Uptime Kuma
   # ──────────────────────────────────────
-  - uptime-kuma/namespace.yaml
-  - uptime-kuma/secret.yaml
-  - uptime-kuma/certificate.yaml
-  - uptime-kuma/configmap.yaml
-  - uptime-kuma/helmrelease.yaml
-  - uptime-kuma/ingressroute.yaml
-  - uptime-kuma/pvc.yaml
+  # - uptime-kuma/namespace.yaml
+  # - uptime-kuma/secret.yaml
+  # - uptime-kuma/certificate.yaml
+  # - uptime-kuma/configmap.yaml
+  # - uptime-kuma/helmrelease.yaml
+  # - uptime-kuma/ingressroute.yaml
+  # - uptime-kuma/pvc.yaml
   
   # ──────────────────────────────────────
   # Kyverno
