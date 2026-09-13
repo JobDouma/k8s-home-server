@@ -32,13 +32,63 @@ spec:
             runAsNonRoot: true
             seccompProfile:
               type: RuntimeDefault
-        containers:
-          app:
+
+        # ── One-time-ish bootstrap + provisioning, before the app starts ──
+        initContainers:
+          bootstrap-db:
             image:
               repository: louislam/uptime-kuma
               tag: 2.5.3@sha256:3e24e96c89efff0e3a4b0698cbdd36c15ad3022371db57166e5588853002ee5c
+            command:
+              - /bin/sh
+              - -c
+              - |
+                set -e
+                if [ -s /app/data/kuma.db ]; then
+                  echo "kuma.db already exists, skipping schema bootstrap"
+                  exit 0
+                fi
+                echo "Bootstrapping schema (brief Uptime Kuma run)..."
+                node server/server.js &
+                PID=$!
+                for i in $(seq 1 90); do
+                  if [ -s /app/data/kuma.db ]; then
+                    # give knex migrations a moment to finish
+                    sleep 10
+                    break
+                  fi
+                  sleep 2
+                done
+                kill -TERM "$PID" 2>/dev/null || true
+                wait "$PID" 2>/dev/null || true
+                echo "Schema bootstrap done."
+            securityContext:
+              runAsUser: 1000
+              runAsGroup: 1000
+              runAsNonRoot: true
+              allowPrivilegeEscalation: false
+              capabilities:
+                drop: ["ALL"]
+            resources:
+              requests:
+                cpu: 50m
+                memory: 128Mi
+              limits:
+                memory: 256Mi
+
+          provision:
+            image:
+              repository: python
+              tag: 3.14-slim@sha256:cad9a2c871761c413caa6fdd6441c783451e740a48aaeba60ae62a8b53525ef6
+            command:
+              - /bin/sh
+              - -c
+              - |
+                set -e
+                pip install --no-cache-dir --quiet --user bcrypt
+                exec python3 /scripts/provision.py
             env:
-              TZ: Europe/Amsterdam
+              HOME: /tmp
               UPTIME_KUMA_ADMIN_USER:
                 valueFrom:
                   secretKeyRef:
@@ -49,9 +99,11 @@ spec:
                   secretKeyRef:
                     name: uptime-kuma-credentials
                     key: admin-pass
-            ports:
-            - name: http
-              containerPort: 3001
+              UPTIME_KUMA_GOTIFY_TOKEN:
+                valueFrom:
+                  secretKeyRef:
+                    name: uptime-kuma-credentials
+                    key: gotify-token
             securityContext:
               runAsUser: 1000
               runAsGroup: 1000
@@ -59,14 +111,38 @@ spec:
               allowPrivilegeEscalation: false
               capabilities:
                 drop: ["ALL"]
-            # ========== FIX: Added CPU request ==========
             resources:
               requests:
-                cpu: 50m          # <-- NEW
+                cpu: 50m
+                memory: 64Mi
+              limits:
+                cpu: 200m
+                memory: 128Mi
+            # Script is mounted from the configmap via the `scripts` persistence entry below.
+
+        containers:
+          app:
+            image:
+              repository: louislam/uptime-kuma
+              tag: 2.5.3@sha256:3e24e96c89efff0e3a4b0698cbdd36c15ad3022371db57166e5588853002ee5c
+            env:
+              TZ: Europe/Amsterdam
+            ports:
+              - name: http
+                containerPort: 3001
+            securityContext:
+              runAsUser: 1000
+              runAsGroup: 1000
+              runAsNonRoot: true
+              allowPrivilegeEscalation: false
+              capabilities:
+                drop: ["ALL"]
+            resources:
+              requests:
+                cpu: 50m
                 memory: 128Mi
               limits:
                 memory: 256Mi
-            # ===========================================
             probes:
               liveness:
                 enabled: true
@@ -88,6 +164,7 @@ spec:
                   initialDelaySeconds: 15
                   periodSeconds: 10
                   failureThreshold: 3
+
     service:
       app:
         controller: uptime-kuma
@@ -95,9 +172,19 @@ spec:
         ports:
           http:
             port: 3001
+
     persistence:
       data:
         type: persistentVolumeClaim
         existingClaim: uptime-kuma-data
         globalMounts:
           - path: /app/data
+
+      # ConfigMap holding provision.py, mounted into the `provision` init container
+      scripts:
+        type: configMap
+        name: uptime-kuma-monitors
+        globalMounts:
+          - path: /scripts/provision.py
+            subPath: provision.py
+            readOnly: true

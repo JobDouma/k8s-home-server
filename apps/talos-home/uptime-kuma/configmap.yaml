@@ -11,56 +11,40 @@ data:
     - No external libraries needed
     - Idempotent: skips monitors that already exist by name
     - Handles deletions: removes monitors listed in REMOVED
+    Runs as an init container inside the uptime-kuma pod, so there is no
+    concurrent SQLite writer and no restart is needed for Uptime Kuma to
+    pick up the monitors.
     """
-    import sqlite3, sys, os, time, json, datetime
+    import sqlite3, sys, os, json, datetime
 
     DB = "/app/data/kuma.db"
 
     def log(msg): print(f"[provision] {msg}", flush=True)
 
-    # ── Wait for DB ──────────────────────────────────────────────────────────────
-    con = None
-    for i in range(40):
-        if os.path.exists(DB) and os.path.getsize(DB) > 0:
-            try:
-                c = sqlite3.connect(f"file:{DB}?mode=ro", uri=True)
-                c.execute("SELECT id FROM monitor LIMIT 1")
-                c.close()
-                con = sqlite3.connect(DB)
-                con.row_factory = sqlite3.Row
-                log(f"DB ready after {i * 5}s")
-                break
-            except sqlite3.OperationalError as e:
-                log(f"DB exists but not ready yet ({e})")
-                if con:
-                    con.close()
-                    con = None
-        else:
-            if i == 0:
-                log("Waiting for DB to appear...")
-            elif i % 4 == 0:
-                log(f"  still waiting... ({i * 5}s elapsed)")
-        time.sleep(5)
-    else:
-        log("ERROR: DB not ready after 200s"); sys.exit(1)
+    # ── Open DB ──────────────────────────────────────────────────────────────
+    # The bootstrap-db init container has already run Uptime Kuma once to
+    # create the schema, so the DB is guaranteed to exist here.
+    if not (os.path.exists(DB) and os.path.getsize(DB) > 0):
+        log(f"ERROR: {DB} missing or empty — bootstrap-db did not run correctly")
+        sys.exit(1)
 
-    # ── Ensure admin user exists (container should already create it, but safe) ──
+    con = sqlite3.connect(DB, timeout=30)
+    con.row_factory = sqlite3.Row
+    con.execute("PRAGMA busy_timeout = 30000")
+    con.execute("PRAGMA journal_mode = WAL")
+    log("DB opened")
+
+    # ── Ensure admin user exists ─────────────────────────────────────────────
     existing_user = con.execute("SELECT id FROM user LIMIT 1").fetchone()
     if not existing_user:
-        import subprocess
+        import bcrypt
         admin_user = os.environ.get("UPTIME_KUMA_ADMIN_USER", "admin")
         admin_pass = os.environ.get("UPTIME_KUMA_ADMIN_PASS", "admin")
-        node_script = "const b=require('bcryptjs');console.log(b.hashSync(process.argv[1],10));"
-        result = subprocess.run(
-            ["node", "-e", node_script, admin_pass],
-            capture_output=True, text=True, cwd="/app"
-        )
-        if result.returncode != 0:
-            log(f"ERROR: bcrypt failed: {result.stderr}"); sys.exit(1)
-        hashed = result.stdout.strip()
+        hashed = bcrypt.hashpw(admin_pass.encode(), bcrypt.gensalt(rounds=10)).decode()
         con.execute(
-            "INSERT INTO user (username, password, active, timezone, createdDate) VALUES (?, ?, 1, 'Europe/Amsterdam', datetime('now'))",
-            (admin_user, hashed)
+            "INSERT INTO user (username, password, active, timezone, createdDate) "
+            "VALUES (?, ?, 1, 'Europe/Amsterdam', datetime('now'))",
+            (admin_user, hashed),
         )
         con.commit()
         log(f"Created admin user: {admin_user}")
@@ -68,7 +52,7 @@ data:
     user_id = con.execute("SELECT id FROM user LIMIT 1").fetchone()["id"]
     log(f"Provisioning for user_id={user_id}")
 
-    # ── Monitors to remove ───────────────────────────────────────────────────────
+    # ── Monitors to remove ───────────────────────────────────────────────────
     REMOVED = [
         "SABnzbd",
         "Router",
@@ -86,7 +70,7 @@ data:
     existing = {r["name"] for r in con.execute("SELECT name FROM monitor")}
     log(f"Existing monitors: {len(existing)}, removed: {removed_count}")
 
-    # ── Gotify notification ──────────────────────────────────────────────────────
+    # ── Gotify notification ──────────────────────────────────────────────────
     def add_notification(name, gotify_url, gotify_token):
         existing_notif = con.execute("SELECT id FROM notification WHERE name = ?", (name,)).fetchone()
         if existing_notif:
@@ -123,7 +107,7 @@ data:
         gotify_token
     ) if gotify_token else None
 
-    # ── Monitor helpers ──────────────────────────────────────────────────────────
+    # ── Monitor helpers ──────────────────────────────────────────────────────
     added_count = 0
     skipped_count = 0
 
@@ -170,7 +154,7 @@ data:
         except Exception as e:
             log(f"  WARN {name}: {e}")
 
-    # ── Monitors ─────────────────────────────────────────────────────────────────
+    # ── Monitors ─────────────────────────────────────────────────────────────
     # Media
     add_http("Jellyfin",      "https://jellyfin.lan")
     add_http("Jellyseerr",    "https://jellyseerr.lan")
