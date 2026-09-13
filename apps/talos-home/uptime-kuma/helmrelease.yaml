@@ -40,13 +40,7 @@ spec:
             seccompProfile:
               type: RuntimeDefault
 
-        # ── One-time bootstrap + provisioning, before the app starts ──
         initContainers:
-          # Ensures the SQLite schema exists. On a fresh PVC it starts
-          # Uptime Kuma briefly, waits for the HTTP server on :3001 to
-          # answer (which proves SQLite is open and Knex migrations have
-          # run), then terminates it. On subsequent boots it exits
-          # immediately.
           bootstrap-db:
             image:
               repository: louislam/uptime-kuma
@@ -58,10 +52,6 @@ spec:
                 set -eu
                 cd /app
 
-                # Schema already present? Nothing to do.
-                # NOTE: Uptime Kuma bundles `better-sqlite3` (sync API), not the
-                # `sqlite3` package — using the wrong module name here silently
-                # fails and defeats the skip-check every run.
                 if [ -f /app/data/kuma.db ]; then
                   if node -e "
                     const Database = require('better-sqlite3');
@@ -78,13 +68,8 @@ spec:
                 echo "Starting Uptime Kuma to bootstrap schema..."
                 node server/server.js &
                 PID=$!
-
-                # Always reap node, even on error.
                 trap 'kill -TERM "$PID" 2>/dev/null || true; wait "$PID" 2>/dev/null || true' EXIT
 
-                # Wait until HTTP on :3001 answers. This proves the server,
-                # SQLite handle, and Knex migrations are all up — which is
-                # more reliable than sniffing kuma.db size under WAL mode.
                 node -e "
                   const http = require('http');
                   let i = 0;
@@ -120,19 +105,23 @@ spec:
               limits:
                 memory: 256Mi
 
-          # Runs provision.py against the now-initialised DB. Idempotent:
-          # skips users/monitors/notifications that already exist, and
-          # rolls back cleanly on any unexpected error.
+          # Runs provision.py against the now-initialised DB.
+          # NOTE: python:3.14-slim caused CrashLoopBackOff — bcrypt has no
+          # prebuilt wheel for 3.14 yet, and this container has no compiler
+          # (non-root, capabilities dropped), so `pip install` fails hard.
+          # Pinned to 3.12-slim, which has stable prebuilt bcrypt wheels,
+          # and forced to --only-binary so it fails fast with a clear
+          # message instead of a compiler-error wall if this ever recurs.
           provision:
             image:
               repository: python
-              tag: 3.14-slim@sha256:cad9a2c871761c413caa6fdd6441c783451e740a48aaeba60ae62a8b53525ef6
+              tag: 3.12-slim
             command:
               - /bin/sh
               - -c
               - |
                 set -eux
-                pip install --no-cache-dir --user bcrypt
+                pip install --no-cache-dir --user --only-binary=:all: bcrypt==4.2.0
                 exec python3 /scripts/provision.py
             env:
               HOME: /tmp
@@ -226,7 +215,6 @@ spec:
         globalMounts:
           - path: /app/data
 
-      # ConfigMap holding provision.py, mounted into the `provision` init container
       scripts:
         type: configMap
         name: uptime-kuma-monitors
