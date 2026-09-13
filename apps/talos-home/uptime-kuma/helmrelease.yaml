@@ -29,6 +29,8 @@ spec:
       uptime-kuma:
         replicas: 1
         pod:
+          annotations:
+            configmap.reloader.stakater.com/reload: uptime-kuma-monitors
           automountServiceAccountToken: false
           securityContext:
             runAsUser: 1000
