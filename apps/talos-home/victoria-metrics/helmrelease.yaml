@@ -4,8 +4,7 @@ metadata:
   name: victoria-metrics-k8s-stack
   namespace: monitoring
   annotations:
-    # bump this string to force a fresh helm upgrade without touching values
-    homelab.io/rollout: "2026-09-13-2"
+    homelab.io/rollout: "2026-09-13-3"
 spec:
   interval: 30m
   timeout: 60m
@@ -126,13 +125,17 @@ spec:
           enabled: false
         alerting:
           enabled: false
+      # Grafana 13.x does heavy work at startup: 713 SQLite migrations
+      # plus installing 10+ plugins back-to-back. Peak RSS easily
+      # exceeds 1Gi during that window. The old 768Mi limit was the
+      # reason the main container now OOMKills alongside the sidecar.
       resources:
         requests:
-          cpu: 50m
-          memory: 256Mi
+          cpu: 100m
+          memory: 512Mi
         limits:
-          cpu: 500m
-          memory: 768Mi
+          cpu: "1"
+          memory: 2Gi
       datasources:
         datasources.yaml:
           apiVersion: 1
@@ -154,20 +157,17 @@ spec:
             jsonData:
               maxLines: 1000
       sidecar:
-        # k8s-sidecar 2.8.1 (shipped with grafana chart 12.7.3 /
-        # grafana 13.1.1) needs substantially more RSS than the old
-        # 1.x sidecar did. 64Mi was OOMKilling it every ~4s, which
-        # in turn prevented the dashboard folder from ever being
-        # populated and produced the endless
-        # "Cannot read directory /var/lib/grafana/dashboards/default"
-        # errors in the grafana container.
+        # k8s-sidecar 2.8.1 watching ALL namespaces for
+        # grafana_dashboard=1 is memory-hungry on a cluster with many
+        # ConfigMaps. 64Mi -> OOM within seconds. 256Mi still wasn't
+        # enough once we actually rendered it. 512Mi leaves headroom.
         resources:
           requests:
             cpu: 10m
             memory: 64Mi
           limits:
-            cpu: 100m
-            memory: 256Mi
+            cpu: 200m
+            memory: 512Mi
         dashboards:
           enabled: true
           searchNamespace: ALL
