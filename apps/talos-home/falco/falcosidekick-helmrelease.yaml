@@ -57,6 +57,9 @@ spec:
           cpu: 100m
           memory: 128Mi
       redis:
+        persistence:
+          enabled: true
+          size: 1Gi
         resources:
           requests:
             cpu: 10m

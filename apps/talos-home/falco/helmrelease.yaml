@@ -30,27 +30,96 @@ spec:
     falco:
       json_output: true
       log_level: info
-      # removed existingRulesConfigMaps, using rules_files + volume mount
-      rules_files:
-        - /etc/falco/falco_rules.yaml
-        - /etc/falco/custom-rules.yaml
       http_output:
         enabled: true
         url: "http://falcosidekick.falco.svc.cluster.local:2801"
+      customRules:
+        custom-rules.yaml: |-
+          # ──────────────────────────────────────────────────────────────────────
+          # 1. EXEMPTIONS FOR NOISY / LEGITIMATE RULES
+          # ──────────────────────────────────────────────────────────────────────
+
+          # Avoid flooding logs with Flaresolverr's chromedriver executions
+          - rule: Drop and execute new binary in container
+            exceptions:
+              - name: cilium_cni_execution
+                fields: [proc.exepath, container.id]
+                comps: [=, =]
+                values:
+                  - [/opt/cni/bin/cilium-cni, runtime]
+
+          # Silence expected K8s API calls from Authentik and Tailscale (they need it)
+          - rule: Contact K8S API Server From Container
+            condition: and not (
+              k8s.ns.name in ("authentik", "tailscale", "monitoring", "kyverno")
+              or ka.user.name in (
+                "system:serviceaccount:monitoring:vmagent",
+                "system:serviceaccount:kyverno:kyverno",
+                "system:serviceaccount:tailscale:tailscale-operator"
+              )
+            )
+            override:
+              condition: append
+
+          # Allow privileged containers for known system components (e.g., Tailscale)
+          - rule: Launch Privileged Container
+            condition: and not (
+              container.image.repository in (
+                "ghcr.io/linuxserver/sonarr",
+                "ghcr.io/linuxserver/radarr",
+                "ghcr.io/linuxserver/prowlarr"
+              )
+              or k8s.ns.name in ("tailscale", "metallb-system")
+            )
+            override:
+              condition: append
+
+          # ──────────────────────────────────────────────────────────────────────
+          # 2. CUSTOM RULES
+          # ──────────────────────────────────────────────────────────────────────
+
+          - rule: Unexpected K8s Secret Access
+            desc: A process accessed Kubernetes secrets via the API server
+            condition: >
+              ka.verb in (get, list, watch) and
+              ka.target.resource = secrets and
+              not ka.user.name in (
+                "system:serviceaccount:monitoring:kube-prometheus-stack-prometheus",
+                "system:serviceaccount:flux-system:kube-apiserver-health-check"
+              )
+            output: >
+              Unexpected secret access (user=%ka.user.name verb=%ka.verb
+              resource=%ka.target.resource ns=%ka.target.namespace)
+            priority: WARNING
+            source: k8s_audit
+
+          - rule: Shell in Media Container
+            desc: Shell spawned inside a media namespace container
+            condition: >
+              spawned_process and
+              shell_procs and
+              container and
+              k8s.ns.name = "media"
+            output: >
+              Shell in media container (pod=%k8s.pod.name image=%container.image.repository
+              shell=%proc.name)
+            priority: WARNING
+            tags: [media, shell]
+
+          - rule: Unexpected Listening Port
+            desc: A container started listening on an unexpected port
+            condition: >
+              evt.type = listen and
+              container and
+              not proc.name in (nginx, traefik, node, python3, java) and
+              not fd.sport in (80, 443, 8080, 8096, 8989, 7878, 9696, 5055, 22300, 53)
+            output: >
+              Unexpected listen port (pod=%k8s.pod.name port=%fd.sport image=%container.image.repository)
+            priority: NOTICE
+            tags: [network]
     daemonset:
       tolerations:
         - operator: Exists
-      podAnnotations: {}
-      # added extra volumes to mount custom rules ConfigMap
-      extraVolumes:
-        - name: custom-rules
-          configMap:
-            name: falco-custom-rules
-      extraVolumeMounts:
-        - name: custom-rules
-          mountPath: /etc/falco/custom-rules.yaml
-          subPath: custom-rules.yaml
-          readOnly: true
       resources:
         requests:
           cpu: 100m

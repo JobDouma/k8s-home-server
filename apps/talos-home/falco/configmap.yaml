@@ -14,9 +14,12 @@ data:
 
     # Avoid flooding logs with Flaresolverr's chromedriver executions
     - rule: Drop and execute new binary in container
-      condition: and not (container.image.repository contains "flaresolverr")
-      override:
-        condition: append
+      exceptions:
+        - name: cilium_cni_execution
+          fields: [proc.exepath, container.id]
+          comps: [=, =]
+          values:
+            - [/opt/cni/bin/cilium-cni, runtime]
 
     # Silence expected K8s API calls from Authentik and Tailscale (they need it)
     - rule: Contact K8S API Server From Container
