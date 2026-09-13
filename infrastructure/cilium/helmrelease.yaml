@@ -14,8 +14,8 @@ spec:
         name: cilium
         namespace: kube-system
   values:
-    devices: "ens18"
-    masqueradeInterfaces: "ens18"
+    devices: ens18
+    masqueradeInterfaces: ens18
     kubeProxyReplacement: true
     k8sServiceHost: 192.168.2.22
     k8sServicePort: 6443
@@ -32,20 +32,18 @@ spec:
         replicas: 1
       ui:
         enabled: true
-
     image:
       repository: quay.io/cilium/cilium
-      tag: v1.20.1
-      digest: "sha256:ae9ea21f7427fe24bc6ea7247eb552157a1b0a431744045d3f641545ca71d11b"
+      tag: v1.20.1@sha256:ae9ea21f7427fe24bc6ea7247eb552157a1b0a431744045d3f641545ca71d11b
+      digest: sha256:ae9ea21f7427fe24bc6ea7247eb552157a1b0a431744045d3f641545ca71d11b
       useDigest: true
-
     operator:
       replicas: 1
       image:
         repository: quay.io/cilium/operator
-        tag: v1.20.1
+        tag: v1.20.1@sha256:67adaf5575902dcce31dc36ba5b5acad397a8b40ec986b55696c94f80b6d861d
         useDigest: true
-        genericDigest: "sha256:6c3885fc7b629099fdbe2a5c87869c86feb825fa18fae299eac0f61918d16ecf"
+        genericDigest: sha256:6c3885fc7b629099fdbe2a5c87869c86feb825fa18fae299eac0f61918d16ecf
       resources:
         requests:
           cpu: 50m
@@ -53,6 +51,5 @@ spec:
         limits:
           cpu: 200m
           memory: 1Gi
-          
     rollOutCiliumPods: true
     enableIPv4Masquerade: true
