@@ -2,18 +2,72 @@
 set -euo pipefail
 
 REPO_ROOT="$(git rev-parse --show-toplevel)"
-# renovate: datasource=docker depName=zricethezav/gitleaks
-GITLEAKS_IMAGE="zricethezav/gitleaks:v8.30.1"
+GITLEAKS_IMAGE="zricethezav/gitleaks:v8.30.1@sha256:c00b6bd0aeb3071cbcb79009cb16a60dd9e0a7c60e2be9ab65d25e6bc8abbb7f"
+GITLEAKS_CONFIG="$REPO_ROOT/.gitleaks.toml"
 
-if ! command -v docker >/dev/null 2>&1; then
-  echo "❌ docker not found — cannot run gitleaks, blocking commit for safety" >&2
-  echo "   (use 'git commit --no-verify' only if you're certain no secrets are staged)" >&2
-  exit 1
+# --- 1. Skip mechanism (matches Gitleaks' own SKIP convention) ---
+if [ "${SKIP:-}" = "gitleaks" ]; then
+  echo "⏭️  gitleaks skipped via SKIP=gitleaks"
+  exit 0
 fi
 
-docker run --rm \
-  -v "$REPO_ROOT:/path:ro" \
-  "$GITLEAKS_IMAGE" \
-  protect --source /path --staged --redact -v
+# --- 2. Docker availability check (warn, don't block) ---
+if ! command -v docker >/dev/null 2>&1; then
+  echo "⚠️  docker not found — gitleaks NOT run. Install Docker or use 'git commit --no-verify'." >&2
+  exit 0   # warn, but don't block commit
+fi
 
-echo "✅ gitleaks: no secrets detected"
+# --- 3. Build config mount (optional .gitleaks.toml) ---
+CONFIG_MOUNT=()
+if [ -f "$GITLEAKS_CONFIG" ]; then
+  CONFIG_MOUNT=(-v "$GITLEAKS_CONFIG:/config/.gitleaks.toml:ro")
+  CONFIG_FLAG=(--config /config/.gitleaks.toml)
+else
+  CONFIG_FLAG=()
+fi
+
+# --- 4. Run gitleaks (detached from stdin, read-only repo mount) ---
+set +e
+docker run --rm \
+  --pull=missing \
+  --user "$(id -u):$(id -g)" \
+  --read-only \
+  --tmpfs /tmp:rw,noexec,nosuid,size=64m \
+  -v "$REPO_ROOT:/path:ro" \
+  "${CONFIG_MOUNT[@]}" \
+  "$GITLEAKS_IMAGE" \
+  protect \
+    --source /path \
+    --staged \
+    --redact \
+    --no-banner \
+    --no-color \
+    "${CONFIG_FLAG[@]}" \
+    --verbose \
+  < /dev/null
+EXIT_CODE=$?
+set -e
+
+# --- 5. Handle exit codes ---
+case "$EXIT_CODE" in
+  0)
+    echo "✅ gitleaks: no secrets detected in staged changes"
+    exit 0
+    ;;
+  100)
+    echo "" >&2
+    echo "❌ gitleaks: SECRETS DETECTED in staged changes — commit blocked." >&2
+    echo "" >&2
+    echo "   Fix options:" >&2
+    echo "     1. Remove the secret and re-stage the file" >&2
+    echo "     2. Use an environment variable or secret manager" >&2
+    echo "     3. If this is a false positive, add it to .gitleaks.toml allowlist" >&2
+    echo "     4. To skip this check: SKIP=gitleaks git commit ..." >&2
+    echo "" >&2
+    exit 1
+    ;;
+  *)
+    echo "⚠️  gitleaks: unexpected exit code $EXIT_CODE — check Docker/gitleaks output above." >&2
+    exit 1
+    ;;
+esac
