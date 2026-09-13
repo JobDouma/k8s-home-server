@@ -8,34 +8,42 @@ OUTPUT="$REPO_DIR/cluster-context.txt"
 LOG_FILE="$HOME/.cache/cluster-context-rebuild.log"
 LOCK_FILE="$REPO_DIR/.git/cluster-context.lock"
 
-# --- 1. Conditional trigger: only run if K8s-related paths changed ---
-if ! git diff-tree --no-commit-id --name-only -r HEAD | grep -qE '^(k8s|manifests|deploy|helm|flux)/'; then
+# --- 1. Gate: only rebuild when K8s-relevant paths or any YAML changed ---
+CHANGED="$(git diff-tree --no-commit-id --name-only -r HEAD || true)"
+if ! printf '%s\n' "$CHANGED" \
+     | grep -qE '^(apps|clusters|infrastructure)/|\.ya?ml$'; then
   exit 0
 fi
 
-# --- 2. Verify repo2txt is available ---
+# --- 2. Verify repo2txt is available (warn, don't block) ---
 if ! command -v repo2txt >/dev/null 2>&1; then
-  echo "❌ repo2txt not found — cluster-context.txt NOT updated" >&2
+  echo "⚠️  repo2txt not found on PATH — cluster-context.txt NOT updated" >&2
   exit 0
 fi
 
-# --- 3. Prevent concurrent runs ---
+# --- 3. Prevent concurrent runs corrupting the output file ---
 if [ -e "$LOCK_FILE" ]; then
-  echo "⚠️  Cluster context regeneration already in progress — skipping." >&2
+  echo "⚠️  cluster-context rebuild already in progress — skipping" >&2
   exit 0
 fi
+
+# --- 4. Detach so `git commit` returns immediately ---
+mkdir -p "$(dirname "$LOG_FILE")"
 touch "$LOCK_FILE"
 
-# --- 4. Run detached ---
-mkdir -p "$(dirname "$LOG_FILE")"
 nohup bash -c '
-  trap "rm -f \"$1\"" EXIT
-  repo2txt -r "$0" -o "$2" \
-    --exclude-dir flux-system .git .github .githooks .vscode dashboards \
-    --ignore-types .sops .lock \
-    >> "$3" 2>&1
-  echo "✅ $(date): cluster-context.txt updated" >> "$3"
-' "$REPO_DIR" "$LOCK_FILE" "$OUTPUT" "$LOG_FILE" > /dev/null 2>&1 &
-disown 2>/dev/null || true
+  set -euo pipefail
+  REPO_DIR="$1"; OUTPUT="$2"; LOG_FILE="$3"; LOCK_FILE="$4"
+  trap "rm -f \"$LOCK_FILE\"" EXIT
+  {
+    echo "=== $(date -Is) rebuilding cluster-context.txt ==="
+    repo2txt -r "$REPO_DIR" -o "$OUTPUT" \
+      --exclude-dir flux-system .git .github .githooks .vscode dashboards backup runbooks \
+      --ignore-types .sops .lock
+    echo "✅ $(date -Is) done"
+  } >> "$LOG_FILE" 2>&1
+' _ "$REPO_DIR" "$OUTPUT" "$LOG_FILE" "$LOCK_FILE" \
+  > /dev/null 2>&1 < /dev/null &
 
+disown 2>/dev/null || true
 exit 0
