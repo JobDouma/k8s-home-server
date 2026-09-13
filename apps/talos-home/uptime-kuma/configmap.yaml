@@ -10,7 +10,7 @@ data:
     Provisions Uptime Kuma monitors by writing directly to SQLite.
     - No external libraries needed (except bcrypt, installed by the init container)
     - Idempotent: skips monitors that already exist by name
-    - Handles deletions: removes monitors listed in REMOVED
+    - Handles deletions: removes monitors listed in REMOVED (with FK cascade)
     Runs as an init container inside the uptime-kuma pod, so there is no
     concurrent SQLite writer and no restart is needed for Uptime Kuma to
     pick up the monitors.
@@ -46,6 +46,10 @@ data:
     con.row_factory = sqlite3.Row
     con.execute("PRAGMA busy_timeout = 30000")
     con.execute("PRAGMA journal_mode = WAL")
+    # Required so that deleting a monitor also cleans up monitor_notification,
+    # heartbeat, tag, etc. rows via the schema's ON DELETE CASCADE constraints.
+    # Must be set outside any active transaction, hence set immediately here.
+    con.execute("PRAGMA foreign_keys = ON")
 
     # Sanity check: the schema must already exist (bootstrap-db's job).
     try:
@@ -76,69 +80,63 @@ data:
     user_id = con.execute("SELECT id FROM user LIMIT 1").fetchone()["id"]
     log(f"Provisioning for user_id={user_id}")
 
-    # ── Monitors to remove ───────────────────────────────────────────────────
-    REMOVED = [
-        "SABnzbd",
-        "Router",
-        "talos-cp-1 (k8s API)",
-        "talos-wk-1 (k8s API)",
-    ]
-    removed_count = 0
-    for name in REMOVED:
-        row = con.execute("SELECT id FROM monitor WHERE name = ?", (name,)).fetchone()
-        if row:
-            con.execute("DELETE FROM monitor WHERE id = ?", (row["id"],))
-            log(f"  removed: {name}")
-            removed_count += 1
+    try:
+        # ── Monitors to remove ───────────────────────────────────────────────
+        REMOVED = [
+            "SABnzbd",
+            "Router",
+            "talos-cp-1 (k8s API)",
+            "talos-wk-1 (k8s API)",
+        ]
+        removed_count = 0
+        for name in REMOVED:
+            row = con.execute("SELECT id FROM monitor WHERE name = ?", (name,)).fetchone()
+            if row:
+                con.execute("DELETE FROM monitor WHERE id = ?", (row["id"],))
+                log(f"  removed: {name}")
+                removed_count += 1
 
-    existing = {r["name"] for r in con.execute("SELECT name FROM monitor")}
-    log(f"Existing monitors: {len(existing)}, removed: {removed_count}")
+        existing = {r["name"] for r in con.execute("SELECT name FROM monitor")}
+        log(f"Existing monitors: {len(existing)}, removed: {removed_count}")
 
-    # ── Gotify notification ──────────────────────────────────────────────────
-    def add_notification(name, gotify_url, gotify_token):
-        existing_notif = con.execute("SELECT id FROM notification WHERE name = ?", (name,)).fetchone()
-        if existing_notif:
+        # ── Gotify notification ──────────────────────────────────────────────
+        def add_notification(name, gotify_url, gotify_token):
+            existing_notif = con.execute("SELECT id FROM notification WHERE name = ?", (name,)).fetchone()
             config = json.dumps({
                 "type": "gotify",
                 "gotifyserverurl": gotify_url,
                 "gotifyapplicationToken": gotify_token,
                 "gotifyPriority": 8
             })
-            con.execute(
-                "UPDATE notification SET config = ? WHERE id = ?",
-                (config, existing_notif["id"])
-            )
-            log(f"  updated notification config: {name}")
-            return existing_notif["id"]
-        config = json.dumps({
-            "type": "gotify",
-            "gotifyserverurl": gotify_url,
-            "gotifyapplicationToken": gotify_token,
-            "gotifyPriority": 8
-        })
-        cur = con.execute("""
-            INSERT INTO notification (name, config, is_default, user_id, active)
-            VALUES (?, ?, 1, ?, 1)
-        """, (name, config, user_id))
-        log(f"  added notification: {name}")
-        return cur.lastrowid
+            if existing_notif:
+                con.execute(
+                    "UPDATE notification SET config = ? WHERE id = ?",
+                    (config, existing_notif["id"])
+                )
+                log(f"  updated notification config: {name}")
+                return existing_notif["id"]
+            cur = con.execute("""
+                INSERT INTO notification (name, config, is_default, user_id, active)
+                VALUES (?, ?, 1, ?, 1)
+            """, (name, config, user_id))
+            log(f"  added notification: {name}")
+            return cur.lastrowid
 
-    gotify_token = os.environ.get("UPTIME_KUMA_GOTIFY_TOKEN", "")
-    notif_id = add_notification(
-        "Gotify",
-        "http://gotify.gotify.svc.cluster.local",
-        gotify_token
-    ) if gotify_token else None
+        gotify_token = os.environ.get("UPTIME_KUMA_GOTIFY_TOKEN", "")
+        notif_id = add_notification(
+            "Gotify",
+            "http://gotify.gotify.svc.cluster.local",
+            gotify_token
+        ) if gotify_token else None
 
-    # ── Monitor helpers ──────────────────────────────────────────────────────
-    added_count = 0
-    skipped_count = 0
+        # ── Monitor helpers ───────────────────────────────────────────────────
+        added_count = 0
+        skipped_count = 0
 
-    def add_http(name, url):
-        global added_count, skipped_count
-        if name in existing:
-            skipped_count += 1; return
-        try:
+        def add_http(name, url):
+            nonlocal added_count, skipped_count
+            if name in existing:
+                skipped_count += 1; return
             cur = con.execute("""
                 INSERT INTO monitor (
                     name, type, url, method, interval, retry_interval, maxretries,
@@ -153,14 +151,11 @@ data:
                 )
             log(f"  added http: {name}")
             added_count += 1
-        except Exception as e:
-            log(f"  WARN {name}: {e}")
 
-    def add_port(name, hostname, port):
-        global added_count, skipped_count
-        if name in existing:
-            skipped_count += 1; return
-        try:
+        def add_port(name, hostname, port):
+            nonlocal added_count, skipped_count
+            if name in existing:
+                skipped_count += 1; return
             cur = con.execute("""
                 INSERT INTO monitor (
                     name, type, hostname, port, interval, retry_interval, maxretries,
@@ -174,40 +169,43 @@ data:
                 )
             log(f"  added port: {name}")
             added_count += 1
-        except Exception as e:
-            log(f"  WARN {name}: {e}")
 
-    # ── Monitors ─────────────────────────────────────────────────────────────
-    # Media
-    add_http("Jellyfin",      "https://jellyfin.lan")
-    add_http("Jellyseerr",    "https://jellyseerr.lan")
-    add_http("Sonarr",        "https://sonarr.lan")
-    add_http("Radarr",        "https://radarr.lan")
-    add_http("Prowlarr",      "https://prowlarr.lan")
-    add_http("qBittorrent",   "https://qbittorrent.lan")
-    add_http("Immich",        "https://immich.lan")
-    # Monitoring
-    add_http("Grafana",       "https://grafana.lan")
-    add_http("Prometheus",    "https://prometheus.lan")
-    add_http("Falco",         "https://falco.lan")
-    add_http("Uptime Kuma",   "https://uptime-kuma.lan")
-    # Networking
-    add_http("Traefik",       "https://traefik.lan")
-    add_http("Blocky DNS",    "https://blocky.lan")
-    add_http("Authentik",     "https://auth.lan")
-    # Apps
-    add_http("Dashy",         "https://dashy.lan")
-    add_http("FreshRSS",      "https://freshrss.lan")
-    add_http("Joplin",        "https://joplin.lan")
-    add_http("Gotify",        "https://gotify.lan")
-    # Infrastructure
-    add_http("TrueNAS",       "https://truenas.lan")
-    add_http("Omni",          "https://omni.lan")
-    # Talos nodes — TCP port check on k8s API (6443)
-    add_port("talos-cp-1",    "192.168.2.22", 6443)
-    add_port("talos-wk-1",    "192.168.2.6",  6443)
+        # ── Monitors ──────────────────────────────────────────────────────────
+        # Media
+        add_http("Jellyfin",      "https://jellyfin.lan")
+        add_http("Jellyseerr",    "https://jellyseerr.lan")
+        add_http("Sonarr",        "https://sonarr.lan")
+        add_http("Radarr",        "https://radarr.lan")
+        add_http("Prowlarr",      "https://prowlarr.lan")
+        add_http("qBittorrent",   "https://qbittorrent.lan")
+        add_http("Immich",        "https://immich.lan")
+        # Monitoring
+        add_http("Grafana",       "https://grafana.lan")
+        add_http("Prometheus",    "https://prometheus.lan")
+        add_http("Falco",         "https://falco.lan")
+        add_http("Uptime Kuma",   "https://uptime-kuma.lan")
+        # Networking
+        add_http("Traefik",       "https://traefik.lan")
+        add_http("Blocky DNS",    "https://blocky.lan")
+        add_http("Authentik",     "https://auth.lan")
+        # Apps
+        add_http("Dashy",         "https://dashy.lan")
+        add_http("FreshRSS",      "https://freshrss.lan")
+        add_http("Joplin",        "https://joplin.lan")
+        add_http("Gotify",        "https://gotify.lan")
+        # Infrastructure
+        add_http("TrueNAS",       "https://truenas.lan")
+        add_http("Omni",          "https://omni.lan")
+        # Talos nodes — TCP port check on k8s API (6443)
+        add_port("talos-cp-1",    "192.168.2.22", 6443)
+        add_port("talos-wk-1",    "192.168.2.6",  6443)
 
-    con.commit()
+        con.commit()
+        log(f"Done. added={added_count}, skipped={skipped_count}, removed={removed_count}")
+    except Exception as e:
+        con.rollback()
+        log(f"ERROR during provisioning, rolled back all changes: {e}")
+        con.close()
+        sys.exit(1)
+
     con.close()
-
-    log(f"Done. added={added_count}, skipped={skipped_count}, removed={removed_count}")

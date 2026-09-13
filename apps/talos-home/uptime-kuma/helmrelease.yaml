@@ -6,10 +6,14 @@ metadata:
 spec:
   interval: 15m
   timeout: 10m
+  driftDetection:
+    mode: enabled
   install:
+    crds: CreateReplace
     remediation:
       retries: 3
   upgrade:
+    crds: CreateReplace
     remediation:
       retries: 3
   chart:
@@ -25,6 +29,7 @@ spec:
       uptime-kuma:
         replicas: 1
         pod:
+          automountServiceAccountToken: false
           securityContext:
             runAsUser: 1000
             runAsGroup: 1000
@@ -52,12 +57,16 @@ spec:
                 cd /app
 
                 # Schema already present? Nothing to do.
+                # NOTE: Uptime Kuma bundles `better-sqlite3` (sync API), not the
+                # `sqlite3` package — using the wrong module name here silently
+                # fails and defeats the skip-check every run.
                 if [ -f /app/data/kuma.db ]; then
                   if node -e "
-                    const s = require('sqlite3');
-                    const db = new s.Database('/app/data/kuma.db');
-                    db.get(\"SELECT 1 FROM sqlite_master WHERE type='table' AND name='monitor'\",
-                      (e, r) => process.exit(e || !r ? 1 : 0));
+                    const Database = require('better-sqlite3');
+                    const db = new Database('/app/data/kuma.db', { readonly: true, fileMustExist: true });
+                    const row = db.prepare(\"SELECT 1 FROM sqlite_master WHERE type='table' AND name='monitor'\").get();
+                    db.close();
+                    process.exit(row ? 0 : 1);
                   " 2>/dev/null; then
                     echo "Schema already present, skipping bootstrap."
                     exit 0
@@ -110,7 +119,8 @@ spec:
                 memory: 256Mi
 
           # Runs provision.py against the now-initialised DB. Idempotent:
-          # skips users/monitors/notifications that already exist.
+          # skips users/monitors/notifications that already exist, and
+          # rolls back cleanly on any unexpected error.
           provision:
             image:
               repository: python
