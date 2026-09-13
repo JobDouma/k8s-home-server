@@ -15,7 +15,7 @@ spec:
   upgrade:
     crds: CreateReplace
     remediation:
-      retries: 3
+      retries: 0
   chart:
     spec:
       chart: app-template
@@ -39,90 +39,65 @@ spec:
             runAsNonRoot: true
             seccompProfile:
               type: RuntimeDefault
-
         initContainers:
           bootstrap-db:
             image:
               repository: louislam/uptime-kuma
               tag: 2.5.3@sha256:3e24e96c89efff0e3a4b0698cbdd36c15ad3022371db57166e5588853002ee5c
             command:
-              - /bin/sh
-              - -c
-              - |
-                set -eu
-                cd /app
-
-                if [ -f /app/data/kuma.db ]; then
-                  if node -e "
-                    const Database = require('better-sqlite3');
-                    const db = new Database('/app/data/kuma.db', { readonly: true, fileMustExist: true });
-                    const row = db.prepare(\"SELECT 1 FROM sqlite_master WHERE type='table' AND name='monitor'\").get();
-                    db.close();
-                    process.exit(row ? 0 : 1);
-                  " 2>/dev/null; then
-                    echo "Schema already present, skipping bootstrap."
-                    exit 0
-                  fi
-                fi
-
-                echo "Starting Uptime Kuma to bootstrap schema..."
-                node server/server.js &
-                PID=$!
-                trap 'kill -TERM "$PID" 2>/dev/null || true; wait "$PID" 2>/dev/null || true' EXIT
-
-                node -e "
-                  const http = require('http');
-                  let i = 0;
-                  const check = () => {
-                    const req = http.get('http://127.0.0.1:3001/', r => {
-                      r.resume();
-                      console.log('uptime-kuma responded on :3001');
-                      process.exit(0);
-                    });
-                    req.on('error', () => {
-                      if (++i < 90) setTimeout(check, 2000);
-                      else { console.error('timeout waiting for :3001'); process.exit(1); }
-                    });
-                    req.setTimeout(2000, () => req.destroy());
-                  };
-                  check();
-                "
-
-                echo "Giving migrations 10s to settle..."
-                sleep 10
-                echo "Bootstrap done."
+            - /bin/sh
+            - -c
+            - "set -eu\ncd /app\n\nif [ -f /app/data/kuma.db ]; then\n  if node -e\
+              \ \"\n    const Database = require('better-sqlite3');\n    const db\
+              \ = new Database('/app/data/kuma.db', { readonly: true, fileMustExist:\
+              \ true });\n    const row = db.prepare(\\\"SELECT 1 FROM sqlite_master\
+              \ WHERE type='table' AND name='monitor'\\\").get();\n    db.close();\n\
+              \    process.exit(row ? 0 : 1);\n  \" 2>/dev/null; then\n    echo \"\
+              Schema already present, skipping bootstrap.\"\n    exit 0\n  fi\nfi\n\
+              \necho \"Starting Uptime Kuma to bootstrap schema...\"\nnode server/server.js\
+              \ &\nPID=$!\ntrap 'kill -TERM \"$PID\" 2>/dev/null || true; wait \"\
+              $PID\" 2>/dev/null || true' EXIT\n\nnode -e \"\n  const http = require('http');\n\
+              \  let i = 0;\n  const check = () => {\n    const req = http.get('http://127.0.0.1:3001/',\
+              \ r => {\n      r.resume();\n      console.log('uptime-kuma responded\
+              \ on :3001');\n      process.exit(0);\n    });\n    req.on('error',\
+              \ () => {\n      if (++i < 90) setTimeout(check, 2000);\n      else\
+              \ { console.error('timeout waiting for :3001'); process.exit(1); }\n\
+              \    });\n    req.setTimeout(2000, () => req.destroy());\n  };\n  check();\n\
+              \"\n\necho \"Giving migrations 10s to settle...\"\nsleep 10\necho \"\
+              Bootstrap done.\"\n"
             securityContext:
               runAsUser: 1000
               runAsGroup: 1000
               runAsNonRoot: true
               allowPrivilegeEscalation: false
               capabilities:
-                drop: ["ALL"]
+                drop:
+                - ALL
             resources:
               requests:
                 cpu: 50m
                 memory: 128Mi
               limits:
                 memory: 256Mi
-
-          # Runs provision.py against the now-initialised DB.
-          # NOTE: python:3.14-slim caused CrashLoopBackOff — bcrypt has no
-          # prebuilt wheel for 3.14 yet, and this container has no compiler
-          # (non-root, capabilities dropped), so `pip install` fails hard.
-          # Pinned to 3.12-slim, which has stable prebuilt bcrypt wheels,
-          # and forced to --only-binary so it fails fast with a clear
-          # message instead of a compiler-error wall if this ever recurs.
           provision:
             image:
               repository: python
-              tag: 3.12-slim
+              tag: 3.12-slim@sha256:78387bc3881b8273120a12ebe6c1ab22b018ccc2c9adf565ae1ac9b536e184ea
             command:
-              - /bin/sh
-              - -c
-              - |
-                set -eux
-                pip install --no-cache-dir --user --only-binary=:all: bcrypt==4.2.0
-                exec python3 /scripts/provision.py
+            - /bin/sh
+            - -c
+            - |
+              set -uex
+              if ! pip install --no-cache-dir --user --only-binary=:all: bcrypt==4.2.0; then
+                echo "PIP INSTALL FAILED — sleeping for debug" >&2
+                sleep 3600
+                exit 1
+              fi
+              if ! python3 /scripts/provision.py; then
+                echo "PROVISION.PY FAILED — sleeping for debug" >&2
+                sleep 3600
+                exit 1
+              fi
             env:
               HOME: /tmp
               UPTIME_KUMA_ADMIN_USER:
@@ -146,7 +121,8 @@ spec:
               runAsNonRoot: true
               allowPrivilegeEscalation: false
               capabilities:
-                drop: ["ALL"]
+                drop:
+                - ALL
             resources:
               requests:
                 cpu: 50m
@@ -154,7 +130,6 @@ spec:
               limits:
                 cpu: 200m
                 memory: 128Mi
-
         containers:
           app:
             image:
@@ -163,15 +138,16 @@ spec:
             env:
               TZ: Europe/Amsterdam
             ports:
-              - name: http
-                containerPort: 3001
+            - name: http
+              containerPort: 3001
             securityContext:
               runAsUser: 1000
               runAsGroup: 1000
               runAsNonRoot: true
               allowPrivilegeEscalation: false
               capabilities:
-                drop: ["ALL"]
+                drop:
+                - ALL
             resources:
               requests:
                 cpu: 50m
@@ -199,7 +175,6 @@ spec:
                   initialDelaySeconds: 15
                   periodSeconds: 10
                   failureThreshold: 3
-
     service:
       app:
         controller: uptime-kuma
@@ -207,18 +182,16 @@ spec:
         ports:
           http:
             port: 3001
-
     persistence:
       data:
         type: persistentVolumeClaim
         existingClaim: uptime-kuma-data
         globalMounts:
-          - path: /app/data
-
+        - path: /app/data
       scripts:
         type: configMap
         name: uptime-kuma-monitors
         globalMounts:
-          - path: /scripts/provision.py
-            subPath: provision.py
-            readOnly: true
+        - path: /scripts/provision.py
+          subPath: provision.py
+          readOnly: true
