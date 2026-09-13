@@ -21,22 +21,10 @@ spec:
         name: authentik
         namespace: flux-system
   values:
-    # ─────────────────────────────────────────────────────────────
-    # FIX #1: existingSecret suppresses chart-injected env vars.
-    # authentik-secret is MISSING AUTHENTIK_REDIS__HOST, so without
-    # this block the server tries to reach the hostname `redis`
-    # (authentik's default) and crashloops even once postgres is up.
-    # ─────────────────────────────────────────────────────────────
     global:
       env:
         - name: AUTHENTIK_REDIS__HOST
           value: authentik-redis-master
-        - name: AUTHENTIK_LISTEN__HTTP
-          value: 0.0.0.0:9000
-        - name: AUTHENTIK_LISTEN__HTTPS
-          value: 0.0.0.0:9443
-        - name: AUTHENTIK_LISTEN__METRICS
-          value: 0.0.0.0:9300
 
     blueprints:
       enabled: true
@@ -123,32 +111,21 @@ spec:
 
     postgresql:
       enabled: true
-      # ─────────────────────────────────────────────────────────────
-      # FIX #2: use Bitnami's built-in volumePermissions init container.
-      # The previous custom `fix-permissions` container joined its
-      # commands without separators ("... data chown -R 1001:1001 ..."),
-      # so mkdir received -R as an argument and exited 1 immediately.
-      # Do NOT reintroduce a custom initContainers block here.
-      # ─────────────────────────────────────────────────────────────
       volumePermissions:
-        enabled: true
-      auth:
-        username: authentik
-        database: authentik
-        existingSecret: authentik-postgresql-secret
+        enabled: false
       primary:
+        podSecurityContext:
+          enabled: true
+          fsGroup: 1001
+        containerSecurityContext:
+          enabled: true
+          runAsUser: 1001
         persistence:
           enabled: true
           storageClass: local-path
           size: 10Gi
-        extendedConfiguration: |
-          autovacuum_vacuum_scale_factor = 0.05
-          autovacuum_analyze_scale_factor = 0.02
-          autovacuum_vacuum_cost_delay = 20ms
-          autovacuum_max_workers = 2
-          shared_buffers = 128MB
-          effective_cache_size = 256MB
-          work_mem = 8MB
+        # extendedConfiguration has been removed – this was the trigger
+        # for the init-chmod-data container that was failing.
         resources:
           requests:
             cpu: 50m
@@ -156,12 +133,22 @@ spec:
           limits:
             cpu: 500m
             memory: 512Mi
+      auth:
+        username: authentik
+        database: authentik
+        existingSecret: authentik-postgresql-secret
 
     redis:
       enabled: true
       auth:
         enabled: false
       master:
+        podSecurityContext:
+          enabled: true
+          fsGroup: 1001
+        containerSecurityContext:
+          enabled: true
+          runAsUser: 1001
         persistence:
           enabled: true
           storageClass: local-path
