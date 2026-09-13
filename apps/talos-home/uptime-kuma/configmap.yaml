@@ -8,31 +8,55 @@ data:
     #!/usr/bin/env python3
     """
     Provisions Uptime Kuma monitors by writing directly to SQLite.
-    - No external libraries needed
+    - No external libraries needed (except bcrypt, installed by the init container)
     - Idempotent: skips monitors that already exist by name
     - Handles deletions: removes monitors listed in REMOVED
     Runs as an init container inside the uptime-kuma pod, so there is no
     concurrent SQLite writer and no restart is needed for Uptime Kuma to
     pick up the monitors.
     """
-    import sqlite3, sys, os, json, datetime
+    import sqlite3, sys, os, json
 
     DB = "/app/data/kuma.db"
 
     def log(msg): print(f"[provision] {msg}", flush=True)
 
-    # ── Open DB ──────────────────────────────────────────────────────────────
-    # The bootstrap-db init container has already run Uptime Kuma once to
-    # create the schema, so the DB is guaranteed to exist here.
-    if not (os.path.exists(DB) and os.path.getsize(DB) > 0):
-        log(f"ERROR: {DB} missing or empty — bootstrap-db did not run correctly")
+    # ── Open DB (with diagnostics) ───────────────────────────────────────────
+    if not os.path.exists(DB):
+        log(f"ERROR: {DB} does not exist. Contents of /app/data:")
+        for entry in sorted(os.listdir("/app/data")):
+            full = os.path.join("/app/data", entry)
+            try:
+                size = os.path.getsize(full)
+            except OSError:
+                size = "?"
+            log(f"  {entry}  ({size} bytes)")
         sys.exit(1)
+
+    if os.path.getsize(DB) == 0:
+        # WAL mode: main DB can be 0 bytes while kuma.db-wal holds the data.
+        wal = DB + "-wal"
+        if os.path.exists(wal) and os.path.getsize(wal) > 0:
+            log(f"{DB} is 0 bytes but WAL exists ({os.path.getsize(wal)} bytes) — OK, SQLite will replay it")
+        else:
+            log(f"ERROR: {DB} is empty and no WAL present")
+            sys.exit(1)
 
     con = sqlite3.connect(DB, timeout=30)
     con.row_factory = sqlite3.Row
     con.execute("PRAGMA busy_timeout = 30000")
     con.execute("PRAGMA journal_mode = WAL")
-    log("DB opened")
+
+    # Sanity check: the schema must already exist (bootstrap-db's job).
+    try:
+        con.execute("SELECT 1 FROM monitor LIMIT 1").fetchone()
+    except sqlite3.OperationalError as e:
+        log(f"ERROR: schema not initialised ({e}). Tables present:")
+        for row in con.execute("SELECT name FROM sqlite_master WHERE type='table'"):
+            log(f"  {row['name']}")
+        sys.exit(1)
+
+    log("DB opened and schema verified")
 
     # ── Ensure admin user exists ─────────────────────────────────────────────
     existing_user = con.execute("SELECT id FROM user LIMIT 1").fetchone()
@@ -74,7 +98,6 @@ data:
     def add_notification(name, gotify_url, gotify_token):
         existing_notif = con.execute("SELECT id FROM notification WHERE name = ?", (name,)).fetchone()
         if existing_notif:
-            # Update token in case it changed in the secret
             config = json.dumps({
                 "type": "gotify",
                 "gotifyserverurl": gotify_url,

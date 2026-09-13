@@ -33,8 +33,13 @@ spec:
             seccompProfile:
               type: RuntimeDefault
 
-        # ── One-time-ish bootstrap + provisioning, before the app starts ──
+        # ── One-time bootstrap + provisioning, before the app starts ──
         initContainers:
+          # Ensures the SQLite schema exists. On a fresh PVC it starts
+          # Uptime Kuma briefly, waits for the HTTP server on :3001 to
+          # answer (which proves SQLite is open and Knex migrations have
+          # run), then terminates it. On subsequent boots it exits
+          # immediately.
           bootstrap-db:
             image:
               repository: louislam/uptime-kuma
@@ -43,25 +48,53 @@ spec:
               - /bin/sh
               - -c
               - |
-                set -e
-                if [ -s /app/data/kuma.db ]; then
-                  echo "kuma.db already exists, skipping schema bootstrap"
-                  exit 0
+                set -eu
+                cd /app
+
+                # Schema already present? Nothing to do.
+                if [ -f /app/data/kuma.db ]; then
+                  if node -e "
+                    const s = require('sqlite3');
+                    const db = new s.Database('/app/data/kuma.db');
+                    db.get(\"SELECT 1 FROM sqlite_master WHERE type='table' AND name='monitor'\",
+                      (e, r) => process.exit(e || !r ? 1 : 0));
+                  " 2>/dev/null; then
+                    echo "Schema already present, skipping bootstrap."
+                    exit 0
+                  fi
                 fi
-                echo "Bootstrapping schema (brief Uptime Kuma run)..."
+
+                echo "Starting Uptime Kuma to bootstrap schema..."
                 node server/server.js &
                 PID=$!
-                for i in $(seq 1 90); do
-                  if [ -s /app/data/kuma.db ]; then
-                    # give knex migrations a moment to finish
-                    sleep 10
-                    break
-                  fi
-                  sleep 2
-                done
-                kill -TERM "$PID" 2>/dev/null || true
-                wait "$PID" 2>/dev/null || true
-                echo "Schema bootstrap done."
+
+                # Always reap node, even on error.
+                trap 'kill -TERM "$PID" 2>/dev/null || true; wait "$PID" 2>/dev/null || true' EXIT
+
+                # Wait until HTTP on :3001 answers. This proves the server,
+                # SQLite handle, and Knex migrations are all up — which is
+                # more reliable than sniffing kuma.db size under WAL mode.
+                node -e "
+                  const http = require('http');
+                  let i = 0;
+                  const check = () => {
+                    const req = http.get('http://127.0.0.1:3001/', r => {
+                      r.resume();
+                      console.log('uptime-kuma responded on :3001');
+                      process.exit(0);
+                    });
+                    req.on('error', () => {
+                      if (++i < 90) setTimeout(check, 2000);
+                      else { console.error('timeout waiting for :3001'); process.exit(1); }
+                    });
+                    req.setTimeout(2000, () => req.destroy());
+                  };
+                  check();
+                "
+
+                echo "Giving migrations 10s to settle..."
+                sleep 10
+                echo "Bootstrap done."
             securityContext:
               runAsUser: 1000
               runAsGroup: 1000
@@ -76,6 +109,8 @@ spec:
               limits:
                 memory: 256Mi
 
+          # Runs provision.py against the now-initialised DB. Idempotent:
+          # skips users/monitors/notifications that already exist.
           provision:
             image:
               repository: python
@@ -84,8 +119,8 @@ spec:
               - /bin/sh
               - -c
               - |
-                set -e
-                pip install --no-cache-dir --quiet --user bcrypt
+                set -eux
+                pip install --no-cache-dir --user bcrypt
                 exec python3 /scripts/provision.py
             env:
               HOME: /tmp
@@ -118,7 +153,6 @@ spec:
               limits:
                 cpu: 200m
                 memory: 128Mi
-            # Script is mounted from the configmap via the `scripts` persistence entry below.
 
         containers:
           app:
