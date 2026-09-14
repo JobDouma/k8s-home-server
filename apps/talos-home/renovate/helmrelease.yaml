@@ -21,13 +21,23 @@ spec:
       successfulJobsHistoryLimit: 1
       failedJobsHistoryLimit: 1
       ttlSecondsAfterFinished: 1800
+      # Grace window if the node/cluster is briefly unavailable right at 3:10 —
+      # without this, a missed trigger time is just skipped for the day.
+      startingDeadlineSeconds: 600
+      # Hard kill-switch in case a run hangs (API stall, rate-limit backoff, etc.)
+      # so it can't silently run forever past the intended 3am-5am schedule window.
+      activeDeadlineSeconds: 5400
+
     envFrom:
       - secretRef:
           name: renovate-secret
     env:
-      LOG_LEVEL: info
+      # NOTE: still set to debug to diagnose why the last clean run created no PRs.
+      # Drop back to "info" once that's resolved.
+      LOG_LEVEL: debug
+      NODE_OPTIONS: "--max-old-space-size=2560"
 
-    # ===== moved out of `renovate:` — these are top-level chart values =====
+    # ===== these are top-level chart values, not nested under `renovate:` =====
     image:
       repository: renovatebot/renovate
       registry: ghcr.io
@@ -51,6 +61,16 @@ spec:
         capabilities:
           drop:
             - ALL
+
+      # Optional: caches repo/package data between runs to speed up repeat
+      # extraction and reduce GitHub API calls. Requires a StorageClass capable
+      # of provisioning a small PVC in this namespace. Remove this block if you
+      # don't want the extra PVC.
+      persistence:
+        cache:
+          enabled: true
+          size: 2Gi
+
       config: |
         {
           "$schema": "https://docs.renovatebot.com/renovate-schema.json",
