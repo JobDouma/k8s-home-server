@@ -18,18 +18,38 @@ spec:
     cronjob:
       schedule: "10 3 * * *"
       concurrencyPolicy: Forbid
-      successfulJobsHistoryLimit: 0
+      successfulJobsHistoryLimit: 1
       failedJobsHistoryLimit: 1
-      ttlSecondsAfterFinished: 300
+      ttlSecondsAfterFinished: 1800
     envFrom:
       - secretRef:
           name: renovate-secret
     env:
       LOG_LEVEL: info
+
+    # ===== moved out of `renovate:` — these are top-level chart values =====
+    image:
+      repository: renovatebot/renovate
+      registry: ghcr.io
+      tag: "44.69.13@sha256:9191c8ba152484974a9faef9e22978a98cc0fc52d16756841816c5f947cd09d2"
+
+    resources:
+      requests:
+        memory: 256Mi
+      limits:
+        memory: 512Mi
+
+    securityContext:
+      runAsNonRoot: true
+      seccompProfile:
+        type: RuntimeDefault
+
     renovate:
-      image:
-        repository: ghcr.io/renovatebot/renovate
-        tag: "44.69.13@sha256:9191c8ba152484974a9faef9e22978a98cc0fc52d16756841816c5f947cd09d2"
+      securityContext:
+        allowPrivilegeEscalation: false
+        capabilities:
+          drop:
+            - ALL
       config: |
         {
           "$schema": "https://docs.renovatebot.com/renovate-schema.json",
@@ -120,10 +140,3 @@ spec:
             }
           ]
         }
-      # ========== NEW ==========
-      resources:
-        requests:
-          memory: 256Mi
-        limits:
-          memory: 512Mi
-      # =========================
