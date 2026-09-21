@@ -9,7 +9,7 @@ spec:
   chart:
     spec:
       chart: renovate
-      version: "46.279.10"
+      version: "46.310.1"
       sourceRef:
         kind: HelmRepository
         name: renovate
@@ -41,7 +41,7 @@ spec:
     image:
       repository: renovatebot/renovate
       registry: ghcr.io
-      tag: "44.69.13@sha256:9191c8ba152484974a9faef9e22978a98cc0fc52d16756841816c5f947cd09d2"
+      tag: "44.104.2@sha256:c87b1c55ab98286dad9df0c1d84ebe1fbe2a805a68d48dd7a6d577709bf951a7"
 
     resources:
       requests:

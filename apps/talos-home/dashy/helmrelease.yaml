@@ -15,7 +15,7 @@ spec:
   chart:
     spec:
       chart: app-template
-      version: 5.1.0
+      version: 5.2.1
       sourceRef:
         kind: HelmRepository
         name: bjw-s
@@ -38,7 +38,7 @@ spec:
           main:
             image:
               repository: ghcr.io/lissy93/dashy
-              tag: 4.6.13@sha256:35094a8b5905573fe465459e0a4e7e4a3d99b14d9c647590e863b0757352affe
+              tag: 4.7.3@sha256:9cdd818ba2abb4b3d64cddfc59ad2fcc44c01fe6eb1100e2d986dd100ad017ef
             env:
               TZ: Europe/Amsterdam
               NODE_ENV: production
