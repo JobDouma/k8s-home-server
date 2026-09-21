@@ -16,7 +16,7 @@ spec:
   chart:
     spec:
       chart: app-template
-      version: 5.1.0
+      version: 5.2.1
       sourceRef:
         kind: HelmRepository
         name: bjw-s
@@ -54,7 +54,7 @@ spec:
           app:
             image:
               repository: postgres
-              tag: 18@sha256:4ef4dbc939d61acea57712655ddb4b4ab27419c913f94cca0cd57cb3ea3c2280
+              tag: 18@sha256:86c951e05bf56c93d95d397747fb8820ac76cc3bedb78f43abd83eedbe3666ae
               pullPolicy: IfNotPresent
             envFrom:
             - secretRef:
