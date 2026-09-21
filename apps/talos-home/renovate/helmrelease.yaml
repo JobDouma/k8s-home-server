@@ -62,14 +62,10 @@ spec:
           drop:
             - ALL
 
-      # Optional: caches repo/package data between runs to speed up repeat
-      # extraction and reduce GitHub API calls. Requires a StorageClass capable
-      # of provisioning a small PVC in this namespace. Remove this block if you
-      # don't want the extra PVC.
-      persistence:
-        cache:
-          enabled: true
-          size: 2Gi
+      # Cache persistence intentionally disabled.
+      # The prior `local-path` PVC (512Mi, WaitForFirstConsumer, no expansion)
+      # could not be patched by Helm on upgrade, wedging the release.
+      # Renovate runs fine without a cache — just a bit slower on cold runs.
 
       config: |
         {
