@@ -70,6 +70,7 @@ spec:
         cache:
           enabled: true
           size: 2Gi
+          storageClass: truenas-nfs
 
       config: |
         {
