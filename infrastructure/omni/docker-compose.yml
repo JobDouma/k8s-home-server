@@ -12,8 +12,6 @@ services:
       - /dev/net/tun
     cap_add:
       - NET_ADMIN
-    # environment:
-    #   - SSL_CERT_FILE=/etc/ssl/certs/ca-certificates.crt   # <-- Added
     mem_limit: 1024m
     mem_reservation: 256m
     volumes:
@@ -22,7 +20,7 @@ services:
       - /opt/omni/omni.asc:/omni.asc
       - /opt/omni/tls.crt:/tls.crt
       - /opt/omni/tls.key:/tls.key
-      - /etc/ssl/certs/ca-certificates.crt:/etc/ssl/certs/ca-certificates.crt:ro   # <-- Add this
+      - /etc/ssl/certs/ca-certificates.crt:/etc/ssl/certs/ca-certificates.crt:ro
     command:
       - --account-id=400d4180-9f90-479f-b0cd-aa3643f53765
       - --name=homelab-omni
@@ -38,10 +36,9 @@ services:
       - --k8s-proxy-bind-addr=0.0.0.0:8100
       - --advertised-api-url=https://omni.lan/
       - --advertised-kubernetes-proxy-url=https://omni.lan:8100/
-      - --siderolink-api-advertised-url=https://omni.lan:8090/
+      - --machine-api-advertised-url=https://omni.lan:8090/
       - --siderolink-wireguard-advertised-addr=192.168.2.12:50180
-
-      # --- OIDC with Auth0 ---
+      # OIDC (Auth0): requires AUTH0_DOMAIN, AUTH0_CLIENT_ID, AUTH0_CLIENT_SECRET in .env
       - --auth-oidc-enabled=true
       - --auth-oidc-provider-url=${AUTH0_DOMAIN}
       - --auth-oidc-client-id=${AUTH0_CLIENT_ID}
@@ -49,18 +46,11 @@ services:
       - --auth-oidc-scopes=openid
       - --auth-oidc-scopes=profile
       - --auth-oidc-scopes=email
-      - --auth-oidc-allow-unverified-email=true   # <-- Added to be safe
-
-      # --- Disable other auth methods ---
       - --auth-auth0-enabled=false
       - --auth-saml-enabled=false
-
-      # --- Initial users and EULA ---
       - --initial-users=admin@example.com
       - --eula-accept-name=job
       - --eula-accept-email=jobdouma@hotmail.com
-
-      - --log-level=debug   # <-- Added for troubleshooting
 
   garage:
     image: dxflrs/garage:v2.4.1@sha256:9c96caa2612d3411acc5b0e6701fb238dbfba33e533a6d7d3d811a4b12d0d020
