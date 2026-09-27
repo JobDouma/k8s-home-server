@@ -36,7 +36,7 @@ spec:
           fix-permissions:
             image:
               repository: busybox
-              tag: latest@sha256:dc2d74b28e4cf8984fa52af1f39bc7c3d9c73760b41a74d629f5d11b1ab28616
+              tag: latest@sha256:fd7dc98638c8e305f4dc34e979f1c0fdfdcaeb0fbf8fcff77ae834b6da3d7e6e
             command:
             - sh
             - -c
@@ -54,7 +54,7 @@ spec:
           app:
             image:
               repository: postgres
-              tag: 18@sha256:86c951e05bf56c93d95d397747fb8820ac76cc3bedb78f43abd83eedbe3666ae
+              tag: 18@sha256:5a5a84b19854a9ffaa54082c166ff4ec27473a361e496e5ea167f298f2da9722
               pullPolicy: IfNotPresent
             envFrom:
             - secretRef:
