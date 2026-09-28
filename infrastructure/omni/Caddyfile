@@ -1,0 +1,18 @@
+{
+	admin off
+	auto_https disable_redirects
+}
+
+omni.lan {
+	tls /certs/omni.lan.crt /certs/omni.lan.key
+	reverse_proxy https://127.0.0.1:8443 {
+		transport http {
+			tls_insecure_skip_verify
+		}
+	}
+}
+
+auth.lan {
+	tls /certs/auth.lan.crt /certs/auth.lan.key
+	reverse_proxy 127.0.0.1:9000
+}

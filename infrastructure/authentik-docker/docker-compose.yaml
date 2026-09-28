@@ -1,0 +1,105 @@
+name: authentik
+
+services:
+  authentik-server:
+    image: ghcr.io/goauthentik/server:2026.8.1@sha256:9d605ed569ff9f39146be39da93714b2acf19072acc4ab0f0e2f2d81be88cdce
+    container_name: authentik-server
+    restart: unless-stopped
+    command: server
+    env_file:
+      - .env
+    environment:
+      AUTHENTIK_POSTGRESQL__HOST: postgres
+      AUTHENTIK_POSTGRESQL__PORT: 5432
+      AUTHENTIK_POSTGRESQL__NAME: authentik
+      AUTHENTIK_POSTGRESQL__USER: authentik
+      AUTHENTIK_REDIS__HOST: redis
+      AUTHENTIK_REDIS__PORT: 6379
+      AUTHENTIK_REDIS__DB: 0
+      AUTHENTIK_ERROR_REPORTING__ENABLED: "false"
+      AUTHENTIK_WEB__PATH: /
+    volumes:
+      - ./blueprints:/blueprints/custom:ro
+      - authentik-media:/media
+    ports:
+      - "9000:9000"
+      - "9443:9443"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "ak", "healthcheck"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 120s
+    mem_limit: 1024m
+    mem_reservation: 256m
+
+  authentik-worker:
+    image: ghcr.io/goauthentik/server:2026.8.1@sha256:9d605ed569ff9f39146be39da93714b2acf19072acc4ab0f0e2f2d81be88cdce
+    container_name: authentik-worker
+    restart: unless-stopped
+    command: worker
+    env_file:
+      - .env
+    environment:
+      AUTHENTIK_POSTGRESQL__HOST: postgres
+      AUTHENTIK_POSTGRESQL__PORT: 5432
+      AUTHENTIK_POSTGRESQL__NAME: authentik
+      AUTHENTIK_POSTGRESQL__USER: authentik
+      AUTHENTIK_REDIS__HOST: redis
+      AUTHENTIK_REDIS__PORT: 6379
+      AUTHENTIK_REDIS__DB: 0
+      AUTHENTIK_ERROR_REPORTING__ENABLED: "false"
+      AUTHENTIK_WEB__PATH: /
+    volumes:
+      - ./blueprints:/blueprints/custom:ro
+      - authentik-media:/media
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    mem_limit: 1536m
+    mem_reservation: 512m
+
+  postgres:
+    image: postgres:16-alpine@sha256:cf78e76683b9ca8c5733cbbdce6c9262b45b6767934dd0a95e671f9a0fc20685
+    container_name: authentik-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: authentik
+      POSTGRES_PASSWORD: ${AUTHENTIK_POSTGRESQL__PASSWORD}
+      POSTGRES_DB: authentik
+    volumes:
+      - authentik-postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U authentik -d authentik"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    mem_limit: 512m
+    mem_reservation: 128m
+
+  redis:
+    image: redis:alpine@sha256:becdda6c7f4b3fb42e42fd7f120bbf5c54c4caaaf16f26da24e4563d2c1f0576
+    container_name: authentik-redis
+    restart: unless-stopped
+    command: redis-server --appendonly yes
+    volumes:
+      - authentik-redis:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    mem_limit: 256m
+    mem_reservation: 64m
+
+volumes:
+  authentik-postgres:
+  authentik-redis:
+  authentik-media:

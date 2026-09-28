@@ -1,12 +1,25 @@
 name: omni-on-prem
 services:
+  caddy:
+    image: caddy:2.8-alpine
+    container_name: caddy
+    restart: unless-stopped
+    network_mode: host
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - ./certs:/certs:ro
+      - caddy-data:/data
+      - caddy-config:/config
+    mem_limit: 128m
+    mem_reservation: 64m
+
   omni:
     container_name: omni
     image: ghcr.io/siderolabs/omni:v1.12.2@sha256:4e961c2250f458b886d269731cd2b889f8fcaf8747d4542fa8b03e99c10e8276
     restart: unless-stopped
     network_mode: host
     extra_hosts:
-      - auth.lan:192.168.2.100
+      - auth.lan:192.168.2.12
       - omni.lan:192.168.2.12
     devices:
       - /dev/net/tun
@@ -31,18 +44,18 @@ services:
       - --machine-api-key=/tls.key
       - --private-key-source=file:///omni.asc
       - --event-sink-port=8091
-      - --bind-addr=0.0.0.0:443
+      - --bind-addr=0.0.0.0:8443                 # was 443
       - --machine-api-bind-addr=0.0.0.0:8090
       - --k8s-proxy-bind-addr=0.0.0.0:8100
       - --advertised-api-url=https://omni.lan/
       - --advertised-kubernetes-proxy-url=https://omni.lan:8100/
       - --machine-api-advertised-url=https://omni.lan:8090/
       - --siderolink-wireguard-advertised-addr=192.168.2.12:50180
-      # OIDC (Auth0): requires AUTH0_DOMAIN, AUTH0_CLIENT_ID, AUTH0_CLIENT_SECRET in .env
+      # OIDC via Authentik (replaces Auth0)
       - --auth-oidc-enabled=true
-      - --auth-oidc-provider-url=${AUTH0_DOMAIN}
-      - --auth-oidc-client-id=${AUTH0_CLIENT_ID}
-      - --auth-oidc-client-secret=${AUTH0_CLIENT_SECRET}
+      - --auth-oidc-provider-url=https://auth.lan/application/o/omni/
+      - --auth-oidc-client-id=omni-homelab
+      - --auth-oidc-client-secret=${OMNI_CLIENT_SECRET}
       - --auth-oidc-scopes=openid
       - --auth-oidc-scopes=profile
       - --auth-oidc-scopes=email
@@ -66,3 +79,7 @@ services:
       - ./garage-config/garage.toml:/etc/garage.toml:ro
       - /opt/omni/garage-meta:/var/lib/garage/meta
       - /mnt/truenas-backups/ubuntu-server/omni/garage-data:/var/lib/garage/data
+
+volumes:
+  caddy-data:
+  caddy-config:
