@@ -1,8 +1,0 @@
-# authentik/namespace.yaml — fix labels → annotations
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: authentik
-  labels:
-    pod-security.kubernetes.io/enforce: baseline
-    pod-security.kubernetes.io/warn: restricted   # warns but doesn't block
