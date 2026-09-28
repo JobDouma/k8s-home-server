@@ -115,6 +115,7 @@ data:
         traefik.lan: 192.168.2.100
         blocky.lan: 192.168.2.100
         freshrss.lan: 192.168.2.100
+        auth.lan: 192.168.2.100
         
         falco.lan: 192.168.2.100
         gotify.lan: 192.168.2.100
@@ -127,4 +128,3 @@ data:
         truenas.lan: 192.168.2.5
         router.lan: 192.168.2.254
         omni.lan: 192.168.2.12
-        auth.lan: 192.168.2.12

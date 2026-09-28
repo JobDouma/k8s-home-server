@@ -34,15 +34,15 @@ resources:
   # ──────────────────────────────────────
   # Authentik
   # ──────────────────────────────────────
-  # - authentik/namespace.yaml
-  # - authentik/certificate.yaml
-  # - authentik/helmrepository.yaml
-  # - authentik/helmrelease.yaml
-  # - authentik/ingressroute.yaml
-  # - authentik/secret.yaml
-  # - authentik/postgresql-secret.yaml
-  # - authentik/networkpolicy.yaml
-  # - authentik/blueprints-secret.yaml
+  - authentik/namespace.yaml
+  - authentik/certificate.yaml
+  - authentik/helmrepository.yaml
+  - authentik/helmrelease.yaml
+  - authentik/ingressroute.yaml
+  - authentik/secret.yaml
+  - authentik/postgresql-secret.yaml
+  - authentik/networkpolicy.yaml
+  - authentik/blueprints-secret.yaml
 
   # ──────────────────────────────────────
   # Kube Metrics Server
