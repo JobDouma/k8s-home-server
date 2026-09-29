@@ -1,7 +1,7 @@
 name: omni-on-prem
 services:
   caddy:
-    image: caddy:2.8-alpine
+    image: caddy:2.11-alpine
     container_name: caddy
     restart: unless-stopped
     network_mode: host
