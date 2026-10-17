@@ -10,6 +10,12 @@ variable "opnsense_api_secret" {
   sensitive   = true
 }
 
+variable "opnsense_uri" {
+  description = "OPNsense API URI. Transitional: https://192.168.2.200, Final: https://10.10.10.1"
+  type        = string
+  default     = "https://10.10.10.1"
+}
+
 # ── MGMT VLAN host addresses referenced in firewall rules ────────
 # These are the hosts that CAMERA and other VLANs are allowed to
 # reach.  Set the real IPs here rather than hard-coding in

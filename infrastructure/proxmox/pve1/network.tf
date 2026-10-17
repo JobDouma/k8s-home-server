@@ -1,8 +1,10 @@
 # NOTE: vmbr0 already exists on PVE1 (bridged to nic0, carries mgmt IP).
-# It is NOT managed by Terraform — we reference it by name only in VM
-# resources. This avoids recreating the bridge and losing management access.
+# It is NOT managed by Terraform — we reference it by name only.
+#
+# vmbr1 IS managed here. prevent_destroy is critical: destroying this
+# bridge detaches every house NIC and every VM NIC that uses it, which
+# is unrecoverable remotely.
 
-# LAN — one VLAN-aware bridge for ALL house-facing NICs.
 resource "proxmox_network_linux_bridge" "lan" {
   node_name  = var.proxmox_node
   name       = "vmbr1"
@@ -10,4 +12,8 @@ resource "proxmox_network_linux_bridge" "lan" {
   ports      = var.lan_nics
   vlan_aware = true
   vids       = var.vlan_ids
+
+  lifecycle {
+    prevent_destroy = true
+  }
 }

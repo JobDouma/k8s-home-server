@@ -1,9 +1,47 @@
+# ─────────────────────────────────────────────────────────────────
+# Talos Control Plane 1 — PVE1
+# ─────────────────────────────────────────────────────────────────
+# The ISO is fetched from the Talos Image Factory and verified
+# against the .sha256 sidecar published next to it. A truncated or
+# corrupted download fails `tofu apply` instead of booting a broken
+# VM.
+#
+# started = false on purpose: the CP boots AFTER OPNsense is routing
+# VLAN 10 (it needs DHCP to get 10.10.10.30 from the reservation).
+# Start it manually once `tofu apply` in infrastructure/opnsense/
+# has confirmed the MGMT VLAN is live.
+# ─────────────────────────────────────────────────────────────────
+
+locals {
+  talos_iso_url = "https://factory.talos.dev/image/${var.talos_schematic_id}/${var.talos_version}/nocloud-amd64.iso"
+  iso_filename  = "talos-${var.talos_version}-nocloud-amd64.iso"
+}
+
+data "http" "talos_iso_sha256" {
+  url = "${local.talos_iso_url}.sha256"
+}
+
+locals {
+  # .sha256 is either "hash" or "hash  filename"; extract the leading 64-hex digest.
+  talos_iso_checksum = regex(
+    "^[a-fA-F0-9]{64}",
+    trimspace(data.http.talos_iso_sha256.response_body),
+  )
+}
+
 resource "proxmox_download_file" "talos_iso" {
   content_type = "iso"
-  datastore_id = "local"
+  datastore_id = var.iso_datastore
   node_name    = var.proxmox_node
-  file_name    = "talos-omni-amd64.iso"
-  url          = "https://factory.talos.dev/image/46a5ffcc6627ec9bf37c6b2f13b290000d5ac2981e90b7160b5f2878f375ee8c/v1.14.2/nocloud-amd64.iso"
+  file_name    = local.iso_filename
+  url          = local.talos_iso_url
+
+  checksum           = local.talos_iso_checksum
+  checksum_algorithm = "sha256"
+
+  lifecycle {
+    prevent_destroy = true
+  }
 }
 
 resource "proxmox_virtual_environment_vm" "talos_cp_1" {
@@ -14,14 +52,17 @@ resource "proxmox_virtual_environment_vm" "talos_cp_1" {
   description = "Talos Control Plane 1 — Mgmt VLAN 10"
   tags        = ["talos", "control-plane", "kubernetes", "terraform"]
 
-  machine = "q35"
-  bios    = "seabios"
-
-  # Disk first; Talos' nocloud image installs itself and reboots into disk.
+  machine    = "q35"
+  bios       = "seabios"
   boot_order = ["scsi0", "ide3"]
 
-  started         = false   # start manually after OPNsense is routing VLAN 10
+  started         = false
   stop_on_destroy = true
+
+  lifecycle {
+    prevent_destroy = true
+    ignore_changes  = [started]
+  }
 
   agent {
     enabled = true
@@ -29,7 +70,7 @@ resource "proxmox_virtual_environment_vm" "talos_cp_1" {
 
   cpu {
     cores = 4
-    type  = "x86-64-v2-AES"   # REQUIRED for Talos
+    type  = "x86-64-v2-AES"
   }
 
   memory {
@@ -50,7 +91,6 @@ resource "proxmox_virtual_environment_vm" "talos_cp_1" {
     interface = "ide3"
   }
 
-  # Single NIC on VLAN 10 via the VLAN-aware bridge.
   network_device {
     bridge  = proxmox_network_linux_bridge.lan.name
     model   = "virtio"

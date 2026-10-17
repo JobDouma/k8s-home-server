@@ -4,22 +4,50 @@ variable "proxmox_api_token" {
   sensitive   = true
 }
 
+variable "proxmox_endpoint" {
+  description = "Proxmox API endpoint. Transitional 192.168.2.11 until mgmt is on VLAN 10; then https://10.10.10.20:8006/"
+  type        = string
+  default     = "https://192.168.2.11:8006/"
+}
+
 variable "proxmox_node" {
+  type    = string
   default = "pve1"
 }
 
 variable "datastore" {
   description = "Proxmox storage for VM disks"
+  type        = string
   default     = "local-lvm"
 }
 
-# WAN — dedicated uplink to Fiber ONT
+variable "iso_datastore" {
+  description = "Proxmox storage for ISOs (must have 'iso' content enabled)"
+  type        = string
+  default     = "local"
+}
+
+# ── Talos ─────────────────────────────────────────────────────────
+variable "talos_version" {
+  description = "Talos Linux version"
+  type        = string
+  default     = "v1.14.2"
+}
+
+variable "talos_schematic_id" {
+  description = "Talos Image Factory schematic ID"
+  type        = string
+  default     = "46a5ffcc6627ec9bf37c6b2f13b290000d5ac2981e90b7160b5f2878f375ee8c"
+}
+
+# ── WAN ───────────────────────────────────────────────────────────
 variable "wan_nic" {
   description = "Physical NIC carrying the WAN uplink (NIC0)"
+  type        = string
   default     = "nic0"
 }
 
-# LAN — all house-facing NICs, bridged together into one VLAN-aware switch
+# ── LAN ───────────────────────────────────────────────────────────
 variable "lan_nics" {
   description = "House-facing NICs (rooms + 10G uplink to Horaco)"
   type        = list(string)
@@ -27,6 +55,7 @@ variable "lan_nics" {
 }
 
 variable "vlan_ids" {
-  description = "VLAN IDs carried on the LAN trunk"
+  description = "VLAN IDs carried on the LAN trunk (space-separated)"
+  type        = string
   default     = "10 20 30 40 50"
 }
