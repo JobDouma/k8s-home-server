@@ -1,0 +1,89 @@
+# ─────────────────────────────────────────────────────────────────
+# Terraform / OpenTofu
+# ─────────────────────────────────────────────────────────────────
+# Provider cache: huge, absolute paths, machine-specific. Regenerated
+# by `tofu init` in seconds.
+**/.terraform/*
+
+# Local state — the source of truth per host. Not in git.
+# (If you later move to a remote backend — S3, GCS, MinIO — flip
+#  this off and let the backend hold it. Until then, keep local.)
+*.tfstate
+*.tfstate.*
+
+# Transient lock file created only during a run of plan/apply.
+.terraform.tfstate.lock.info
+
+# Written when apply partially fails.
+errored.tfstate
+
+# Plan output — may embed resource attributes in plaintext (secrets).
+*.tfplan
+*.tfplan.json
+
+# Local-only overrides — never commit.
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# CLI config — can carry credentials, not portable.
+.terraformrc
+terraform.rc
+
+# ─────────────────────────────────────────────────────────────────
+# Lock file — COMMIT THIS (un-ignore the .terraform/ exclusion above)
+# ─────────────────────────────────────────────────────────────────
+# Pins provider versions + hashes so every machine and CI runner
+# gets byte-identical providers. Per HashiCorp guidance: commit.
+!**/.terraform.lock.hcl
+
+# ─────────────────────────────────────────────────────────────────
+# Secrets — never commit
+# ─────────────────────────────────────────────────────────────────
+.env
+.env.local
+.env.*
+*.tfvars
+*.tfvars.json
+
+# But allow templates so the shape of secrets is documented
+!*.tfvars.example
+!*.tfvars.json.example
+!.env.example
+
+# Key material (in case a .pem sneaks in as an SSH key for proxmox)
+*.pem
+*.key
+*.p12
+*.pfx
+*.crt
+
+# ─────────────────────────────────────────────────────────────────
+# direnv
+# ─────────────────────────────────────────────────────────────────
+# .envrc SHOULD be committed (it's the loader script, no secrets).
+# Only the per-machine .direnv cache is ignored.
+.direnv/
+
+# ─────────────────────────────────────────────────────────────────
+# Editor / OS noise
+# ─────────────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+desktop.ini
+*.swp
+*.swo
+*~
+
+# Uncomment if you don't want editor settings in the repo:
+# .vscode/
+# .idea/
+
+# ─────────────────────────────────────────────────────────────────
+# Logs and local backups
+# ─────────────────────────────────────────────────────────────────
+*.log
+*.bak
+*.orig
+*.rej
