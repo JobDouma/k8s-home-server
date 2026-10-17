@@ -1,0 +1,27 @@
+# ─────────────────────────────────────────────────────────────────
+# Terraform / OpenTofu
+# ─────────────────────────────────────────────────────────────────
+**/.terraform/*
+*.tfstate
+*.tfstate.*
+*.tfplan
+*.tfplan.json
+crash.log
+crash.*.log
+
+# ─────────────────────────────────────────────────────────────────
+# Secrets — never commit
+# ─────────────────────────────────────────────────────────────────
+.env
+.env.local
+*.tfvars
+*.tfvars.json
+
+# But allow example/template files
+!*.tfvars.example
+!.env.example
+
+# ─────────────────────────────────────────────────────────────────
+# Lock files: commit these for reproducible provider versions
+# ─────────────────────────────────────────────────────────────────
+!**/.terraform.lock.hcl
