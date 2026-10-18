@@ -85,13 +85,13 @@ resource "opnsense_kea_dhcpv4_subnet" "camera" {
 #     MAC addresses are known.  Uncomment and fill in the MAC when ready.
 # ─────────────────────────────────────────────────────────────────
 
-# resource "opnsense_kea_dhcpv4_reservation" "truenas" {
-#   subnet_id    = opnsense_kea_dhcpv4_subnet.mgmt.id
-#   ip_address   = "10.10.10.10"
-#   mac_address  = "TODO:TN:MGMT:MAC:00"
-#   hostname     = "truenas"
-#   description  = "TrueNAS Scale storage"
-# }
+resource "opnsense_kea_dhcpv4_reservation" "truenas" {
+  subnet_id    = opnsense_kea_dhcpv4_subnet.mgmt.id
+  ip_address   = "10.10.10.10"
+  mac_address  = "00:e2:69:75:ea:e5" #enp3s0
+  hostname     = "truenas"
+  description  = "TrueNAS Scale storage"
+}
 
 # resource "opnsense_kea_dhcpv4_reservation" "omni" {
 #   subnet_id    = opnsense_kea_dhcpv4_subnet.mgmt.id
