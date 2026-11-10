@@ -45,6 +45,14 @@
 # RFC1918 blocks prevent VLANs from leaking sideways into the
 # 192.168.2.0/24 WAN-side dev LAN, the old-router subnet, or any
 # 172.16.x.x gear you haven't migrated yet.
+#
+# Casting note (Chromecast / AirPlay / Sonos):
+#   - mDNS discovery works if os-mdns-repeater is installed.
+#   - The actual peer-to-peer stream is blocked by the VLAN block
+#     rules. Recommended approach for a home network: put cast
+#     targets on HOME, not IOT. Alternatively add explicit
+#     HOME → IOT allows for 8008/8009 (Chromecast), 7000/7001
+#     (AirPlay), 5000 (RAOP), 4070 (Spotify Connect).
 # ─────────────────────────────────────────────────────────────────
 
 # ── MGMT VLAN (opt1) ──────────────────────────────────────────────
@@ -305,7 +313,7 @@ resource "opnsense_firewall_filter" "home_to_mgmt_https" {
     source      = { net = "10.10.30.0/24" }
     destination = { net = "10.10.10.0/24", port = "443" }
   }
-  sequence = 46   # before home_block_internal at 49
+  sequence = 46
 }
 
 resource "opnsense_firewall_filter" "home_to_mgmt_proxmox" {
@@ -334,6 +342,63 @@ resource "opnsense_firewall_filter" "home_to_mgmt_ssh" {
   sequence = 48
 }
 
+# HTTP on Mgmt: switches, NVR web UI, Home Assistant before TLS,
+# any pre-HTTPS appliance.  Will be missed constantly without this.
+resource "opnsense_firewall_filter" "home_to_mgmt_http" {
+  description = "HOME: allow HTTP to Mgmt (switches, NVR UI, HA pre-TLS)"
+  interface   = { interface = ["opt3"] }
+  filter = {
+    action      = "pass"
+    direction   = "in"
+    protocol    = "TCP"
+    source      = { net = "10.10.30.0/24" }
+    destination = { net = "10.10.10.0/24", port = "80" }
+  }
+  sequence = 49
+}
+
+# RTSP direct to NVR, for VLC / Frigate / HA generic camera.
+resource "opnsense_firewall_filter" "home_to_mgmt_rtsp" {
+  description = "HOME: allow RTSP to NVR for stream viewing"
+  interface   = { interface = ["opt3"] }
+  filter = {
+    action      = "pass"
+    direction   = "in"
+    protocol    = "TCP"
+    source      = { net = "10.10.30.0/24" }
+    destination = { net = var.nvr_ip, port = "554" }
+  }
+  sequence = 50
+}
+
+# ICMP for debugging from HOME to Mgmt.
+resource "opnsense_firewall_filter" "home_to_mgmt_icmp" {
+  description = "HOME: allow ICMP to Mgmt for debugging"
+  interface   = { interface = ["opt3"] }
+  filter = {
+    action      = "pass"
+    direction   = "in"
+    protocol    = "ICMP"
+    source      = { net = "10.10.30.0/24" }
+    destination = { net = "10.10.10.0/24" }
+  }
+  sequence = 51
+}
+
+# Blocky VIP direct — for hardcoded DNS clients on HOME.
+resource "opnsense_firewall_filter" "home_to_blocky_vip" {
+  description = "HOME: allow DNS to Blocky VIP (hardcoded clients)"
+  interface   = { interface = ["opt3"] }
+  filter = {
+    action      = "pass"
+    direction   = "in"
+    protocol    = "TCP/UDP"
+    source      = { net = "10.10.30.0/24" }
+    destination = { net = "10.10.10.53", port = "53" }
+  }
+  sequence = 52
+}
+
 resource "opnsense_firewall_filter" "home_block_internal" {
   description = "HOME: block all other 10.10.0.0/16 traffic"
   interface   = { interface = ["opt3"] }
@@ -344,7 +409,7 @@ resource "opnsense_firewall_filter" "home_block_internal" {
     source    = { net = "10.10.30.0/24" }
     destination = { net = "10.10.0.0/16" }
   }
-  sequence = 49
+  sequence = 53
 }
 
 resource "opnsense_firewall_filter" "home_block_rfc1918_192" {
@@ -357,7 +422,7 @@ resource "opnsense_firewall_filter" "home_block_rfc1918_192" {
     source    = { net = "10.10.30.0/24" }
     destination = { net = "192.168.0.0/16" }
   }
-  sequence = 50
+  sequence = 54
 }
 
 resource "opnsense_firewall_filter" "home_block_rfc1918_172" {
@@ -370,7 +435,7 @@ resource "opnsense_firewall_filter" "home_block_rfc1918_172" {
     source    = { net = "10.10.30.0/24" }
     destination = { net = "172.16.0.0/12" }
   }
-  sequence = 51
+  sequence = 55
 }
 
 resource "opnsense_firewall_filter" "home_internet" {
@@ -383,7 +448,7 @@ resource "opnsense_firewall_filter" "home_internet" {
     source    = { net = "10.10.30.0/24" }
     destination = { net = "any" }
   }
-  sequence = 52
+  sequence = 56
 }
 
 # ── GUEST VLAN (opt4) ─────────────────────────────────────────────
@@ -483,8 +548,9 @@ resource "opnsense_firewall_filter" "guest_internet" {
 # ── CAMERA VLAN (opt5) ────────────────────────────────────────────
 # Camera: DHCP, DNS, NTP, RTSP to NVR, HA UI, then default deny.
 # The default-deny below blocks CAMERA → internal AND CAMERA → WAN.
-# If your cameras need cloud connectivity, add a specific allow rule
-# above sequence 89 — do NOT remove the default deny.
+# If your cameras need cloud connectivity or vendor OTA firmware
+# updates, add a specific allow rule above sequence 89 — do NOT
+# remove the default deny.
 
 resource "opnsense_firewall_filter" "camera_dhcp" {
   description = "CAMERA: allow DHCP to OPNsense"
