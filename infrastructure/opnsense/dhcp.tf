@@ -193,21 +193,21 @@ resource "opnsense_kea_dhcpv4_reservation" "talos_cp" {
 
 # Network gear — DHCP reservations on MGMT VLAN
 
-# resource "opnsense_kea_dhcpv4_reservation" "horaco_switch" {
-#   subnet_id    = opnsense_kea_dhcpv4_subnet.mgmt.id
-#   ip_address   = "10.10.10.3"
-#   mac_address  = "TODO:SW:MGMT:MAC:00"
-#   hostname     = "horaco-core"
-#   description  = "Horaco ZX-SWTG3624AS core switch"
-# }
+resource "opnsense_kea_dhcpv4_reservation" "horaco_switch" {
+  subnet_id    = opnsense_kea_dhcpv4_subnet.mgmt.id
+  ip_address   = "10.10.10.3"
+  mac_address  = "1C:2A:A3:32:DB:F8"
+  hostname     = "horaco-core"
+  description  = "Horaco ZX-SWTG3624AS core switch"
+}
 
-# resource "opnsense_kea_dhcpv4_reservation" "omada_eap770" {
-#   subnet_id    = opnsense_kea_dhcpv4_subnet.mgmt.id
-#   ip_address   = "10.10.10.4"
-#   mac_address  = "TODO:AP:MGMT:MAC:00"
-#   hostname     = "eap770"
-#   description  = "Omada EAP770 (mgmt)"
-# }
+resource "opnsense_kea_dhcpv4_reservation" "omada_eap770" {
+  subnet_id    = opnsense_kea_dhcpv4_subnet.mgmt.id
+  ip_address   = "10.10.10.4"
+  mac_address  = "a8:29:48:ed:a3:00"
+  hostname     = "eap770"
+  description  = "Omada EAP770 (mgmt)"
+}
 
 resource "opnsense_kea_dhcpv4_reservation" "TL-SG108PE" {
   subnet_id    = opnsense_kea_dhcpv4_subnet.mgmt.id
@@ -253,6 +253,46 @@ resource "opnsense_kea_dhcpv4_reservation" "TL-SG108PE" {
 #   description  = "Sensy One E1 Pro — Office"
 # }
 
+resource "opnsense_kea_dhcpv4_reservation" "p1meter" {
+  subnet_id    = opnsense_kea_dhcpv4_subnet.iot.id
+  ip_address   = "10.10.20.40"
+  mac_address  = "5C:2F:AF:49:52:2C"
+  hostname     = "p1meter"
+  description  = "HomeWizard P1 meter (2.4G)"
+}
+
+resource "opnsense_kea_dhcpv4_reservation" "siemens_oven" {
+  subnet_id    = opnsense_kea_dhcpv4_subnet.iot.id
+  ip_address   = "10.10.20.41"
+  mac_address  = "e4:67:a6:3f:45:9d"
+  hostname     = "siemens-oven"
+  description  = "Siemens oven (386100390235000482)"
+}
+
+resource "opnsense_kea_dhcpv4_reservation" "siemens_hood" {
+  subnet_id    = opnsense_kea_dhcpv4_subnet.iot.id
+  ip_address   = "10.10.20.42"
+  mac_address  = "E4:67:A6:09:B8:9C"
+  hostname     = "siemens-hood"
+  description  = "Siemens range hood (306030393847000383)"
+}
+
+resource "opnsense_kea_dhcpv4_reservation" "siemens_hob" {
+  subnet_id    = opnsense_kea_dhcpv4_subnet.iot.id
+  ip_address   = "10.10.20.43"
+  mac_address  = "E4:67:A6:3D:3D:1A"
+  hostname     = "siemens-hob"
+  description  = "Siemens hob (336080392725001544)"
+}
+
+resource "opnsense_kea_dhcpv4_reservation" "siemens_dishwasher" {
+  subnet_id    = opnsense_kea_dhcpv4_subnet.iot.id
+  ip_address   = "10.10.20.44"
+  mac_address  = "48:26:4C:C2:D1:6C"
+  hostname     = "siemens-dishwasher"
+  description  = "Siemens dishwasher (016100396695000914)"
+}
+
 # ─────────────────────────────────────────────────────────────────
 # Static DHCP reservations — HOME VLAN (30)
 # ─────────────────────────────────────────────────────────────────
@@ -265,6 +305,25 @@ resource "opnsense_kea_dhcpv4_reservation" "TL-SG108PE" {
 #   description  = "Desktop i5-8600K (AI inference)"
 # }
 
+resource "opnsense_kea_dhcpv4_reservation" "galaxy_s24_ultra" {
+  subnet_id    = opnsense_kea_dhcpv4_subnet.home.id
+  ip_address   = "10.10.30.51"
+  mac_address  = "36:88:AA:AB:B0:13"
+  hostname     = "s24-ultra"
+  description  = "Samsung Galaxy S24 Ultra (Job)"
+}
+
+resource "opnsense_kea_dhcpv4_reservation" "jobs_hammer" {
+  subnet_id    = opnsense_kea_dhcpv4_subnet.home.id
+  ip_address   = "10.10.30.52"
+  mac_address  = "98:3B:8F:EC:2A:25"
+  hostname     = "jobs-hammer"
+  description  = "Job's laptop"
+}
+
+# TODO: subnet_id below is mgmt.id with a 10.10.10.x address, but the
+# section header says HOME.  Left untouched to avoid breaking an
+# existing lease — please confirm intended VLAN and move accordingly.
 resource "opnsense_kea_dhcpv4_reservation" "dell_g5" {
   subnet_id    = opnsense_kea_dhcpv4_subnet.mgmt.id
   ip_address   = "10.10.10.51"        # outside the .101–.199 pool, no VIP
