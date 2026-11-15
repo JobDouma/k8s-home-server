@@ -109,6 +109,14 @@ resource "opnsense_kea_dhcpv4_reservation" "truenas" {
 #   description  = "Raspberry Pi 4B"
 # }
 
+# resource "opnsense_kea_dhcpv4_reservation" "pve_topton" {
+#   subnet_id    = opnsense_kea_dhcpv4_subnet.mgmt.id
+#   ip_address   = "10.10.10.20"
+#   mac_address  = "60:BE:B4:2E:9A:D7"
+#   hostname     = "pve-topton"
+#   description  = "Topton box / Proxmox host"
+# }
+
 # resource "opnsense_kea_dhcpv4_reservation" "pve_hp1" {
 #   subnet_id    = opnsense_kea_dhcpv4_subnet.mgmt.id
 #   ip_address   = "10.10.10.21"
@@ -203,7 +211,7 @@ resource "opnsense_kea_dhcpv4_reservation" "horaco_switch" {
 
 resource "opnsense_kea_dhcpv4_reservation" "omada_eap770" {
   subnet_id    = opnsense_kea_dhcpv4_subnet.mgmt.id
-  ip_address   = "10.10.10.4"
+  ip_address   = "10.10.10.6"
   mac_address  = "a8:29:48:ed:a3:00"
   hostname     = "eap770"
   description  = "Omada EAP770 (mgmt)"
@@ -211,10 +219,18 @@ resource "opnsense_kea_dhcpv4_reservation" "omada_eap770" {
 
 resource "opnsense_kea_dhcpv4_reservation" "TL-SG108PE" {
   subnet_id    = opnsense_kea_dhcpv4_subnet.mgmt.id
-  ip_address   = "10.10.10.5"
+  ip_address   = "10.10.10.7"
   mac_address  = "60:15:6F:87:84:9F"
   hostname     = "TL-SG108PE"
   description  = "TP-Link TL-SG108PE switch"
+}
+
+resource "opnsense_kea_dhcpv4_reservation" "dell_g5" {
+  subnet_id    = opnsense_kea_dhcpv4_subnet.mgmt.id
+  ip_address   = "10.10.10.51"        # outside the .101–.199 pool, no VIP
+  mac_address  = "00:4E:01:99:3C:B8"
+  hostname     = "dell-g5"
+  description  = "Dell G5 5590 (light inference)"
 }
 
 # ─────────────────────────────────────────────────────────────────
@@ -319,17 +335,6 @@ resource "opnsense_kea_dhcpv4_reservation" "jobs_hammer" {
   mac_address  = "98:3B:8F:EC:2A:25"
   hostname     = "jobs-hammer"
   description  = "Job's laptop"
-}
-
-# TODO: subnet_id below is mgmt.id with a 10.10.10.x address, but the
-# section header says HOME.  Left untouched to avoid breaking an
-# existing lease — please confirm intended VLAN and move accordingly.
-resource "opnsense_kea_dhcpv4_reservation" "dell_g5" {
-  subnet_id    = opnsense_kea_dhcpv4_subnet.mgmt.id
-  ip_address   = "10.10.10.51"        # outside the .101–.199 pool, no VIP
-  mac_address  = "00:4E:01:99:3C:B8"
-  hostname     = "dell-g5"
-  description  = "Dell G5 5590 (light inference)"
 }
 
 # resource "opnsense_kea_dhcpv4_reservation" "sonos_arc" {
