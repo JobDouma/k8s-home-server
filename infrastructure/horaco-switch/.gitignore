@@ -1,0 +1,37 @@
+# Local environment / secrets
+.env.local
+.env.*.local
+
+# Terraform/OpenTofu state
+*.tfstate
+*.tfstate.*
+crash.log
+*.tfvars
+*.tfvars.json
+
+# Terraform/OpenTofu working dirs & provider caches
+.terraform/
+.terraform.lock.hcl
+**/.terraform/
+**/.terraform.lock.hcl
+
+# Provider filesystem mirrors (OpenTofu installs binaries here)
+registry.opentofu.org/
+registry.terraform.io/
+**/registry.opentofu.org/
+**/registry.terraform.io/
+
+# Provider version directories produced by mirror/install steps
+**/3.3.2/
+**/*/linux_amd64/
+**/*/darwin_amd64/
+**/*/darwin_arm64/
+**/*/windows_amd64/
+
+# Editor / OS noise
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+*~
