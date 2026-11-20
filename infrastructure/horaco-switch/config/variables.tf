@@ -59,9 +59,9 @@ variable "vlan_port_map" {
     "20" = []
     # all remaining copper ports are HOME
     "30" = ["mgi9", "mgi10", "mgi11", "mgi12",
-            "mgi13", "mgi14", "mgi15", "mgi16",
-            "mgi17", "mgi18", "mgi19", "mgi20",
-            "mgi21", "mgi22", "mgi23", "mgi24"]
+      "mgi13", "mgi14", "mgi15", "mgi16",
+      "mgi17", "mgi18", "mgi19", "mgi20",
+    "mgi21", "mgi22", "mgi23", "mgi24"]
     # no dedicated GUEST / CAMERA ports
     "40" = []
     "50" = []

@@ -63,7 +63,7 @@ log_user 1
 set mode    [lindex $argv 0]
 set host    [lindex $argv 1]
 set user    [lindex $argv 2]
-set pass    [lindex $argv 3]
+set pass    $env(TF_VAR_switch_password)
 set newip   [lindex $argv 4]
 set newbits [lindex $argv 5]
 set vlan    [lindex $argv 6]
@@ -121,7 +121,7 @@ INNER_EOF
       expect "$EXPECT_SCRIPT" set-ip \
         "${var.switch_host}" \
         "${var.switch_user}" \
-        "$${TF_VAR_switch_password}" \
+        "-" \
         "${var.switch_new_ip}" \
         "${var.switch_subnet_bits}" \
         "${var.vlan_interface}"
@@ -156,7 +156,7 @@ INNER_EOF
       expect "$EXPECT_SCRIPT" save \
         "${var.switch_new_ip}" \
         "${var.switch_user}" \
-        "$${TF_VAR_switch_password}" \
+        "-" \
         "" "" ""
       phase2_rc=$?
       set -e
