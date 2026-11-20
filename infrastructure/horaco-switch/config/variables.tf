@@ -1,5 +1,5 @@
 variable "switch_host" {
-  description = "Post-bootstrap management IP. Will be the ONLY IP on the mgmt VLAN after migration."
+  description = "IP used to reach the switch when the run starts (current management IP)."
   type        = string
   default     = "10.10.10.3"
 
@@ -21,19 +21,19 @@ variable "switch_password" {
 }
 
 variable "factory_ip" {
-  description = "Factory IP used only as a diagnostic hint when switch_host is unreachable."
+  description = "Factory IP - only used in diagnostic messages."
   type        = string
   default     = "192.168.2.1"
 }
 
 variable "uplink_port" {
-  description = "SFP+ port to Proxmox/OPNsense (trunk). Horaco naming: te1..te6."
+  description = "SFP+ trunk port to OPNsense/router (VLANs 10-50 tagged)."
   type        = string
-  default     = "te6"
+  default     = "te1"
 
   validation {
     condition     = can(regex("^te[1-6]$", var.uplink_port))
-    error_message = "uplink_port must be te1..te6 (SFP+ ports)."
+    error_message = "uplink_port must be te1..te6."
   }
 }
 
@@ -50,19 +50,26 @@ variable "vlan_names" {
 }
 
 variable "vlan_port_map" {
-  description = "VLAN ID -> list of copper ports that become TRUE untagged hybrid members. mgi1-mgi8 are all MGMT per user request."
+  description = "VLAN ID -> list of copper ports that become untagged hybrid members (with PVID)."
   type        = map(list(string))
   default = {
-    "10" = ["mgi1", "mgi2", "mgi3", "mgi4", "mgi5", "mgi6", "mgi7", "mgi8"]  # all 8 ports MGMT
-    "20" = []                                                                 # no IOT ports (all reassigned to MGMT)
-    "30" = ["mgi9", "mgi10", "mgi11"]
-    "40" = ["mgi13"]
-    "50" = ["mgi14", "mgi15"]
+    # 8 dedicated MGMT access ports
+    "10" = ["mgi1", "mgi2", "mgi3", "mgi4", "mgi5", "mgi6", "mgi7", "mgi8"]
+    # no IOT ports
+    "20" = []
+    # all remaining copper ports are HOME
+    "30" = ["mgi9", "mgi10", "mgi11", "mgi12",
+            "mgi13", "mgi14", "mgi15", "mgi16",
+            "mgi17", "mgi18", "mgi19", "mgi20",
+            "mgi21", "mgi22", "mgi23", "mgi24"]
+    # no dedicated GUEST / CAMERA ports
+    "40" = []
+    "50" = []
   }
 }
 
 variable "lag_port_map" {
-  description = "LAG definition: lag id -> { members = [...], vlan = untagged VLAN ID }. Empty to disable (default — MGI2/MGI3 are standalone MGMT). Set to { \"1\" = { members = [\"mgi2\",\"mgi3\"], vlan = 10 } } to restore TrueNAS LAG, and remove mgi2/mgi3 from vlan_port_map[\"10\"]."
+  description = "LAG: lag id -> { members = [...], vlan = number }. Empty = disabled."
   type = map(object({
     members = list(string)
     vlan    = number
@@ -71,66 +78,48 @@ variable "lag_port_map" {
 }
 
 variable "mgmt_vlan" {
-  description = "VLAN ID that will host the switch management SVI."
+  description = "VLAN ID hosting the switch management SVI."
   type        = number
   default     = 10
 }
 
 variable "mgmt_ip" {
-  description = "IP address to assign to the management SVI (mgmt_vlan)."
+  description = "IP on the management SVI (final management IP)."
   type        = string
   default     = "10.10.10.3"
 }
 
 variable "mgmt_subnet_mask" {
-  description = "Subnet mask for the management SVI. KT-NOS wants space-separated mask, not CIDR."
+  description = "Subnet mask for the SVI (dotted, not CIDR - KT-NOS wants this form)."
   type        = string
   default     = "255.255.255.0"
 }
 
-variable "bootstrap_ip" {
-  description = "Temporary secondary IP assigned to the mgmt VLAN SVI so the SVI comes up before the primary IP is moved from VLAN 1. Removed after migration. Must be in the mgmt subnet and not collide with any other device."
-  type        = string
-  default     = "10.10.10.5"
-}
-
 variable "host_vlan_ip" {
-  description = "IP assigned to the Terraform host's temporary VLAN sub-interface. Must be in the mgmt subnet, not collide with switch or OPNsense."
+  description = "Fallback IP for the Terraform host's VLAN sub-interface (only used if switch is unreachable via default route - likely won't work in WSL)."
   type        = string
   default     = "10.10.10.250"
 }
 
 variable "host_vlan_prefix" {
-  description = "Prefix length for host_vlan_ip."
-  type        = number
-  default     = 24
-}
-
-variable "terraform_host_port" {
-  description = "Switch port where the Terraform host is cabled. Made hybrid (VLAN 1 untagged + mgmt VLAN tagged) so the host can reach the switch before and after migration."
-  type        = string
-  default     = "mgi12"
-
-  validation {
-    condition     = can(regex("^mgi([1-9]|1[0-9]|2[0-4])$", var.terraform_host_port))
-    error_message = "terraform_host_port must be mgi1..mgi24."
-  }
+  type    = number
+  default = 24
 }
 
 variable "migrate_mgmt_to_vlan10" {
-  description = "If true, remove the IP from VLAN 1 after bringing up the mgmt VLAN SVI. Default true."
+  description = "Move the mgmt IP from vlan1 to the mgmt VLAN SVI (removes it from vlan1 first)."
   type        = bool
   default     = true
 }
 
 variable "dry_run" {
-  description = "If true, only read state (show vlan / running-config). Change nothing."
+  description = "If true, only reads state (show vlan / running-config). Changes nothing."
   type        = bool
   default     = true
 }
 
-variable "no_save_first" {
-  description = "If true, apply to running-config but DO NOT save to flash. Re-apply with false to persist."
+variable "save_after_verify" {
+  description = "If true, save to flash only AFTER the switch is confirmed reachable on mgmt_ip. If false, changes stay in running-config and a power cycle rolls them back."
   type        = bool
-  default     = true
+  default     = false
 }
