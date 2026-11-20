@@ -1,10 +1,13 @@
 # ─────────────────────────────────────────────────────────────────
 # Talos Control Plane 1 — PVE1
 # ─────────────────────────────────────────────────────────────────
-# The ISO is fetched from the Talos Image Factory and verified
-# against the .sha256 sidecar published next to it. A truncated or
-# corrupted download fails `tofu apply` instead of booting a broken
-# VM.
+# The ISO is fetched from the Talos Image Factory over HTTPS.
+#
+# Note on integrity: the open-source factory does NOT expose a
+# .sha256 sidecar (that endpoint is Enterprise-only). The image is
+# generated on the fly and delivered over TLS, which is the
+# documented trust model for the free factory. If you later move to
+# Enterprise Image Factory, you can add checksum = ... here.
 #
 # started = false on purpose: the CP boots AFTER OPNsense is routing
 # VLAN 10 (it needs DHCP to get 10.10.10.30 from the reservation).
@@ -17,18 +20,6 @@ locals {
   iso_filename  = "talos-${var.talos_version}-nocloud-amd64.iso"
 }
 
-data "http" "talos_iso_sha256" {
-  url = "${local.talos_iso_url}.sha256"
-}
-
-locals {
-  # .sha256 is either "hash" or "hash  filename"; extract the leading 64-hex digest.
-  talos_iso_checksum = regex(
-    "^[a-fA-F0-9]{64}",
-    trimspace(data.http.talos_iso_sha256.response_body),
-  )
-}
-
 resource "proxmox_download_file" "talos_iso" {
   content_type = "iso"
   datastore_id = var.iso_datastore
@@ -36,8 +27,8 @@ resource "proxmox_download_file" "talos_iso" {
   file_name    = local.iso_filename
   url          = local.talos_iso_url
 
-  checksum           = local.talos_iso_checksum
-  checksum_algorithm = "sha256"
+  # No checksum: the free factory does not serve .sha256.
+  # The download is TLS-protected; see header note.
 
   lifecycle {
     prevent_destroy = true
