@@ -88,7 +88,7 @@ resource "opnsense_kea_dhcpv4_subnet" "camera" {
 resource "opnsense_kea_dhcpv4_reservation" "truenas" {
   subnet_id    = opnsense_kea_dhcpv4_subnet.mgmt.id
   ip_address   = "10.10.10.10"
-  mac_address  = "00:e2:69:75:ea:e5" #enp3s0
+  mac_address  = "00:e2:69:75:ea:e4" # bond0 (inherits enp2s0 MAC)
   hostname     = "truenas"
   description  = "TrueNAS Scale storage"
 }
