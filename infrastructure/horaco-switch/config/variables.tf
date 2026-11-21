@@ -50,11 +50,11 @@ variable "vlan_names" {
 }
 
 variable "vlan_port_map" {
-  description = "VLAN ID -> list of copper ports that become untagged hybrid members (with PVID)."
+  description = "VLAN ID -> list of copper ports that become untagged hybrid members (with PVID). LAG members must NOT be listed here."
   type        = map(list(string))
   default = {
-    # 8 dedicated MGMT access ports
-    "10" = ["mgi1", "mgi2", "mgi3", "mgi4", "mgi5", "mgi6", "mgi7", "mgi8"]
+    # MGMT access ports (mgi2 + mgi3 are in lag 1 for TrueNAS)
+    "10" = ["mgi1", "mgi4", "mgi5", "mgi6", "mgi7", "mgi8"]
     # no IOT ports
     "20" = []
     # all remaining copper ports are HOME
@@ -74,7 +74,19 @@ variable "lag_port_map" {
     members = list(string)
     vlan    = number
   }))
-  default = {}
+  default = {
+    # TrueNAS 2.5GbE NICs
+    "1" = {
+      members = ["mgi2", "mgi3"]
+      vlan    = 10
+    }
+  }
+}
+
+variable "lag_mode" {
+  description = "Extra arguments for the per-member 'lag <id>' command, e.g. 'mode active' for LACP. Empty = bare 'lag <id>' (rejected by this switch)."
+  type        = string
+  default     = "mode active"
 }
 
 variable "mgmt_vlan" {

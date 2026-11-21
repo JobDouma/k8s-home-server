@@ -5,6 +5,7 @@ resource "null_resource" "switch_vlan_config" {
     vlan_names           = jsonencode(var.vlan_names)
     vlan_port_map        = jsonencode(var.vlan_port_map)
     lag_port_map         = jsonencode(var.lag_port_map)
+    lag_mode             = var.lag_mode
     mgmt_vlan            = var.mgmt_vlan
     mgmt_ip              = var.mgmt_ip
     mgmt_subnet_mask     = var.mgmt_subnet_mask
@@ -21,16 +22,22 @@ resource "null_resource" "switch_vlan_config" {
 
     environment = {
       SWITCH_PASS = var.switch_password
+      LAG_MODE    = var.lag_mode
     }
 
     command = <<-EOT
       set -e
+
+      umask 077
+      LOG=/tmp/switch-tofu.log
+      exec > >(tee "$LOG") 2>&1
 
       if [ -z "$SWITCH_PASS" ]; then
         echo "ERROR: switch_password is empty. Set TF_VAR_switch_password." >&2
         exit 1
       fi
       export SWITCH_PASS
+      export LAG_MODE
 
       if [ "$(id -u)" -ne 0 ]; then
         echo "ERROR: must run as root. Use: sudo -E tofu apply ..." >&2
@@ -124,6 +131,10 @@ set mgmt_mask       [lindex $argv 9]
 set migrate_mgmt    [lindex $argv 10]
 set pass            $env(SWITCH_PASS)
 
+# Extra args for the per-member "lag <id>" command, e.g. "mode active"
+set lag_mode ""
+if {[info exists env(LAG_MODE)]} { set lag_mode $env(LAG_MODE) }
+
 array set vlan_names {}
 foreach pair [split $vlan_names_str ","] {
     if {$pair eq ""} { continue }
@@ -156,7 +167,7 @@ proc cmd {text prompt} {
     send "$text\r"
     expect {
         -re $prompt {
-            if {[regexp {Invalid|Unknown|syntax error|% *[Ee]rror|command not found} $expect_out(buffer)]} {
+            if {[regexp {Invalid|Unknown|Incomplete|syntax error|% *[Ee]rror|command not found} $expect_out(buffer)]} {
                 puts stderr "ERROR from switch after '$text': $expect_out(buffer)"
                 exit 1
             }
@@ -233,6 +244,7 @@ if { $mode eq "read" } {
     cmd "show vlan static" "Switch#"
     cmd "show ip interface vlan$mgmt_vlan" "Switch#"
     cmd "show ip interface vlan1" "Switch#"
+    cmd "show lag" "Switch#"
     cmd "show running-config" "Switch#"
     quiet_exit
     exit 0
@@ -277,10 +289,11 @@ foreach lagid [array names lag_vlan] {
     cmd "switchport mode hybrid" "config-if.*#"
     cmd "switchport hybrid allowed vlan add $lag_vlan($lagid) untagged" "config-if.*#"
     soft_cmd "switchport hybrid pvid $lag_vlan($lagid)" "config-if.*#" "Invalid|Unknown|Incomplete"
+    soft_cmd "switchport hybrid allowed vlan remove 1" "config-if.*#" "Invalid|Unknown|Incomplete"
     cmd "exit" "config.*#"
     foreach p $lag_members($lagid) {
         cmd "interface $p" "config-if.*#"
-        cmd "lag $lagid" "config-if.*#"
+        cmd [string trim "lag $lagid $lag_mode"] "config-if.*#"
         cmd "exit" "config.*#"
     }
 }
@@ -348,6 +361,7 @@ disable_paging
 
 cmd "show ip interface vlan$mgmt_vlan" "Switch#"
 cmd "show vlan static" "Switch#"
+cmd "show lag" "Switch#"
 puts "Changes applied to running-config (NOT saved to flash)."
 quiet_exit
 exit 0
@@ -378,7 +392,7 @@ INNER_EOF
         exit 1
       fi
 
-      echo "APPLY: uplink=${var.uplink_port} mgmt=vlan${var.mgmt_vlan}@${var.mgmt_ip} migrate=${var.migrate_mgmt_to_vlan10}"
+      echo "APPLY: uplink=${var.uplink_port} mgmt=vlan${var.mgmt_vlan}@${var.mgmt_ip} migrate=${var.migrate_mgmt_to_vlan10} lag_mode='${var.lag_mode}'"
 
       set +e
       expect "$EXPECT_SCRIPT" apply \
