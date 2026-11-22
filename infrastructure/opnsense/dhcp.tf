@@ -109,36 +109,36 @@ resource "opnsense_kea_dhcpv4_reservation" "truenas" {
 #   description  = "Raspberry Pi 4B"
 # }
 
-# resource "opnsense_kea_dhcpv4_reservation" "pve_topton" {
-#   subnet_id    = opnsense_kea_dhcpv4_subnet.mgmt.id
-#   ip_address   = "10.10.10.20"
-#   mac_address  = "60:BE:B4:2E:9A:D7"
-#   hostname     = "pve-topton"
-#   description  = "Topton box / Proxmox host"
-# }
+resource "opnsense_kea_dhcpv4_reservation" "pve_topton" {
+  subnet_id    = opnsense_kea_dhcpv4_subnet.mgmt.id
+  ip_address   = "10.10.10.20"
+  mac_address  = "60:be:b4:26:81:8f" 
+  hostname     = "pve-topton"
+  description  = "Topton box / Proxmox host"
+}
 
-# resource "opnsense_kea_dhcpv4_reservation" "pve_hp1" {
-#   subnet_id    = opnsense_kea_dhcpv4_subnet.mgmt.id
-#   ip_address   = "10.10.10.21"
-#   mac_address  = "TODO:HP1:MGMT:MAC:00"
-#   hostname     = "pve-hp1"
-#   description  = "HP ProDesk 1 (worker .31)"
-# }
+resource "opnsense_kea_dhcpv4_reservation" "pve_lenovo" {
+  subnet_id    = opnsense_kea_dhcpv4_subnet.mgmt.id
+  ip_address   = "10.10.10.21"
+  mac_address  = "8c:3b:4a:2d:db:77"
+  hostname     = "pve-lenovo"
+  description  = "Lenovo M75q (worker .31)"
+}
+
+resource "opnsense_kea_dhcpv4_reservation" "pve_hp1" {
+  subnet_id    = opnsense_kea_dhcpv4_subnet.mgmt.id
+  ip_address   = "10.10.10.22"
+  mac_address  = "e8:d8:d1:52:57:1b"
+  hostname     = "pve-hp1"
+  description  = "HP ProDesk 1 (worker .32)"
+}
 
 # resource "opnsense_kea_dhcpv4_reservation" "pve_hp2" {
 #   subnet_id    = opnsense_kea_dhcpv4_subnet.mgmt.id
-#   ip_address   = "10.10.10.22"
+#   ip_address   = "10.10.10.23"
 #   mac_address  = "TODO:HP2:MGMT:MAC:00"
 #   hostname     = "pve-hp2"
-#   description  = "HP ProDesk 2 (worker .32)"
-# }
-
-# resource "opnsense_kea_dhcpv4_reservation" "pve_lenovo" {
-#   subnet_id    = opnsense_kea_dhcpv4_subnet.mgmt.id
-#   ip_address   = "10.10.10.23"
-#   mac_address  = "TODO:LEN:MGMT:MAC:00"
-#   hostname     = "pve-lenovo"
-#   description  = "Lenovo M75q (worker .33)"
+#   description  = "HP ProDesk 2 (worker .33)"
 # }
 
 # Talos control plane — keep. This is the reservation you already

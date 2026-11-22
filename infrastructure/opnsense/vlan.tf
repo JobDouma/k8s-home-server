@@ -53,17 +53,3 @@ resource "opnsense_interfaces_vlan" "camera" {
   parent      = "vtnet1"
   lifecycle { prevent_destroy = true }
 }
-
-# ─────────────────────────────────────────────────────────────────
-# WAN / ISP VLAN — DISABLED until the old router is removed
-# ─────────────────────────────────────────────────────────────────
-# Uncomment and adjust only after the ONT is moved directly to the
-# OPNsense WAN NIC (vtnet0) and the old router is out of the path.
-#
-# resource "opnsense_interfaces_vlan" "wan_odido" {
-#   description = "Odido internet"
-#   tag         = 300
-#   priority    = 0
-#   parent      = "vtnet0"
-#   lifecycle { prevent_destroy = true }
-# }
