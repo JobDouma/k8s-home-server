@@ -1,4 +1,5 @@
 terraform {
+  required_version = ">= 1.6.0"
   required_providers {
     proxmox = {
       source  = "bpg/proxmox"
@@ -11,9 +12,8 @@ terraform {
   }
 }
 
-# Endpoint is a variable so the 192.168 → 10.10 migration is a
-# .env.local change, not a code change. Default remains the current
-# transitional IP; flip only after pve1 mgmt is on VLAN 10.
+# Provider config lives at the ROOT of each host's directory.
+# Modules inherit this — child modules must NOT declare a provider block.
 provider "proxmox" {
   endpoint  = var.proxmox_endpoint
   api_token = var.proxmox_api_token
