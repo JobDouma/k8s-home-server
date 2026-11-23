@@ -30,13 +30,17 @@ variable "iso_datastore" {
 
 # ── Talos ─────────────────────────────────────────────────────────
 variable "talos_version" {
-  type    = string
-  default = "v1.14.2"
+  description = "Talos version contract. Bumping this only affects NEW clusters; existing clusters keep their original secrets."
+  type        = string
+  default     = "v1.14.6"
 }
 
 variable "talos_schematic_id" {
   type    = string
   default = "46a5ffcc6627ec9bf37c6b2f13b290000d5ac2981e90b7160b5f2878f375ee8c"
+  # This schematic ID is content-addressed on the extension list.
+  # It remains stable across Talos version bumps. Validate extension
+  # compatibility before changing talos_version.
 }
 
 # ── Network ───────────────────────────────────────────────────────

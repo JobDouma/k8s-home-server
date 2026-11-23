@@ -3,8 +3,6 @@ output "talos_vm_ids" {
 }
 
 output "talos_vm_ips" {
-  description = "IPs are set via OPNsense DHCP reservations."
-  value = {
-    "talos-cp-1" = "10.10.10.30"
-  }
+  description = "IPs are enforced by OPNsense DHCP reservations."
+  value       = { for k, v in local.talos_nodes : v.name => v.ip }
 }

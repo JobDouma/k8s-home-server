@@ -1,6 +1,9 @@
-# The OPNsense ISO is manually uploaded to `local` storage.
-# Official mirrors only serve .iso.bz2, which Proxmox cannot decompress,
-# so we reference the uploaded file directly by file_id.
+# Import the already-running OPNsense VM (VM ID 100) into Terraform state.
+# This MUST be done before any apply that includes this resource.
+import {
+  to = proxmox_virtual_environment_vm.opnsense
+  id = "pve1/100"   # <node_name>/<vm_id>
+}
 
 resource "proxmox_virtual_environment_vm" "opnsense" {
   name      = "opnsense"
@@ -13,7 +16,6 @@ resource "proxmox_virtual_environment_vm" "opnsense" {
   machine = "q35"
   bios    = "ovmf"
 
-  # Disk first, CD as fallback. Prevents installer re-entry on reboot.
   boot_order = ["scsi0", "ide3"]
 
   started         = true
@@ -25,7 +27,7 @@ resource "proxmox_virtual_environment_vm" "opnsense" {
   }
 
   memory {
-    dedicated = 2048
+    dedicated = 4096
   }
 
   efi_disk {
@@ -41,7 +43,6 @@ resource "proxmox_virtual_environment_vm" "opnsense" {
   }
 
   # NIC 2: LAN trunk on the new VLAN-aware bridge.
-  # OPNsense creates VLAN sub-interfaces internally (vtnet1.10, etc.).
   network_device {
     bridge   = proxmox_network_linux_bridge.lan.name
     model    = "virtio"
@@ -62,4 +63,15 @@ resource "proxmox_virtual_environment_vm" "opnsense" {
   }
 
   serial_device {}
+
+  lifecycle {
+    prevent_destroy = true
+
+    # After the import, if the plan shows diffs on MAC addresses
+    # (they are assigned by Proxmox, not by Terraform), uncomment:
+    # ignore_changes = [
+    #   network_device[0].mac_address,
+    #   network_device[1].mac_address,
+    # ]
+  }
 }

@@ -24,3 +24,15 @@ module "talos_vms" {
   vlan_id         = 10
   mac_address     = each.value.mac
 }
+
+module "talos_config" {
+  source = "../../modules/talos-cluster-config"
+
+  cluster_name      = "talos-cp-1"
+  control_plane_ips = [local.talos_nodes["cp-1"].ip]
+  cluster_endpoint  = "https://${local.talos_nodes["cp-1"].ip}:6443"
+  talos_version     = var.talos_version
+  install_disk      = "/dev/sda"
+
+  depends_on = [module.talos_vms]
+}
