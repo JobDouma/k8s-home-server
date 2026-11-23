@@ -1,49 +1,46 @@
-# PVE1 — Proxmox Infrastructure as Code
+# pve-topton — Talos control plane on Proxmox
 
-Managed by Terraform/OpenTofu with the `bpg/proxmox` provider.
+Manages the OPNsense router, the VLAN-aware bridge, and the Talos control-plane
+VMs on the `pve1` Proxmox node.
 
-## Host
+## Apply
 
-| Item | Value |
-|---|---|
-| Hostname | `pve1` |
-| Proxmox IP | `192.168.2.11:8006` (transitional; will move to `10.10.10.20` on VLAN 10) |
-| Datastore | `local-lvm` |
-| ISO store | `local` (`/var/lib/vz/template/iso/`) |
+    tofu init
+    tofu plan
+    tofu apply
 
-## NIC Layout (unusual naming — documented for portability)
+## Accessing the cluster
 
-| Interface | Role | Bridge |
-|---|---|---|
-| `nic0` | WAN uplink to Fiber ONT | `vmbr0` (pre-existing, not TF-managed) |
-| `nic1` | Room run — Living Room | `vmbr1` |
-| `nic2` | Room run — Bedroom 1 | `vmbr1` |
-| `nic3` | Room run — Bedroom 2 | `vmbr1` |
-| `nic4` | 10G SFP+ → Horaco core switch | `vmbr1` |
-| `nic5` | 10G SFP+ (spare) | `vmbr1` |
+After `tofu apply` completes, export the credentials from this directory:
 
-> **Warning:** NIC names are `nic0`–`nic5`, not the usual `eno1`/`enp1s0`. If PVE1 is ever reinstalled, verify names match before `terraform apply`.
+    tofu output --raw kubeconfig   > ./kubeconfig
+    tofu output --raw talosconfig  > ./talosconfig
 
-## VMs
+Add both files to `.gitignore` — they contain admin credentials.
 
-| VM ID | Name | Role | VLAN | IP |
-|---|---|---|---|---|
-| 100 | `opnsense` | Router/firewall | trunk (all) | `.1` on each VLAN |
-| 110 | `talos-cp-1` | Kubernetes control plane | 10 | `10.10.10.30` |
+### kubectl
 
-## Bridge Layout
+    export KUBECONFIG=./kubeconfig
+    kubectl get nodes
 
-- **`vmbr0`** — pre-existing, bridged to `nic0`. Carries management. **Not managed by Terraform.**
-- **`vmbr1`** — Terraform-managed, VLAN-aware (10/20/30/40/50), trunk to all house runs + office.
+### talosctl
 
-## Manual Prerequisites
+The generated `talosconfig` lists every control-plane IP as an endpoint, so
+`talosctl` fails over automatically if a node is down:
 
-1. **OPNsense ISO** must be uploaded to `local` storage before `tofu apply`:
-   - Download from https://opnsense.org/download/ (`dvd`/`amd64`)
-   - Decompress `.iso.bz2`
-   - Upload via PVE UI → `local` → ISO Images → Upload
-   - Filename must match `file_id` in `opnsense.tf`
+    talosctl --talosconfig ./talosconfig version
+    talosctl --talosconfig ./talosconfig -n 10.10.10.30 get members
 
-2. **API token** in `terraform.tfvars` (see `variables.tf` for format).
+## Disaster recovery
 
-3. **Proxmox role/token** must have `SDN.Audit` + `SDN.Use` (see `bpg/proxmox` docs).
+    tofu output --raw machine_secrets > secrets.json
+
+This is the Talos PKI (CA, keys, bootstrap tokens). Store it offline — if the
+cluster is lost and the state is gone, this is the only way to recover it in
+place. Never commit it.
+
+## Omni
+
+Not used. The full lifecycle — VM creation → Talos config → bootstrap →
+kubeconfig — is handled by OpenTofu. Omni adds a management layer that would
+duplicate this; it becomes worthwhile only when you're running many clusters.
