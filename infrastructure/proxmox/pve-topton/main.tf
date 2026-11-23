@@ -31,10 +31,10 @@ module "talos_config" {
   source = "../../modules/talos-cluster-config"
 
   cluster_name        = "talos-cp-1"
-  control_plane_nodes = local.talos_nodes          # ✅ correct type: map(object({ ip, mac }))
-  # cluster_vip      = "10.10.10.29"               # optional; omit to use the first node IP as endpoint
+  control_plane_nodes = local.talos_nodes
   talos_version       = var.talos_version
   install_disk        = "/dev/sda"
 
+  # ✅ Ensure the VM is created and running before applying configuration.
   depends_on = [module.talos_vms]
 }
