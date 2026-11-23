@@ -7,7 +7,7 @@ terraform {
   }
 }
 
-resource "proxmox_virtual_environment_download_file" "talos_iso" {
+resource "proxmox_download_file" "talos_iso" {
   content_type = "iso"
   datastore_id = var.iso_datastore
   node_name    = var.node_name
@@ -35,7 +35,7 @@ resource "proxmox_virtual_environment_vm" "talos_vm" {
   stop_on_destroy = true
 
   lifecycle {
-    prevent_destroy = true
+    # prevent_destroy = true
     ignore_changes  = [started]
   }
 
@@ -62,7 +62,7 @@ resource "proxmox_virtual_environment_vm" "talos_vm" {
   }
 
   cdrom {
-    file_id   = proxmox_virtual_environment_download_file.talos_iso.id
+    file_id   = proxmox_download_file.talos_iso.id
     interface = "ide3"
   }
 
@@ -74,4 +74,7 @@ resource "proxmox_virtual_environment_vm" "talos_vm" {
   }
 
   serial_device {}
+
+  # Ensure the ISO is fully downloaded before the VM is created.
+  depends_on = [proxmox_download_file.talos_iso]
 }
