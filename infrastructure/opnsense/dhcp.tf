@@ -109,72 +109,67 @@ resource "opnsense_kea_dhcpv4_reservation" "truenas" {
 #   description  = "Raspberry Pi 4B"
 # }
 
+# ── Proxmox host mgmt IPs ────────────────────────────────────────
 resource "opnsense_kea_dhcpv4_reservation" "pve_topton" {
-  subnet_id    = opnsense_kea_dhcpv4_subnet.mgmt.id
-  ip_address   = "10.10.10.20"
-  mac_address  = "60:be:b4:26:81:8f" 
-  hostname     = "pve-topton"
-  description  = "Topton box / Proxmox host"
+  subnet_id   = opnsense_kea_dhcpv4_subnet.mgmt.id
+  ip_address  = "10.10.10.20"
+  mac_address = "60:be:b4:26:81:8f"
+  hostname    = "pve-topton"
+  description = "Topton box — Proxmox host (Talos CP-1 @ .30)"
 }
 
 resource "opnsense_kea_dhcpv4_reservation" "pve_lenovo" {
-  subnet_id    = opnsense_kea_dhcpv4_subnet.mgmt.id
-  ip_address   = "10.10.10.21"
-  mac_address  = "8c:3b:4a:2d:db:77"
-  hostname     = "pve-lenovo"
-  description  = "Lenovo M75q (worker .31)"
+  subnet_id   = opnsense_kea_dhcpv4_subnet.mgmt.id
+  ip_address  = "10.10.10.21"
+  mac_address = "8c:3b:4a:2d:db:77"
+  hostname    = "pve-lenovo"
+  description = "Lenovo M75q — Proxmox host (Talos CP-2 @ .31)"
 }
 
 resource "opnsense_kea_dhcpv4_reservation" "pve_hp1" {
-  subnet_id    = opnsense_kea_dhcpv4_subnet.mgmt.id
-  ip_address   = "10.10.10.22"
-  mac_address  = "e8:d8:d1:52:57:1b"
-  hostname     = "pve-hp1"
-  description  = "HP ProDesk 1 (worker .32)"
+  subnet_id   = opnsense_kea_dhcpv4_subnet.mgmt.id
+  ip_address  = "10.10.10.22"
+  mac_address = "e8:d8:d1:52:57:1b"
+  hostname    = "pve-hp1"
+  description = "HP ProDesk 1 — Proxmox host (Talos CP-3 @ .32)"
 }
 
 # resource "opnsense_kea_dhcpv4_reservation" "pve_hp2" {
-#   subnet_id    = opnsense_kea_dhcpv4_subnet.mgmt.id
-#   ip_address   = "10.10.10.23"
-#   mac_address  = "TODO:HP2:MGMT:MAC:00"
-#   hostname     = "pve-hp2"
-#   description  = "HP ProDesk 2 (worker .33)"
+#   subnet_id   = opnsense_kea_dhcpv4_subnet.mgmt.id
+#   ip_address  = "10.10.10.23"
+#   mac_address = "TODO:HP2:MGMT:MAC:00"
+#   hostname    = "pve-hp2"
+#   description = "HP ProDesk 2 — Proxmox host (worker .33)"
 # }
 
-# Talos control plane — keep. This is the reservation you already
-# proved works end-to-end.
-resource "opnsense_kea_dhcpv4_reservation" "talos_cp" {
-  subnet_id    = opnsense_kea_dhcpv4_subnet.mgmt.id
-  ip_address   = "10.10.10.30"
-  mac_address  = "BC:24:11:C5:51:77"
-  hostname     = "talos-cp-1"
-  description  = "Talos control-plane"
+# ── Talos control planes ─────────────────────────────────────────
+# MACs are declared in each host's terraform locals and set on the
+# VM NIC by the module, so these reservations and the VMs can never
+# drift apart.
+resource "opnsense_kea_dhcpv4_reservation" "talos_cp_1" {
+  subnet_id   = opnsense_kea_dhcpv4_subnet.mgmt.id
+  ip_address  = "10.10.10.30"
+  mac_address = "BC:24:11:C5:51:77"
+  hostname    = "talos-cp-1"
+  description = "Talos control plane 1 (pve-topton)"
 }
 
-# Talos workers — add once the VMs exist. Same pattern as the CP.
-# resource "opnsense_kea_dhcpv4_reservation" "talos_worker_hp1" {
-#   subnet_id   = opnsense_kea_dhcpv4_subnet.mgmt.id
-#   ip_address  = "10.10.10.31"
-#   mac_address = "TODO"
-#   hostname    = "talos-worker-1"
-#   description = "Talos worker on HP ProDesk 1"
-# }
-#
-# resource "opnsense_kea_dhcpv4_reservation" "talos_worker_hp2" {
-#   subnet_id   = opnsense_kea_dhcpv4_subnet.mgmt.id
-#   ip_address  = "10.10.10.32"
-#   mac_address = "TODO"
-#   hostname    = "talos-worker-2"
-#   description = "Talos worker on HP ProDesk 2"
-# }
-#
-# resource "opnsense_kea_dhcpv4_reservation" "talos_worker_lenovo" {
-#   subnet_id   = opnsense_kea_dhcpv4_subnet.mgmt.id
-#   ip_address  = "10.10.10.33"
-#   mac_address = "TODO"
-#   hostname    = "talos-worker-3"
-#   description = "Talos worker on Lenovo"
-# }
+resource "opnsense_kea_dhcpv4_reservation" "talos_cp_2" {
+  subnet_id   = opnsense_kea_dhcpv4_subnet.mgmt.id
+  ip_address  = "10.10.10.31"
+  mac_address = "BC:24:11:C5:51:78"
+  hostname    = "talos-cp-2"
+  description = "Talos control plane 2 (pve-lenovo)"
+}
+
+resource "opnsense_kea_dhcpv4_reservation" "talos_cp_3" {
+  subnet_id   = opnsense_kea_dhcpv4_subnet.mgmt.id
+  ip_address  = "10.10.10.32"
+  mac_address = "BC:24:11:C5:51:79"
+  hostname    = "talos-cp-3"
+  description = "Talos control plane 3 (pve-hp1)"
+}
+
 
 # ─────────────────────────────────────────────────────────────────
 # Hosts referenced by firewall rules in firewall.tf
