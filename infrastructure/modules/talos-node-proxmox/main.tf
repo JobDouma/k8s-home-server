@@ -14,9 +14,8 @@ resource "proxmox_download_file" "talos_iso" {
   file_name    = "talos-${var.talos_version}-nocloud-amd64.iso"
   url          = "https://factory.talos.dev/image/${var.talos_schematic}/${var.talos_version}/nocloud-amd64.iso"
 
-  lifecycle {
-    prevent_destroy = true
-  }
+  # Keep prevent_destroy only on the OPNsense VM and the network bridge — those are your pets. 
+  # The Talos VM and ISO are cattle.
 }
 
 resource "proxmox_virtual_environment_vm" "talos_vm" {
