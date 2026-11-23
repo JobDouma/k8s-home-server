@@ -1,3 +1,4 @@
+
 terraform {
   required_providers {
     proxmox = {
@@ -7,62 +8,67 @@ terraform {
   }
 }
 
-resource "proxmox_download_file" "talos_iso" {
-  content_type = "iso"
-  datastore_id = var.iso_datastore
-  node_name    = var.node_name
-  file_name    = "talos-${var.talos_version}-nocloud-amd64.iso"
-  url          = "https://factory.talos.dev/image/${var.talos_schematic}/${var.talos_version}/nocloud-amd64.iso"
-
-  # Keep prevent_destroy only on the OPNsense VM and the network bridge — those are your pets. 
-  # The Talos VM and ISO are cattle.
+# Preserve previous resource address
+moved {
+  from = proxmox_virtual_environment_vm.talos_vm
+  to   = proxmox_virtual_environment_vm.this
 }
 
-resource "proxmox_virtual_environment_vm" "talos_vm" {
+# Track changes to the Talos installation image.
+# This does NOT destroy the existing VM.
+resource "terraform_data" "generation" {
+  triggers_replace = [
+    var.talos_version,
+    var.iso_file_id
+  ]
+}
+
+resource "proxmox_virtual_environment_vm" "this" {
   name      = var.vm_name
   vm_id     = var.vm_id
   node_name = var.node_name
 
-  description = "Talos Control Plane — Mgmt VLAN ${var.vlan_id}"
-  tags        = ["talos", "control-plane", "kubernetes", "terraform"]
+  description = "Talos control plane (VLAN ${var.vlan_id}), managed by OpenTofu"
+
+  tags = [
+    "talos",
+    "control-plane",
+    "kubernetes",
+    "terraform"
+  ]
 
   machine    = "q35"
   bios       = "seabios"
-  boot_order = ["scsi0", "ide3"]
+  boot_order = ["scsi0", "ide2"]
 
-  started         = false
+  started         = true
   stop_on_destroy = true
 
-  lifecycle {
-    # prevent_destroy = true
-    ignore_changes  = [started]
-  }
-
   agent {
-    enabled = true
+    enabled = false
   }
 
   cpu {
-    cores = 4
+    cores = var.cpu_cores
     type  = "x86-64-v2-AES"
   }
 
   memory {
-    dedicated = 8192
+    dedicated = var.memory_mb
   }
 
   disk {
-    datastore_id = var.datastore
+    datastore_id = var.vm_datastore_id
     interface    = "scsi0"
-    size         = 100
+    size         = var.disk_size_gb
     iothread     = true
     discard      = "on"
     file_format  = "raw"
   }
 
   cdrom {
-    file_id   = proxmox_download_file.talos_iso.id
-    interface = "ide3"
+    file_id   = var.iso_file_id
+    interface = "ide2"
   }
 
   network_device {
@@ -73,7 +79,4 @@ resource "proxmox_virtual_environment_vm" "talos_vm" {
   }
 
   serial_device {}
-
-  # Ensure the ISO is fully downloaded before the VM is created.
-  depends_on = [proxmox_download_file.talos_iso]
 }
