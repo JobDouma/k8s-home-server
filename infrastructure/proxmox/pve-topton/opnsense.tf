@@ -2,7 +2,7 @@
 # This MUST be done before any apply that includes this resource.
 import {
   to = proxmox_virtual_environment_vm.opnsense
-  id = "pve1/100"   # <node_name>/<vm_id>
+  id = "pve1/100" # <node_name>/<vm_id>
 }
 
 resource "proxmox_virtual_environment_vm" "opnsense" {
@@ -31,7 +31,7 @@ resource "proxmox_virtual_environment_vm" "opnsense" {
   }
 
   efi_disk {
-    datastore_id = var.datastore
+    datastore_id = var.vm_datastore_id
     type         = "4m"
   }
 
@@ -55,7 +55,7 @@ resource "proxmox_virtual_environment_vm" "opnsense" {
   }
 
   disk {
-    datastore_id = var.datastore
+    datastore_id = var.vm_datastore_id
     interface    = "scsi0"
     size         = 16
     iothread     = true
