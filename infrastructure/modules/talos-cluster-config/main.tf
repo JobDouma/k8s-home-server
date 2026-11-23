@@ -83,7 +83,7 @@ data "talos_client_configuration" "this" {
   nodes                = local.control_plane_ips    # talosctl can target any node
 }
 
-data "talos_cluster_kubeconfig" "this" {
+resource "talos_cluster_kubeconfig" "this" {
   depends_on = [talos_machine_bootstrap.this]
 
   client_configuration = talos_machine_secrets.this.client_configuration

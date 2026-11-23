@@ -1,3 +1,5 @@
+# infrastructure/proxmox/pve-topton/main.tf
+
 locals {
   talos_nodes = {
     "cp-1" = {
@@ -28,11 +30,11 @@ module "talos_vms" {
 module "talos_config" {
   source = "../../modules/talos-cluster-config"
 
-  cluster_name      = "talos-cp-1"
-  control_plane_ips = [local.talos_nodes["cp-1"].ip]
-  cluster_endpoint  = "https://${local.talos_nodes["cp-1"].ip}:6443"
-  talos_version     = var.talos_version
-  install_disk      = "/dev/sda"
+  cluster_name        = "talos-cp-1"
+  control_plane_nodes = local.talos_nodes          # ✅ correct type: map(object({ ip, mac }))
+  # cluster_vip      = "10.10.10.29"               # optional; omit to use the first node IP as endpoint
+  talos_version       = var.talos_version
+  install_disk        = "/dev/sda"
 
   depends_on = [module.talos_vms]
 }

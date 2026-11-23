@@ -1,6 +1,6 @@
 output "kubeconfig" {
   description = "Raw kubeconfig for kubectl."
-  value       = data.talos_cluster_kubeconfig.this.kubeconfig_raw
+  value       = talos_cluster_kubeconfig.this.kubeconfig_raw
   sensitive   = true
 }
 
