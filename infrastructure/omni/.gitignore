@@ -1,7 +1,0 @@
-secrets/
-.env
-.env.*
-*.bak
-cluster-template.yaml
-garage-config/garage.toml
-certs/
