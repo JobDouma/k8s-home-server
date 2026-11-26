@@ -1,14 +1,12 @@
-# Import the already-running OPNsense VM (VM ID 100) into Terraform state.
-# This MUST be done before any apply that includes this resource.
 import {
   to = proxmox_virtual_environment_vm.opnsense
-  id = "pve1/100" # <node_name>/<vm_id>
+  id = "pve1/100"
 }
 
 resource "proxmox_virtual_environment_vm" "opnsense" {
   name      = "opnsense"
   vm_id     = 100
-  node_name = var.proxmox_node
+  node_name = "pve1"
 
   description = "OPNsense Router — managed by Terraform"
   tags        = ["router", "opnsense", "terraform"]
@@ -35,16 +33,14 @@ resource "proxmox_virtual_environment_vm" "opnsense" {
     type         = "4m"
   }
 
-  # NIC 1: WAN — uses the EXISTING vmbr0 (bridged to nic0).
   network_device {
     bridge   = "vmbr0"
     model    = "virtio"
     firewall = true
   }
 
-  # NIC 2: LAN trunk on the new VLAN-aware bridge.
   network_device {
-    bridge   = proxmox_network_linux_bridge.lan.name
+    bridge   = proxmox_network_linux_bridge.lan["pve1"].name
     model    = "virtio"
     firewall = false
   }
@@ -66,12 +62,5 @@ resource "proxmox_virtual_environment_vm" "opnsense" {
 
   lifecycle {
     prevent_destroy = true
-
-    # After the import, if the plan shows diffs on MAC addresses
-    # (they are assigned by Proxmox, not by Terraform), uncomment:
-    # ignore_changes = [
-    #   network_device[0].mac_address,
-    #   network_device[1].mac_address,
-    # ]
   }
 }
