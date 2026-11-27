@@ -1,21 +1,33 @@
+# .sops.yaml
+# Rule order is significant: SOPS uses the FIRST matching path_regex.
+# Place the most specific rules first; end with a catch-all if desired.
+
 creation_rules:
-  # Cosign private keys
-  - path_regex: '^cosign\.key(\.sops)?$'
-    age: age18zx3u4cnpe3y55rruzp5v4uregm0kxe2ge6wzle54nu9vlxlndmqweckld
+  # ── Runbooks (plaintext, no encryption) ──────────────────────
+  # If you never want these encrypted, remove this rule entirely.
+  # As written, it would encrypt runbooks. Delete it if that is
+  # not what you want.
+  # - path_regex: ^runbooks/.*\.ya?ml$
+  #   age: age156h3vmsrtye8590hgdx6kaqeymwyu5qtsw7vq664lyf3jt5am9asvkp4gf
 
-  # Kubernetes Secret manifests
-  - path_regex: '.*secret(\.yaml|\.yml)$'
+  # ── Kubernetes Secret manifests ───────────────────────────────
+  # Matches files whose name ends in "secret" (singular or plural),
+  # or that contain ".secret." anywhere. Narrower than your original
+  # pattern, so unrelated YAML is not accidentally encrypted.
+  - path_regex: '(^|/)secret(s)?\.ya?ml$|\.secret\.ya?ml$'
     encrypted_regex: '^(data|stringData)$'
-    age: age18zx3u4cnpe3y55rruzp5v4uregm0kxe2ge6wzle54nu9vlxlndmqweckld
+    age: age156h3vmsrtye8590hgdx6kaqeymwyu5qtsw7vq664lyf3jt5am9asvkp4gf
 
-  # Full-file encrypted configs
-  - path_regex: '.*config\.sops\.ya?ml$'
-    age: age18zx3u4cnpe3y55rruzp5v4uregm0kxe2ge6wzle54nu9vlxlndmqweckld
+  # ── Fully encrypted config files ──────────────────────────────
+  - path_regex: '\.sops\.ya?ml$'
+    age: age156h3vmsrtye8590hgdx6kaqeymwyu5qtsw7vq664lyf3jt5am9asvkp4gf
 
-  # Runbooks
-  - path_regex: '^runbooks/.*\.ya?ml$'
-    age: age18zx3u4cnpe3y55rruzp5v4uregm0kxe2ge6wzle54nu9vlxlndmqweckld
+  # ── Cosign private keys ───────────────────────────────────────
+  - path_regex: '(^|/)cosign\.key(\.sops)?$'
+    age: age156h3vmsrtye8590hgdx6kaqeymwyu5qtsw7vq664lyf3jt5am9asvkp4gf
 
-  # Any other *.sops.yaml file
-  - path_regex: '.*\.sops\.ya?ml$'
-    age: age18zx3u4cnpe3y55rruzp5v4uregm0kxe2ge6wzle54nu9vlxlndmqweckld
+  # ── Catch-all (optional) ──────────────────────────────────────
+  # If you want any other .sops.yaml file to be encrypted.
+  # Remove if you prefer "no matching rule" errors for unexpected files.
+  # - path_regex: '.*'
+  #   age: age156h3vmsrtye8590hgdx6kaqeymwyu5qtsw7vq664lyf3jt5am9asvkp4gf
