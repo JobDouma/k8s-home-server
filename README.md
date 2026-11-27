@@ -104,7 +104,7 @@ cd infrastructure/omni
 
 1. Create a namespace if needed and a HelmRelease using the `bjw-s/app-template` chart.
 2. Add the required Certificate and IngressRoute resources to expose the service through Traefik.
-3. Add the new files to `apps/talos-home/kustomization.yaml` under the appropriate category.
+3. Add the new files to `apps/kustomization.yaml` under the appropriate category.
 4. Commit and push — Flux will apply the changes automatically.
 
 ## Network Policies

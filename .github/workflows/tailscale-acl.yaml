@@ -4,11 +4,11 @@ on:
   push:
     branches: [main]
     paths:
-      - apps/talos-home/tailscale/acl.json
+      - apps/tailscale/acl.json
   pull_request:
     branches: [main]
     paths:
-      - apps/talos-home/tailscale/acl.json
+      - apps/tailscale/acl.json
   workflow_dispatch: # allows manual trigger from GitHub Actions UI
 
 jobs:
@@ -36,7 +36,7 @@ jobs:
           oauth-client-id: ${{ secrets.TS_OAUTH_CLIENT_ID }}
           oauth-secret: ${{ secrets.TS_OAUTH_SECRET }}
           tailnet: ${{ secrets.TS_TAILNET }}
-          policy-file: apps/talos-home/tailscale/acl.json
+          policy-file: apps/tailscale/acl.json
           action: apply
 
       - name: Test ACL (dry-run on PRs)
@@ -46,5 +46,5 @@ jobs:
           oauth-client-id: ${{ secrets.TS_OAUTH_CLIENT_ID }}
           oauth-secret: ${{ secrets.TS_OAUTH_SECRET }}
           tailnet: ${{ secrets.TS_TAILNET }}
-          policy-file: apps/talos-home/tailscale/acl.json
+          policy-file: apps/tailscale/acl.json
           action: test
