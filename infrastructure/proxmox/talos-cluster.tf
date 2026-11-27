@@ -13,15 +13,12 @@ locals {
     "https://${local.talos_nodes[local.bootstrap_node].ip}:6443"
   )
 
-  # Static IP + hostname + default route (+ VIP if set) baked into each
-  # node's machine config. Makes nodes self-contained after install; DHCP
-  # from OPNsense is only used for the initial maintenance-mode boot.
   talos_node_patches = {
     for k, v in local.talos_nodes : k => [
+      # Static IP + default route (+ optional VIP)
       yamlencode({
         machine = {
           network = {
-            hostname = k
             interfaces = [merge(
               {
                 deviceSelector = { driver = "virtio_net" }
@@ -36,6 +33,14 @@ locals {
             )]
           }
         }
+      }),
+
+      # Hostname via dedicated document with auto-generation disabled.
+      yamlencode({
+        apiVersion = "v1alpha1"
+        kind       = "HostnameConfig"
+        hostname   = k
+        auto       = "off"
       }),
     ]
   }
@@ -70,6 +75,11 @@ resource "talos_machine" "this" {
 
   kubeconfig_wo = ephemeral.talos_cluster_kubeconfig.drain.kubeconfig_raw
 
+  # Keep false while the cluster is being (re)built — the provider would try
+  # to cordon/drain nodes that are not yet in a running cluster. For day-2
+  # OS upgrades on a healthy cluster you can temporarily flip this to true.
+  drain_on_upgrade = false
+
   depends_on = [
     proxmox_virtual_environment_vm.talos,
   ]
@@ -79,9 +89,8 @@ resource "talos_machine" "this" {
   }
 }
 
-# Runs after Talos is installed on each node, then flips Proxmox's agent
-# flag on and reboots the VM. The qemu-guest-agent extension in Talos
-# will start on this boot and populate IPs/hostnames in the UI.
+# After Talos is installed, flip Proxmox's agent flag on and reboot the VM
+# so the qemu-guest-agent extension starts and populates IP/hostname in the UI.
 resource "terraform_data" "enable_agent" {
   for_each = local.talos_nodes
 
@@ -106,7 +115,10 @@ resource "terraform_data" "enable_agent" {
 }
 
 resource "talos_machine_bootstrap" "this" {
-  depends_on = [talos_machine.this]
+  depends_on = [
+    talos_machine.this,
+    terraform_data.enable_agent,
+  ]
 
   client_configuration = talos_machine_secrets.this.client_configuration
   node                 = local.talos_nodes[local.bootstrap_node].ip
