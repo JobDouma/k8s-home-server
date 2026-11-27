@@ -2,257 +2,36 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
 resources:
-  # ──────────────────────────────────────
-  # Blocky (DNS)
-  # ──────────────────────────────────────
-  - blocky/namespace.yaml
-  - blocky/configmap.yaml
-  - blocky/helmrepository.yaml
-  - blocky/helmrelease.yaml
-  - blocky/servicemonitor.yaml
-  - blocky/ingressroute.yaml
-  - blocky/certificate.yaml
-  - blocky/redis.yaml
+  - blocky
+  - flaresolverr
+  - prowlarr
 
-  # ──────────────────────────────────────
-  # Jellyfin
-  # ──────────────────────────────────────
-  - jellyfin/deployment.yaml
-  - jellyfin/ingressroute.yaml
-  - jellyfin/certificate.yaml
-  - jellyfin/pvc.yaml
+  - jellyfin
+  - jellyseerr
+  - qbittorrent
+  - sonarr
+  - radarr
 
-  # ──────────────────────────────────────
-  # qBittorrent
-  # ──────────────────────────────────────
-  - qbittorrent/helmrelease.yaml
-  - qbittorrent/secret.yaml
-  - qbittorrent/ingressroute.yaml
-  - qbittorrent/certificate.yaml
-  - qbittorrent/pvc.yaml
+  - freshrss
+  - joplin
+  - dashy
 
-  # ──────────────────────────────────────
-  # monitoring / VictoriaMetrics (lightweight Prometheus)
-  # ──────────────────────────────────────
-  - victoria-metrics/namespace.yaml
-  - victoria-metrics/helmrepository.yaml
-  - victoria-metrics/helmrelease.yaml
-  - victoria-metrics/ingressroute.yaml
-  - victoria-metrics/alertmanager-secret.yaml
+  - victoria-metrics
+  - grafana
+  - promtail
+  - loki
 
-  # ──────────────────────────────────────
-  # Grafana
-  # ──────────────────────────────────────
-  - grafana/ingressroute.yaml
-  - grafana/admin-secret.yaml
-  - grafana/certificate.yaml
-  - grafana/dashboards/
+  - kyverno
+  - stakater-reloader
+  - renovate
+  - tailscale
+  - truenas-nfs
+  - recyclarr
+  - gotify
+  - falco
+  - immich
 
-  # ──────────────────────────────────────
-  # Promtail
-  # ──────────────────────────────────────
-  - promtail/helmrelease.yaml
-
-  # ──────────────────────────────────────
-  # Loki
-  # ──────────────────────────────────────
-  - loki/helmrepository.yaml
-  - loki/helmrelease.yaml
-  - loki/servicemonitor.yaml
-
-  # ──────────────────────────────────────
-  # Jellyseerr
-  # ──────────────────────────────────────
-  - jellyseerr/helmrelease.yaml
-  - jellyseerr/ingressroute.yaml
-  - jellyseerr/pvc.yaml
-  - jellyseerr/certificate.yaml
-
-  # ──────────────────────────────────────
-  # Network Policies
-  # ──────────────────────────────────────
-  # - networkpolicies/allow-all-kube-system.yaml
-  # - networkpolicies/allow-renovate-egress.yaml
-  # - networkpolicies/allow-dns-from-lan.yaml
-  # - networkpolicies/media-namespace.yaml
-  # - networkpolicies/dns-namespace.yaml
-  # - networkpolicies/networking-namespace.yaml
-  # - networkpolicies/monitoring-namespace.yaml
-
-  # ──────────────────────────────────────
-  # Sonarr
-  # ──────────────────────────────────────
-  - sonarr/pvc.yaml
-  - sonarr/helmrelease.yaml
-  - sonarr/ingressroute.yaml
-  - sonarr/certificate.yaml
-
-  # ──────────────────────────────────────
-  # Radarr
-  # ──────────────────────────────────────
-  - radarr/pvc.yaml
-  - radarr/helmrelease.yaml
-  - radarr/ingressroute.yaml
-  - radarr/certificate.yaml
-
-  # ──────────────────────────────────────
-  # Renovate
-  # ──────────────────────────────────────
-  - renovate/namespace.yaml
-  - renovate/secret.yaml
-  - renovate/helmrepository.yaml
-  - renovate/helmrelease.yaml
-
-  # ──────────────────────────────────────
-  # Dashy
-  # ──────────────────────────────────────
-  - dashy/configmap.yaml
-  - dashy/helmrelease.yaml
-  - dashy/ingressroute.yaml
-  - dashy/certificate.yaml
-
-  # ──────────────────────────────────────
-  # Prowlarr
-  # ──────────────────────────────────────
-  - prowlarr/pvc.yaml
-  - prowlarr/helmrelease.yaml
-  - prowlarr/ingressroute.yaml
-  - prowlarr/certificate.yaml
-
-  # ──────────────────────────────────────
-  # Reloader
-  # ──────────────────────────────────────
-  - stakater-reloader/helmrepository.yaml
-  - stakater-reloader/helmrelease.yaml
-  - stakater-reloader/servicemonitor.yaml
-
-  # ──────────────────────────────────────
-  # Recyclarr
-  # ──────────────────────────────────────
-  - recyclarr/configmap.yaml
-  - recyclarr/secret.yaml
-  - recyclarr/cronjob.yaml
-
-  # ──────────────────────────────────────
-  # Joplin
-  # ──────────────────────────────────────
-  - joplin/namespace.yaml
-  - joplin/secret.yaml
-  - joplin/hr-postgres.yaml
-  - joplin/hr-joplin.yaml
-  - joplin/ingressroute.yaml
-  - joplin/certificate.yaml
-  - joplin/networkpolicy.yaml
-
-  # ──────────────────────────────────────
-  # TrueNAS NFS dynamic provisioner
-  # ──────────────────────────────────────
-  - truenas-nfs/helmrepository.yaml
-  - truenas-nfs/helmrelease.yaml
-
-  # ──────────────────────────────────────
-  # FreshRSS
-  # ──────────────────────────────────────
-  - freshrss/namespace.yaml
-  - freshrss/secret.yaml
-  - freshrss/opml-configmap.yaml
-  - freshrss/init-configmap.yaml
-  - freshrss/helmrelease.yaml
-  - freshrss/ingressroute.yaml
-  - freshrss/certificate.yaml
-  - freshrss/networkpolicy.yaml
-
-  # ──────────────────────────────────────
-  # Falco
-  # ──────────────────────────────────────
-  - falco/namespace.yaml
-  - falco/helmrepository.yaml
-  - falco/helmrelease.yaml
-  - falco/falcosidekick-helmrelease.yaml
-  - falco/falcosidekick-secret.yaml
-  - falco/ingressroute.yaml
-  - falco/servicemonitor.yaml
-  - falco/servicemonitor-sidekick.yaml
-  - falco/certificate.yaml
-  - falco/configmap.yaml
-  # - falco/networkpolicy.yaml
-
-  # ──────────────────────────────────────
-  # gotify
-  # ──────────────────────────────────────
-  - gotify/namespace.yaml
-  - gotify/secret.yaml
-  - gotify/helmrelease.yaml
-  - gotify/certificate.yaml
-  - gotify/ingressroute.yaml
-  - gotify/networkpolicy.yaml
-  - gotify/flux-notifications.yaml
-  - gotify/flux-token-secret.yaml
-
-
-  # ──────────────────────────────────────
-  # Tailscale
-  # ──────────────────────────────────────
-  - tailscale/namespace.yaml
-  - tailscale/helmrepository.yaml
-  - tailscale/helmrelease.yaml
-  - tailscale/connector.yaml
-  - tailscale/servicemonitor.yaml
-  - tailscale/secret.yaml
-  - tailscale/ingress.yaml
-  - tailscale/proxyclass.yaml
-  - tailscale/proxygroup.yaml
-  - tailscale/rbac.yaml
-
-  # ──────────────────────────────────────
-  # Immich
-  # ──────────────────────────────────────
-  - immich/namespace.yaml
-  - immich/secret.yaml
-  - immich/certificate.yaml
-  - immich/helmrelease.yaml
-  - immich/ingressroute.yaml
-  # - immich/networkpolicy.yaml
-  - immich/servicemonitor.yaml
-  - immich/serverstransport.yaml
-
-  # ──────────────────────────────────────
-  # Uptime Kuma
-  # ──────────────────────────────────────
-  # - uptime-kuma/namespace.yaml
-  # - uptime-kuma/secret.yaml
-  # - uptime-kuma/certificate.yaml
-  # - uptime-kuma/configmap.yaml
-  # - uptime-kuma/helmrelease.yaml
-  # - uptime-kuma/ingressroute.yaml
-  # - uptime-kuma/pvc.yaml
-  
-  # ──────────────────────────────────────
-  # Kyverno
-  # ──────────────────────────────────────
-  - kyverno/namespace.yaml
-  - kyverno/helmrepository.yaml
-  - kyverno/helmrelease.yaml
-  - kyverno/cosign-secret.yaml
-  - kyverno/networkpolicy.yaml 
-  - kyverno/policies/block-latest-tag.yaml
-  - kyverno/policies/require-resource-limits.yaml    
-  - kyverno/policies/disallow-privilege-escalation.yaml
-
-
-  # ──────────────────────────────────────
-  # Argus (WatchYourPorts)
-  # ──────────────────────────────────────
-  # - argus/namespace.yaml
-  # - argus/helmrelease.yaml
-  # - argus/ingressroute.yaml
-  # - argus/certificate.yaml
-  # - argus/configmap.yaml
-
-
-  # ──────────────────────────────────────
-  # Flaresolverr
-  # ──────────────────────────────────────
-  - flaresolverr/namespace.yaml
-  - flaresolverr/helmrelease.yaml
-  - flaresolverr/networkpolicy.yaml
+  # Enable when ready
+  # - argus
+  # - networkpolicies
+  # - uptime-kuma
