@@ -1,4 +1,4 @@
-# apps/talos-home/uptime-kuma/pvc.yaml
+# apps/uptime-kuma/pvc.yaml
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:

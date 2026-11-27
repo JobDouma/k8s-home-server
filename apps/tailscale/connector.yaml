@@ -6,7 +6,7 @@ metadata:
   labels:
     app.kubernetes.io/managed-by: flux
 spec:
-  hostnamePrefix: talos-home-subnet
+  hostnamePrefix: apps-subnet
 
   # 2 active subnet router replicas — one can restart without dropping LAN access
   replicas: 2

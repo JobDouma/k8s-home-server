@@ -7,7 +7,7 @@ spec:
   dependsOn:
     - name: infrastructure
   interval: 10m
-  path: ./apps/talos-home
+  path: ./apps
   prune: true
   sourceRef:
     kind: GitRepository

@@ -1,4 +1,4 @@
-# ~/k8s-home-server/apps/talos-home/monitoring/dashboards/kustomization.yaml
+# ~/k8s-home-server/apps/monitoring/dashboards/kustomization.yaml
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
