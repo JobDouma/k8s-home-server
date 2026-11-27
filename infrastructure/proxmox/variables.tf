@@ -24,9 +24,8 @@ variable "cluster_name" {
 }
 
 variable "talos_version" {
-  description = "Talos OS version used for ISO download and as the config-generation contract."
-  type        = string
-  default     = "v1.14.6"
+  type    = string
+  default = "v1.14.6"
 }
 
 variable "talos_extensions" {
@@ -35,7 +34,18 @@ variable "talos_extensions" {
 }
 
 variable "cluster_vip" {
-  description = "Optional floating VIP for the Kubernetes API. Null = use bootstrap node IP."
+  type    = string
+  default = null
+}
+
+variable "network_gateway" {
+  description = "Default gateway for Talos control-plane nodes (OPNsense LAN interface)."
   type        = string
-  default     = null
+  default     = "10.10.10.1"
+}
+
+variable "vm_revision" {
+  description = "Bump this to force full recreation of every Talos VM, machine and agent step."
+  type        = number
+  default     = 1
 }

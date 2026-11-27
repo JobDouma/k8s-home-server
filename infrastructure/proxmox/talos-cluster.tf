@@ -13,18 +13,32 @@ locals {
     "https://${local.talos_nodes[local.bootstrap_node].ip}:6443"
   )
 
-  vip_patch = var.cluster_vip != null ? [
-    yamlencode({
-      machine = {
-        network = {
-          interfaces = [{
-            deviceSelector = { driver = "virtio_net" }
-            vip            = { ip = var.cluster_vip }
-          }]
+  # Static IP + hostname + default route (+ VIP if set) baked into each
+  # node's machine config. Makes nodes self-contained after install; DHCP
+  # from OPNsense is only used for the initial maintenance-mode boot.
+  talos_node_patches = {
+    for k, v in local.talos_nodes : k => [
+      yamlencode({
+        machine = {
+          network = {
+            hostname = k
+            interfaces = [merge(
+              {
+                deviceSelector = { driver = "virtio_net" }
+                dhcp           = false
+                addresses      = ["${v.ip}/24"]
+                routes = [{
+                  network = "0.0.0.0/0"
+                  gateway = var.network_gateway
+                }]
+              },
+              var.cluster_vip != null ? { vip = { ip = var.cluster_vip } } : {}
+            )]
+          }
         }
-      }
-    })
-  ] : []
+      }),
+    ]
+  }
 }
 
 data "talos_machine_configuration" "this" {
@@ -36,96 +50,82 @@ data "talos_machine_configuration" "this" {
   machine_secrets  = talos_machine_secrets.this.machine_secrets
   talos_version    = var.talos_version
 
-  config_patches = local.vip_patch
+  config_patches = local.talos_node_patches[each.key]
 }
 
-# Ephemeral kubeconfig used only for drain/uncordon during in-place upgrades.
-# It never enters state, which is exactly what talos_machine wants.
 ephemeral "talos_cluster_kubeconfig" "drain" {
   machine_secrets = talos_machine_secrets.this.machine_secrets
   cluster_name    = var.cluster_name
   endpoint        = local.cluster_endpoint
 }
 
-resource "talos_machine" "cp_topton" {
-  depends_on = [
-    proxmox_virtual_environment_vm.talos["cp-topton"],
-  ]
+resource "talos_machine" "this" {
+  for_each = local.talos_nodes
 
-  node = local.talos_nodes["cp-topton"].ip
+  node = each.value.ip
 
   client_configuration  = talos_machine_secrets.this.client_configuration
-  machine_configuration = data.talos_machine_configuration.this["cp-topton"].machine_configuration
+  machine_configuration = data.talos_machine_configuration.this[each.key].machine_configuration
   image                 = local.talos_installer_image
 
   kubeconfig_wo = ephemeral.talos_cluster_kubeconfig.drain.kubeconfig_raw
 
-  # Keep prevent_destroy for routine operations. Remove it only when you
-  # intentionally replace this node (disaster recovery / cattle redeploy).
+  depends_on = [
+    proxmox_virtual_environment_vm.talos,
+  ]
+
   lifecycle {
-    prevent_destroy = true
+    replace_triggered_by = [terraform_data.vm_revision]
   }
 }
 
-resource "talos_machine" "cp_lenovo" {
-  depends_on = [
-    proxmox_virtual_environment_vm.talos["cp-lenovo"],
+# Runs after Talos is installed on each node, then flips Proxmox's agent
+# flag on and reboots the VM. The qemu-guest-agent extension in Talos
+# will start on this boot and populate IPs/hostnames in the UI.
+resource "terraform_data" "enable_agent" {
+  for_each = local.talos_nodes
+
+  depends_on = [talos_machine.this]
+
+  triggers_replace = [
+    terraform_data.vm_revision.id,
+    proxmox_virtual_environment_vm.talos[each.key].id,
   ]
 
-  node = local.talos_nodes["cp-lenovo"].ip
-
-  client_configuration  = talos_machine_secrets.this.client_configuration
-  machine_configuration = data.talos_machine_configuration.this["cp-lenovo"].machine_configuration
-  image                 = local.talos_installer_image
-
-  kubeconfig_wo = ephemeral.talos_cluster_kubeconfig.drain.kubeconfig_raw
-
-  lifecycle {
-    prevent_destroy = true
-  }
-}
-
-resource "talos_machine" "cp_hp1" {
-  depends_on = [
-    proxmox_virtual_environment_vm.talos["cp-hp1"],
-  ]
-
-  node = local.talos_nodes["cp-hp1"].ip
-
-  client_configuration  = talos_machine_secrets.this.client_configuration
-  machine_configuration = data.talos_machine_configuration.this["cp-hp1"].machine_configuration
-  image                 = local.talos_installer_image
-
-  kubeconfig_wo = ephemeral.talos_cluster_kubeconfig.drain.kubeconfig_raw
-
-  lifecycle {
-    prevent_destroy = true
+  provisioner "local-exec" {
+    interpreter = ["/bin/bash", "-c"]
+    command     = <<-EOT
+      set -eu
+      HOST="${local.proxmox_nodes[each.value.proxmox_node].management_ip}"
+      VMID="${each.value.vm_id}"
+      ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null \
+          root@$HOST \
+          "qm set $VMID --agent enabled=1 && qm reboot $VMID"
+    EOT
   }
 }
 
 resource "talos_machine_bootstrap" "this" {
-  depends_on = [
-    talos_machine.cp_topton,
-    talos_machine.cp_lenovo,
-    talos_machine.cp_hp1,
-  ]
+  depends_on = [talos_machine.this]
 
   client_configuration = talos_machine_secrets.this.client_configuration
   node                 = local.talos_nodes[local.bootstrap_node].ip
+
+  lifecycle {
+    replace_triggered_by = [terraform_data.vm_revision]
+  }
 }
 
 data "talos_client_configuration" "this" {
   depends_on = [talos_machine_bootstrap.this]
 
-  cluster_name = var.cluster_name
-
+  cluster_name         = var.cluster_name
   client_configuration = talos_machine_secrets.this.client_configuration
 
   endpoints = [for n in local.talos_nodes : n.ip]
   nodes     = [for n in local.talos_nodes : n.ip]
 }
 
-# Managed kubeconfig for local_file.kubeconfig and outputs.
 resource "talos_cluster_kubeconfig" "this" {
   depends_on = [talos_machine_bootstrap.this]
 
