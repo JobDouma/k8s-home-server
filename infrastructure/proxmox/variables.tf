@@ -49,3 +49,41 @@ variable "vm_revision" {
   type        = number
   default     = 1
 }
+
+# ── Flux bootstrap ──────────────────────────────────────────────
+
+variable "github_token" {
+  description = "GitHub PAT with repo:read+write scope for Flux bootstrap"
+  type        = string
+  sensitive   = true
+}
+
+variable "github_owner" {
+  description = "GitHub user or organisation"
+  type        = string
+  default     = "JobDouma"
+}
+
+variable "github_repo" {
+  description = "GitHub repository name"
+  type        = string
+  default     = "k8s-home-server"
+}
+
+variable "github_branch" {
+  description = "Branch Flux syncs from"
+  type        = string
+  default     = "main"
+}
+
+variable "flux_path" {
+  description = "Path inside the git repo where Flux cluster config lives"
+  type        = string
+  default     = "clusters/talos-home"
+}
+
+variable "flux_version" {
+  description = "Flux version to install"
+  type        = string
+  default     = "v2.4.0"
+}

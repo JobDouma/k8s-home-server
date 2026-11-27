@@ -14,6 +14,10 @@ terraform {
       source  = "hashicorp/local"
       version = "~> 2.5"
     }
+    flux = {
+      source  = "fluxcd/flux"
+      version = "~> 1.4"
+    }
   }
 }
 
