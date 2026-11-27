@@ -15,7 +15,7 @@ locals {
 
   talos_node_patches = {
     for k, v in local.talos_nodes : k => [
-      # Static IP + default route (+ optional VIP)
+      # 1. Static IP / route (existing)
       yamlencode({
         machine = {
           network = {
@@ -35,12 +35,23 @@ locals {
         }
       }),
 
-      # Hostname via dedicated document with auto-generation disabled.
+      # 2. Hostname (existing)
       yamlencode({
         apiVersion = "v1alpha1"
         kind       = "HostnameConfig"
         hostname   = k
         auto       = "off"
+      }),
+
+      # 3. Remove the control-plane NoSchedule taint
+      yamlencode({
+        apiVersion = "v1alpha1"
+        kind       = "KubeNodeConfig"
+        taints = {
+          "node-role.kubernetes.io/control-plane" = {
+            "$patch" = "delete"
+          }
+        }
       }),
     ]
   }
