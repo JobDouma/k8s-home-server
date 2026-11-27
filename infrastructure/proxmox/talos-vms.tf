@@ -23,8 +23,10 @@ resource "proxmox_virtual_environment_vm" "talos" {
 
   # Do NOT enable the Proxmox agent here. The Talos qemu-guest-agent
   # extension doesn't come up in maintenance mode, so the provider would
-  # hang waiting for a reply. Instead we enable the virtio-serial device
-  # AFTER Talos is installed, via terraform_data.enable_agent.
+  # hang waiting for a reply. terraform_data.enable_agent sets this on
+  # AFTER Talos is installed — and ignore_changes prevents the next
+  # apply from reverting it back to false (which would reboot the VM
+  # and leave the guest agent stranded).
   agent {
     enabled = false
   }
@@ -66,6 +68,8 @@ resource "proxmox_virtual_environment_vm" "talos" {
   ]
 
   lifecycle {
-    replace_triggered_by = [terraform_data.vm_revision]
+    prevent_destroy       = false
+    replace_triggered_by  = [terraform_data.vm_revision]
+    ignore_changes        = [agent]
   }
 }
