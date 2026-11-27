@@ -86,3 +86,7 @@ terraform.tfstate*
 talosconfig
 kubeconfig
 terraform.tfvars
+
+# .gitignore
+*.agekey
+age.agekey

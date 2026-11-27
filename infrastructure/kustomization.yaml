@@ -44,9 +44,10 @@ resources:
   - cert-manager/namespace.yaml
   - cert-manager/helmrepository.yaml
   - cert-manager/helmrelease.yaml
-  - cert-manager/ca-certificate.yaml
-  - cert-manager/clusterissuer-ca.yaml
-  - cert-manager/clusterissuer-selfsigned.yaml
+
+  - certificates/00-selfsigning-issuer.yaml
+  - certificates/10-homelab-ca.yaml
+  - certificates/20-homelab-ca-issuer.yaml
 
   - local-path-storage
 

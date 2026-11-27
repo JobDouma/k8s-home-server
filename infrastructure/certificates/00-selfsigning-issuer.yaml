@@ -1,0 +1,7 @@
+# infrastructure/certificates/00-selfsigning-issuer.yaml
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: selfsigned-bootstrap
+spec:
+  selfSigned: {}

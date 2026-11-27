@@ -6,4 +6,6 @@ kind: Kustomization
 resources:
   - infrastructure.yaml
   - apps.yaml
+  - cert-manager.yaml
+  - certificates.yaml
   - flux-system

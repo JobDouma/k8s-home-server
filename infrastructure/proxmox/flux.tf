@@ -16,6 +16,7 @@ provider "flux" {
 resource "flux_bootstrap_git" "this" {
   depends_on = [
     talos_machine_bootstrap.this,
+    kubernetes_secret.sops_age,
     local_file.kubeconfig,
   ]
 
@@ -32,4 +33,17 @@ resource "flux_bootstrap_git" "this" {
     "image-reflector-controller",
     "image-automation-controller",
   ]
+}
+
+resource "kubernetes_secret" "sops_age" {
+  depends_on = [talos_machine_bootstrap.this]
+
+  metadata {
+    name      = "sops-age"
+    namespace = "flux-system"
+  }
+
+  data = {
+    "age.agekey" = file("${path.module}/age.agekey")
+  }
 }
